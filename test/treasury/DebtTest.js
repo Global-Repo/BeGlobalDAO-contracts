@@ -7,7 +7,7 @@ const {
 } = require("ethers");
 const { advanceBlock } = require("../utils/advancement");
 
-describe.only('Treasury', async () => {
+describe('Treasury', async () => {
 
     const LARGE_APPROVAL = '100000000000000000000000000000000';
     const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
