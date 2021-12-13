@@ -4,6 +4,7 @@
 // This solidity function was conflicting w js object property name
 
 const { ethers } = require("hardhat");
+const {TREASURY_ADDRESS, BONDING_CALCULATOR_ADDRESS, DISTRIBUTOR_ADDRESS} = require("./addresses_testnet");
 
 async function main() {
 
@@ -57,70 +58,84 @@ async function main() {
 
     // Initial Bond debt
     const intialBondDebt = '0'
-    console.log(1);
-    // Deploy OHM
-    const OHM = await ethers.getContractFactory('OlympusERC20Token');
-    //const ohm = await OHM.deploy();
-    const ohm = await OHM.attach("0x5A2f4Ddd22c4098420bEf64ecBB8cE5aeB769A41");
-    console.log( "OHM: " + ohm.address );
-    console.log(2);
 
-    // Deploy DAI
-    const DAI = await ethers.getContractFactory('DAI');
-    //const dai = await DAI.deploy( 0 );
-    const dai = await DAI.attach( "0x46fd3695faF3100ec3000f7E1903f9Db94cFBf19" );
-    console.log( "DAI: " + dai.address );
-    console.log(3);
+    await hre.run("verify:verify", {
+        address: OHM_ADDRESS,
+        constructorArguments: [
+        ],
+    });
+    console.log( "OHM verified: " + OHM_ADDRESS );
 
-    // Deploy Frax
-    const Frax = await ethers.getContractFactory('FRAX');
-    //const frax = await Frax.deploy( 0 );
-    const frax = await Frax.attach( "0xa10B7BfD30AFd3Cdad24f48055664935993Ac62A" );
-    console.log( "Frax: " + frax.address );
-    console.log(4);
+    await hre.run("verify:verify", {
+        address: DAI_ADDRESS,
+        constructorArguments: [
+            0
+        ],
+    });
+    console.log( "DAI verified: " + DAI_ADDRESS );
 
-    // Deploy 10,000,000 mock DAI and mock Frax
-    await dai.mint( deployer.address, initialMint );
-    await frax.mint( deployer.address, initialMint );
-    console.log(5);
+    await hre.run("verify:verify", {
+        address: FRAX_ADDRESS,
+        constructorArguments: [
+            0
+        ],
+    });
+    console.log( "FRAX verified: " + FRAX_ADDRESS );
 
-    // Deploy treasury
-    //@dev changed function in treaury from 'valueOf' to 'valueOfToken'... solidity function was coflicting w js object property name
-    const Treasury = await ethers.getContractFactory('MockOlympusTreasury'); 
-    //const treasury = await Treasury.deploy( ohm.address, dai.address, frax.address, 0 );
-    const treasury = await Treasury.attach( "0xDe5B7f31bB96696e462b412e9564E2475767e532" );
-    console.log( "Treasury: " + treasury.address );
-    console.log(6);
+    await hre.run("verify:verify", {
+        address: TREASURY_ADDRESS_ADDRESS,
+        constructorArguments: [
+            OHM_ADDRESS,
+            DAI_ADDRESS,
+            FRAX_ADDRESS,
+            0
+        ],
+    });
+    console.log( "Treasury verified: " + TREASURY_ADDRESS_ADDRESS );
 
-    // Deploy bonding calc
-    const OlympusBondingCalculator = await ethers.getContractFactory('OlympusBondingCalculator');
-    //const olympusBondingCalculator = await OlympusBondingCalculator.deploy( ohm.address );
-    const olympusBondingCalculator = await OlympusBondingCalculator.deploy( "0x3201bA341Ba8792458032b6058eFB3FFdB17FF90" );
-    console.log( "Calc: " + olympusBondingCalculator.address );
-    console.log(7);
+    await hre.run("verify:verify", {
+        address: BONDING_CALCULATOR_ADDRESS,
+        constructorArguments: [
+            OHM_ADDRESS
+        ],
+    });
+    console.log( "Bonding Calculator verified: " + BONDING_CALCULATOR_ADDRESS );
 
-    // Deploy staking distributor
-    const Distributor = await ethers.getContractFactory('Distributor');
-    //const distributor = await Distributor.deploy(treasury.address, ohm.address, epochLengthInBlocks, firstEpochBlock);
-    const distributor = await Distributor.attach("0xc2830f3E10acdEB38D5e43291f7b5F639c936B6F");
-    console.log( "Distributor " + distributor.address);
-    console.log(8);
+    await hre.run("verify:verify", {
+        address: DISTRIBUTOR_ADDRESS,
+        constructorArguments: [
+            TREASURY_ADDRESS,
+            OHM_ADDRESS,
+            epochLengthInBlocks,
+            firstEpochBlock
+        ],
+    });
+    console.log( "Distributor verified: " + DISTRIBUTOR_ADDRESS );
 
-    // Deploy sOHM
-    const SOHM = await ethers.getContractFactory('sOlympus');
-    //const sOHM = await SOHM.deploy();
-    const sOHM = await SOHM.attach("0xe93eA08b69b7e6c6bc12013E1dEf86096e09F3e2");
-    console.log( "sOHM: " + sOHM.address );
-    console.log(9);
+    await hre.run("verify:verify", {
+        address: SOHM_ADDRESS,
+        constructorArguments: [
+            TREASURY_ADDRESS,
+            OHM_ADDRESS,
+            epochLengthInBlocks,
+            firstEpochBlock
+        ],
+    });
+    console.log( "SOHM verified: " + SOHM_ADDRESS );
 
-    // Deploy Staking
-    const Staking = await ethers.getContractFactory('OlympusStaking');
-    //const staking = await Staking.deploy( ohm.address, sOHM.address, epochLengthInBlocks, firstEpochNumber, firstEpochBlock );
-    const staking = await Staking.attach( "0x332C95ceA895B94d56b87c945AB42E80a67615f7" );
-    console.log( "Staking: " + staking.address );
-    console.log(10);
+    await hre.run("verify:verify", {
+        address: STAKING_ADDRESS,
+        constructorArguments: [
+            OHM_ADDRESS,
+            SOHM_ADDRESS,
+            epochLengthInBlocks,
+            firstEpochNumber,
+            firstEpochBlock
+        ],
+    });
+    console.log( "Staking verified: " + STAKING_ADDRESS );
 
-    // Deploy staking warmpup
+    // Deploy staking warmup
     const StakingWarmpup = await ethers.getContractFactory('StakingWarmup');
     //const stakingWarmup = await StakingWarmpup.deploy(staking.address, sOHM.address);
     const stakingWarmup = await StakingWarmpup.attach("0x52d6eb61f15A7259046D6D167e9b7EcA335FD45a");

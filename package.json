@@ -6,6 +6,7 @@
     "test": "test"
   },
   "dependencies": {
+    "@nomiclabs/hardhat-etherscan": "^2.1.8",
     "@openzeppelin/contracts": "^3.4.0"
   },
   "devDependencies": {
