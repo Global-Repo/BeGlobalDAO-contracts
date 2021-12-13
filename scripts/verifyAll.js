@@ -9,7 +9,7 @@ const {TREASURY_ADDRESS, BONDING_CALCULATOR_ADDRESS, DISTRIBUTOR_ADDRESS} = requ
 async function main() {
 
     const [deployer, MockDAO] = await ethers.getSigners();
-    console.log('Deploying contracts with the account: ' + deployer.address);
+    console.log('Verifying contracts with the account: ' + deployer.address);
 
     // Initial staking index
     const initialIndex = '7675210820';
@@ -135,118 +135,49 @@ async function main() {
     });
     console.log( "Staking verified: " + STAKING_ADDRESS );
 
-    // Deploy staking warmup
-    const StakingWarmpup = await ethers.getContractFactory('StakingWarmup');
-    //const stakingWarmup = await StakingWarmpup.deploy(staking.address, sOHM.address);
-    const stakingWarmup = await StakingWarmpup.attach("0x52d6eb61f15A7259046D6D167e9b7EcA335FD45a");
-    console.log( "Staking Warmup " + stakingWarmup.address);
-    console.log(11);
+    await hre.run("verify:verify", {
+        address: STAKING_WARMUP_ADDRESS,
+        constructorArguments: [
+            STAKING_ADDRESS,
+            SOHM_ADDRESS
+        ],
+    });
+    console.log( "StakingWarmup verified: " + STAKING_WARMUP_ADDRESS );
 
-    // Deploy staking helper
-    const StakingHelper = await ethers.getContractFactory('StakingHelper');
-    //const stakingHelper = await StakingHelper.deploy(staking.address, ohm.address);
-    const stakingHelper = await StakingHelper.attach("0x2BFF42bc1b61834ECd769bc1b54E9F6fF84b4a9E");
-    console.log( "Staking Helper " + stakingHelper.address);
-    console.log(12);
+    await hre.run("verify:verify", {
+        address: STAKING_HELPER_ADDRESS,
+        constructorArguments: [
+            STAKING_ADDRESS,
+            OHM_ADDRESS
+        ],
+    });
+    console.log( "StakingHelper verified: " + STAKING_HELPER_ADDRESS );
 
-    // Deploy DAI bond
-    //@dev changed function call to Treasury of 'valueOf' to 'valueOfToken' in BondDepository due to change in Treausry contract
-    const DAIBond = await ethers.getContractFactory('MockOlympusBondDepository');
-    //const daiBond = await DAIBond.deploy(ohm.address, dai.address, treasury.address, MockDAO.address, zeroAddress);
-    const daiBond = await DAIBond.attach("0x634DE04EcbA54EE4BBf3eE1F7C1F807d0752d260");
-    console.log("DAI Bond: " + daiBond.address);
-    console.log(13);
+    await hre.run("verify:verify", {
+        address: DAI_BOND_ADDRESS,
+        constructorArguments: [
+            OHM_ADDRESS,
+            DAI_ADDRESS,
+            TREASURY_ADDRESS,
+            MockDAO.address,
+            zeroAddress
+        ],
+    });
+    console.log( "DAI_BOND_ADDRESS verified: " + DAI_BOND_ADDRESS );
 
-    // Deploy Frax bond
-    //@dev changed function call to Treasury of 'valueOf' to 'valueOfToken' in BondDepository due to change in Treausry contract
-    const FraxBond = await ethers.getContractFactory('MockOlympusBondDepository');
-    //const fraxBond = await FraxBond.deploy(ohm.address, frax.address, treasury.address, MockDAO.address, zeroAddress);
-    const fraxBond = await FraxBond.attach("0x9E259D6200440Ce5e414F3a459056A576644Bcbf");
-    console.log("Frax Bond: " + fraxBond.address);
-    console.log(14);
+    await hre.run("verify:verify", {
+        address: FRAX_BOND_ADDRESS,
+        constructorArguments: [
+            OHM_ADDRESS,
+            FRAX_ADDRESS,
+            TREASURY_ADDRESS,
+            MockDAO.address,
+            zeroAddress
+        ],
+    });
+    console.log( "FRAX_BOND_ADDRESS verified: " + FRAX_BOND_ADDRESS );
 
-    // queue and toggle DAI and Frax bond reserve depositor
-    /*await treasury.queue('0', daiBond.address);
-    await treasury.queue('0', fraxBond.address);
-    await treasury.toggle('0', daiBond.address, zeroAddress);
-    await treasury.toggle('0', fraxBond.address, zeroAddress);
-    console.log(15);
-
-    // Set DAI and Frax bond terms
-    await daiBond.initializeBondTerms(daiBondBCV, bondVestingLength, minBondPrice, maxBondPayout, bondFee, maxBondDebt, intialBondDebt);
-    await fraxBond.initializeBondTerms(fraxBondBCV, bondVestingLength, minBondPrice, maxBondPayout, bondFee, maxBondDebt, intialBondDebt);
-    console.log(16);
-
-    // Set staking for DAI and Frax bond
-    await daiBond.setStaking(staking.address, stakingHelper.address);
-    await fraxBond.setStaking(staking.address, stakingHelper.address);
-    console.log(17);
-
-    // Initialize sOHM and set the index
-    await sOHM.initialize(staking.address);
-    await sOHM.setIndex(initialIndex);
-    console.log(18);
-
-    // set distributor contract and warmup contract
-    await staking.setContract('0', distributor.address);
-    await staking.setContract('1', stakingWarmup.address);
-    console.log(19);
-
-    // Set treasury for OHM token
-    await ohm.setVault(treasury.address);
-    console.log(20);
-
-    // Add staking contract as distributor recipient
-    await distributor.addRecipient(staking.address, initialRewardRate);*/
-    console.log(21);
-
-    // queue and toggle reward manager
-    await treasury.queue('8', distributor.address);
-    await treasury.toggle('8', distributor.address, zeroAddress);
-    console.log(22);
-
-    // queue and toggle deployer reserve depositor
-    await treasury.queue('0', deployer.address);
-    await treasury.toggle('0', deployer.address, zeroAddress);
-    console.log(23);
-
-    // queue and toggle liquidity depositor
-    await treasury.queue('4', deployer.address, );
-    await treasury.toggle('4', deployer.address, zeroAddress);
-    console.log(24);
-
-    // Approve the treasury to spend DAI and Frax
-    await dai.approve(treasury.address, largeApproval );
-    await frax.approve(treasury.address, largeApproval );
-    console.log(25);
-
-    // Approve dai and frax bonds to spend deployer's DAI and Frax
-    await dai.approve(daiBond.address, largeApproval );
-    await frax.approve(fraxBond.address, largeApproval );
-    console.log(26);
-
-    // Approve staking and staking helper contact to spend deployer's OHM
-    await ohm.approve(staking.address, largeApproval);
-    await ohm.approve(stakingHelper.address, largeApproval);
-    console.log(27);
-
-    // Deposit 9,000,000 DAI to treasury, 600,000 OHM gets minted to deployer and 8,400,000 are in treasury as excesss reserves
-    await treasury.deposit('9000000000000000000000000', dai.address, '8400000000000000');
-    console.log(28);
-
-    // Deposit 5,000,000 Frax to treasury, all is profit and goes as excess reserves
-    await treasury.deposit('5000000000000000000000000', frax.address, '5000000000000000');
-    console.log(29);
-
-    // Stake OHM through helper
-    await stakingHelper.stake('100000000000');
-    console.log(30);
-
-    // Bond 1,000 OHM and Frax in each of their bonds
-    await daiBond.deposit('1000000000000000000000', '60000', deployer.address );
-    await fraxBond.deposit('1000000000000000000000', '60000', deployer.address );
-
-    console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
+    console.log("VERIFICATION SUCCESSFULLY FINISHED");
 }
 
 main()
