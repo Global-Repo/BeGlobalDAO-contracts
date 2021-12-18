@@ -1,18 +1,25 @@
-// @dev. This script will deploy this V1.1 of Olympus. It will deploy the whole ecosystem except for the LP tokens and their bonds. 
-// This should be enough of a test environment to learn about and test implementations with the Olympus as of V1.1.
-// Not that the every instance of the Treasury's function 'valueOf' has been changed to 'valueOfToken'... 
-// This solidity function was conflicting w js object property name
-
 const { ethers } = require("hardhat");
-const {TREASURY_ADDRESS, BONDING_CALCULATOR_ADDRESS, DISTRIBUTOR_ADDRESS} = require("./addresses_testnet");
+const {
+    MULTISIG_ADDRESS,
+    GLBD_ADDRESS,
+    SGLBD_ADDRESS,
+    TREASURY_ADDRESS,
+    DISTRIBUTOR_ADDRESS,
+    STAKING_ADDRESS,
+    STAKING_HELPER_ADDRESS,
+    STAKING_WARMUP_ADDRESS,
+    BONDING_CALCULATOR_ADDRESS,
+    BUSD_BOND_ADDRESS,
+    GLBD_BUSD_BOND_ADDRESS,
+    REDEEM_HELPER_ADDRESS,
+    BUSD_ADDRESS,
+    GLBD_BUSD_LP_ADDRESS
+} = require("./addresses_testnet");
 
 async function main() {
 
     const [deployer, MockDAO] = await ethers.getSigners();
     console.log('Verifying contracts with the account: ' + deployer.address);
-
-    // Initial staking index
-    const initialIndex = '7675210820';
 
     // First block epoch occurs
     const firstEpochBlock = '8961000';
@@ -22,6 +29,125 @@ async function main() {
 
     // How many blocks are in each epoch
     const epochLengthInBlocks = '2200';
+
+
+    await hre.run("verify:verify", {
+        address: BUSD_ADDRESS,
+        constructorArguments: [
+        ],
+    });
+    console.log( "BUSD verified: " + BUSD_ADDRESS );
+
+
+    await hre.run("verify:verify", {
+        address: GLBD_ADDRESS,
+        constructorArguments: [
+        ],
+    });
+    console.log( "GLBD verified: " + GLBD_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: SGLBD_ADDRESS,
+        constructorArguments: [
+        ],
+    });
+    console.log( "SGLBD verified: " + SGLBD_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: TREASURY_ADDRESS,
+        constructorArguments: [
+            GLBD_ADDRESS,
+            BUSD_ADDRESS,
+            0
+        ],
+    });
+    console.log( "TREASURY verified: " + TREASURY_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: DISTRIBUTOR_ADDRESS,
+        constructorArguments: [
+            TREASURY_ADDRESS,
+            GLBD_ADDRESS,
+            epochLengthInBlocks,
+            firstEpochBlock
+        ],
+    });
+    console.log( "DISTRIBUTOR verified: " + DISTRIBUTOR_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: STAKING_ADDRESS,
+        constructorArguments: [
+            GLBD_ADDRESS,
+            SGLBD_ADDRESS,
+            epochLengthInBlocks,
+            firstEpochNumber,
+            firstEpochBlock
+        ],
+    });
+    console.log( "STAKING verified: " + STAKING_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: STAKING_HELPER_ADDRESS,
+        constructorArguments: [
+            STAKING_ADDRESS,
+            GLBD_ADDRESS
+        ],
+    });
+    console.log( "STAKING_HELPER verified: " + STAKING_HELPER_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: STAKING_WARMUP_ADDRESS,
+        constructorArguments: [
+            STAKING_ADDRESS,
+            SGLBD_ADDRESS
+        ],
+    });
+    console.log( "STAKING_WARMUP verified: " + STAKING_WARMUP_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: BONDING_CALCULATOR_ADDRESS,
+        constructorArguments: [
+            GLBD_ADDRESS
+        ],
+    });
+    console.log( "BONDING_CALCULATOR verified: " + BONDING_CALCULATOR_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: BUSD_BOND_ADDRESS,
+        constructorArguments: [
+            GLBD_ADDRESS,
+            BUSD_ADDRESS,
+            TREASURY_ADDRESS,
+            MULTISIG_ADDRESS,
+            BONDING_CALCULATOR_ADDRESS
+        ],
+    });
+    console.log( "BUSD_BOND verified: " + BUSD_BOND_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: GLBD_BUSD_BOND_ADDRESS,
+        constructorArguments: [
+            GLBD_ADDRESS,
+            GLBD_BUSD_LP_ADDRESS,
+            TREASURY_ADDRESS,
+            MULTISIG_ADDRESS,
+            BONDING_CALCULATOR_ADDRESS
+        ],
+    });
+    console.log( "GLBD_BUSD_BOND verified: " + GLBD_BUSD_BOND_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: REDEEM_HELPER_ADDRESS,
+        constructorArguments: [
+        ],
+    });
+    console.log( "REDEEM_HELPER verified: " + REDEEM_HELPER_ADDRESS );
+
+
+
+
+    // Initial staking index
+    const initialIndex = '7675210820';
 
     // Initial reward rate for epoch
     const initialRewardRate = '3000';
@@ -58,124 +184,6 @@ async function main() {
 
     // Initial Bond debt
     const intialBondDebt = '0'
-
-    await hre.run("verify:verify", {
-        address: OHM_ADDRESS,
-        constructorArguments: [
-        ],
-    });
-    console.log( "OHM verified: " + OHM_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: DAI_ADDRESS,
-        constructorArguments: [
-            0
-        ],
-    });
-    console.log( "DAI verified: " + DAI_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: FRAX_ADDRESS,
-        constructorArguments: [
-            0
-        ],
-    });
-    console.log( "FRAX verified: " + FRAX_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: TREASURY_ADDRESS_ADDRESS,
-        constructorArguments: [
-            OHM_ADDRESS,
-            DAI_ADDRESS,
-            FRAX_ADDRESS,
-            0
-        ],
-    });
-    console.log( "Treasury verified: " + TREASURY_ADDRESS_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: BONDING_CALCULATOR_ADDRESS,
-        constructorArguments: [
-            OHM_ADDRESS
-        ],
-    });
-    console.log( "Bonding Calculator verified: " + BONDING_CALCULATOR_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: DISTRIBUTOR_ADDRESS,
-        constructorArguments: [
-            TREASURY_ADDRESS,
-            OHM_ADDRESS,
-            epochLengthInBlocks,
-            firstEpochBlock
-        ],
-    });
-    console.log( "Distributor verified: " + DISTRIBUTOR_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: SOHM_ADDRESS,
-        constructorArguments: [
-            TREASURY_ADDRESS,
-            OHM_ADDRESS,
-            epochLengthInBlocks,
-            firstEpochBlock
-        ],
-    });
-    console.log( "SOHM verified: " + SOHM_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: STAKING_ADDRESS,
-        constructorArguments: [
-            OHM_ADDRESS,
-            SOHM_ADDRESS,
-            epochLengthInBlocks,
-            firstEpochNumber,
-            firstEpochBlock
-        ],
-    });
-    console.log( "Staking verified: " + STAKING_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: STAKING_WARMUP_ADDRESS,
-        constructorArguments: [
-            STAKING_ADDRESS,
-            SOHM_ADDRESS
-        ],
-    });
-    console.log( "StakingWarmup verified: " + STAKING_WARMUP_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: STAKING_HELPER_ADDRESS,
-        constructorArguments: [
-            STAKING_ADDRESS,
-            OHM_ADDRESS
-        ],
-    });
-    console.log( "StakingHelper verified: " + STAKING_HELPER_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: DAI_BOND_ADDRESS,
-        constructorArguments: [
-            OHM_ADDRESS,
-            DAI_ADDRESS,
-            TREASURY_ADDRESS,
-            MockDAO.address,
-            zeroAddress
-        ],
-    });
-    console.log( "DAI_BOND_ADDRESS verified: " + DAI_BOND_ADDRESS );
-
-    await hre.run("verify:verify", {
-        address: FRAX_BOND_ADDRESS,
-        constructorArguments: [
-            OHM_ADDRESS,
-            FRAX_ADDRESS,
-            TREASURY_ADDRESS,
-            MockDAO.address,
-            zeroAddress
-        ],
-    });
-    console.log( "FRAX_BOND_ADDRESS verified: " + FRAX_BOND_ADDRESS );
 
     console.log("VERIFICATION SUCCESSFULLY FINISHED");
 }

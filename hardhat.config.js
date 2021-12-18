@@ -2,7 +2,7 @@ require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 
 const fs = require('fs');
-const secretsDeployer = fs.readFileSync(".secret_deployer").toString().trim().split(/\n/);
+const secretsDeployer = fs.readFileSync(".secret_deployer_aa3").toString().trim().split(/\n/);
 const mnemonicDeployer = secretsDeployer[0].trim();
 const apiKeyBSC = secretsDeployer[1].trim();
 
@@ -37,6 +37,15 @@ module.exports = {
   },
   solidity: {
     compilers: [
+      {
+        version: "0.5.16",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 200
+          }
+        }
+      },
       {
         version: "0.7.5",
         settings: {
