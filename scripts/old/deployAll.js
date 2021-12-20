@@ -6,7 +6,7 @@ const {
     BUSD_ADDRESS,
     GLBD_BUSD_LP_ADDRESS,
     ROUTER_BEGLOBAL_ADDRESS
-} = require("./addresses_testnet");
+} = require("../addresses_testnet");
 
 const TOKEN_DECIMALS = 18;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);

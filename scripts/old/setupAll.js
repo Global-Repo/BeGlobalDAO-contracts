@@ -14,7 +14,7 @@ const {
     REDEEM_HELPER_ADDRESS,
     BUSD_ADDRESS,
     GLBD_BUSD_LP_ADDRESS
-} = require("./addresses_testnet");
+} = require("../addresses_testnet");
 
 async function main() {
 
