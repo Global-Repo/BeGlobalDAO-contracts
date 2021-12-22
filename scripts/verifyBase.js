@@ -11,7 +11,7 @@ const {
     REDEEM_HELPER_ADDRESS,
     BUSD_ADDRESS,
     GLBD_BUSD_LP_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 async function main() {
 
@@ -28,14 +28,14 @@ async function main() {
     // How many blocks are in each epoch
     //const epochLengthInBlocks = '2200';
     const epochLengthInBlocks = '9600';
-
-    /*await hre.run("verify:verify", {
+/*
+    await hre.run("verify:verify", {
         address: BUSD_ADDRESS,
         constructorArguments: [
         ],
     });
     console.log( "BUSD verified: " + BUSD_ADDRESS );
-
+*/
 
     await hre.run("verify:verify", {
         address: GLBD_ADDRESS,
@@ -109,7 +109,7 @@ async function main() {
             GLBD_ADDRESS
         ],
     });
-    console.log( "BONDING_CALCULATOR verified: " + BONDING_CALCULATOR_ADDRESS );*/
+    console.log( "BONDING_CALCULATOR verified: " + BONDING_CALCULATOR_ADDRESS );
 
     await hre.run("verify:verify", {
         address: REDEEM_HELPER_ADDRESS,

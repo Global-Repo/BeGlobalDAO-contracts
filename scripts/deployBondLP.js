@@ -73,8 +73,7 @@ async function main() {
     await glbdbusdBond.setStaking(STAKING_HELPER_ADDRESS, true);
     await treasury.queue('4', glbdbusdBond.address);
     await treasury.toggle('4', glbdbusdBond.address, BONDING_CALCULATOR_ADDRESS);
-    await treasury.queue('5', GLBD_BUSD_LP_ADDRESS);
-    await treasury.toggle('5', GLBD_BUSD_LP_ADDRESS, BONDING_CALCULATOR_ADDRESS);
+
     await redeemHelper.addBondContract(glbdbusdBond.address);
     await glbdbusdLP.approve(ROUTER_BEGLOBAL_ADDRESS, largeApproval );
     await glbdbusdLP.approve(TREASURY_ADDRESS, largeApproval );

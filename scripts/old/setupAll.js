@@ -120,6 +120,7 @@ async function main() {
     await treasury.deposit('20000000000000000000', BUSD_ADDRESS, '18000000000000000000'); //TODO revisar
     await treasury.deposit('20000000000000000000', GLBD_BUSD_LP_ADDRESS, '18000000000000000000'); //TODO revisar
 
+
     // Stake GLBD through helper
     await stakingHelper.stake('100000000000');
 

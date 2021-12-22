@@ -9,8 +9,9 @@ const {
     BONDING_CALCULATOR_ADDRESS,
     REDEEM_HELPER_ADDRESS,
     BUSD_ADDRESS,
-    ROUTER_BEGLOBAL_ADDRESS
-} = require("./addresses_testnet");
+    ROUTER_BEGLOBAL_ADDRESS,
+    BUSD_BOND_ADDRESS
+} = require("./addresses_mainnet");
 
 const TOKEN_DECIMALS = 18;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
@@ -63,21 +64,49 @@ async function main() {
     /*const BUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
     const busdBond = await BUSDBond.attach(BUSD_BOND_ADDRESS);*/
     const BUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
-    const busdBond = await BUSDBond.deploy(GLBD_ADDRESS, BUSD_ADDRESS, TREASURY_ADDRESS, MULTISIG_ADDRESS, BONDING_CALCULATOR_ADDRESS);
-    console.log("BUSD Bond: " + busdBond.address);
-
+    //const busdBond = await BUSDBond.deploy(GLBD_ADDRESS, BUSD_ADDRESS, TREASURY_ADDRESS, MULTISIG_ADDRESS, BONDING_CALCULATOR_ADDRESS);
+    const busdBond = await BUSDBond.attach(BUSD_BOND_ADDRESS);
+    console.log("BUSD Bond: " + BUSD_BOND_ADDRESS);
+/*
     console.log('Setting BUSD Bond');
     // Set BUSD bond terms
     await busdBond.initializeBondTerms(busdBondBCV, bondVestingLength, minBondPrice, maxBondPayout, bondFee, maxBUSDBondDebt, intialBUSDBondDebt);
     // Set staking for BUSD bond
+    await new Promise(r => setTimeout(() => r(), 5000));
     await busdBond.setStaking(STAKING_HELPER_ADDRESS, true);
     // queue and toggle BUSD bond reserve depositor
-    await treasury.queue('0', busdBond.address);
-    await treasury.toggle('0', busdBond.address, BONDING_CALCULATOR_ADDRESS);
-    await redeemHelper.addBondContract(busdBond.address);
+    // Queue busdBond as reserve depositoir
+    await new Promise(r => setTimeout(() => r(), 5000));
+    console.log("Queue busdBond as reserve depositoir.");
+    await treasury.queue('0', BUSD_BOND_ADDRESS);
+    await new Promise(r => setTimeout(() => r(), 5000));
+
+    // Toggle busdBond as reserve depositoir
+    console.log(". Toggle busdBond as reserve depositoir.");
+    await treasury.toggle('0', BUSD_BOND_ADDRESS, BONDING_CALCULATOR_ADDRESS);
+    await new Promise(r => setTimeout(() => r(), 5000));
+
+
+    //await treasury.queue('0', busdBond.address);
+    //await treasury.toggle('0', busdBond.address, BONDING_CALCULATOR_ADDRESS);
+    console.log("redeemHelper.addBondContract(BUSD_BOND_ADDRESS)");
+    await redeemHelper.addBondContract(BUSD_BOND_ADDRESS);
+    await new Promise(r => setTimeout(() => r(), 5000));
+
+    console.log("busd.approve(ROUTER_BEGLOBAL_ADDRESS, largeApproval ))");
     await busd.approve(ROUTER_BEGLOBAL_ADDRESS, largeApproval );
+    await new Promise(r => setTimeout(() => r(), 5000));
+
+    console.log("busd.approve(TREASURY_ADDRESS, largeApproval )");
     await busd.approve(TREASURY_ADDRESS, largeApproval );
-    await busdBond.deposit('5000000000000','1000000000000000000000',DEPLOYER_ADDRESS); //TODO revisar
+    await new Promise(r => setTimeout(() => r(), 5000));
+
+    console.log("busd.approve(BUSD_BOND_ADDRESS, largeApproval )");
+    await busd.approve(BUSD_BOND_ADDRESS, largeApproval );
+    await new Promise(r => setTimeout(() => r(), 5000));
+
+    console.log("busdBond.deposit('1000000000','1000000000000000000000',DEPLOYER_ADDRESS)");
+    await busdBond.deposit('1000000000','1000000000000000000000',DEPLOYER_ADDRESS); //TODO revisar
     //await busdBond.setAdjustment(false,'2','40','0');
 
     await hre.run("verify:verify", {
@@ -87,9 +116,18 @@ async function main() {
             BUSD_ADDRESS,
             TREASURY_ADDRESS,
             MULTISIG_ADDRESS,
-            BONDING_CALCULATOR_ADDRESS
+            BONDING_CALCULATOR_ADDRESS,
+            BUSD_BOND_ADDRESS
         ],
     });
+    */
+    await hre.run("verify:verify", {
+        address: BUSD_BOND_ADDRESS,//busdBond.address,
+        constructorArguments: [
+            GLBD_ADDRESS, BUSD_ADDRESS, TREASURY_ADDRESS, MULTISIG_ADDRESS, BONDING_CALCULATOR_ADDRESS
+        ],
+    });
+
     console.log( "BUSD_BOND verified: " + busdBond.address );
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
