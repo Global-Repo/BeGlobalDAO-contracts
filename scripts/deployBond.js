@@ -104,11 +104,11 @@ async function main() {
     console.log("busd.approve(BUSD_BOND_ADDRESS, largeApproval )");
     await busd.approve(BUSD_BOND_ADDRESS, largeApproval );
     await new Promise(r => setTimeout(() => r(), 5000));
-
-    console.log("busdBond.deposit('1000000000','1000000000000000000000',DEPLOYER_ADDRESS)");
+*/
+    console.log("busdBond.deposit('1000000000','1000000000000000000000000',DEPLOYER_ADDRESS)");
     await busdBond.deposit('1000000000','1000000000000000000000',DEPLOYER_ADDRESS); //TODO revisar
     //await busdBond.setAdjustment(false,'2','40','0');
-
+/*
     await hre.run("verify:verify", {
         address: busdBond.address,
         constructorArguments: [
@@ -120,13 +120,13 @@ async function main() {
             BUSD_BOND_ADDRESS
         ],
     });
-    */
+
     await hre.run("verify:verify", {
         address: BUSD_BOND_ADDRESS,//busdBond.address,
         constructorArguments: [
             GLBD_ADDRESS, BUSD_ADDRESS, TREASURY_ADDRESS, MULTISIG_ADDRESS, BONDING_CALCULATOR_ADDRESS
         ],
-    });
+    });*/
 
     console.log( "BUSD_BOND verified: " + busdBond.address );
 
