@@ -2,10 +2,23 @@ const { ethers } = require("hardhat");
 const { BigNumber } = require("@ethersproject/bignumber");
 const {
     MULTISIG_ADDRESS,
-    ROUTER_BEGLOBAL_ADDRESS, DEPLOYER_ADDRESS, GLBD_ADDRESS, SGLBD_ADDRESS, BUSD_ADDRESS, TREASURY_ADDRESS, WETH_ADDRESS, TREASURY_SWAP_ADDRESS
+    ROUTER_BEGLOBAL_ADDRESS,
+    DEPLOYER_ADDRESS,
+    GLBD_ADDRESS,
+    SGLBD_ADDRESS,
+    BUSD_ADDRESS,
+    TREASURY_ADDRESS,
+    WETH_ADDRESS,
+    TREASURY_SWAP_ADDRESS,
+    STAKING_ADDRESS,
+    FACTORY_ADDRESS,
+    GLBD_BUSD_LP_ADDRESS,
+    DISTRIBUTOR_ADDRESS,
+    STAKING_HELPER_ADDRESS,
+    STAKING_WARMUP_ADDRESS,
+    BONDING_CALCULATOR_ADDRESS,
+    REDEEM_HELPER_ADDRESS
 } = require("./addresses_testnet");
-const {DISTRIBUTOR_ADDRESS, STAKING_ADDRESS} = require("./addresses_mainnet");
-
 
 const TOKEN_DECIMALS = 9;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
@@ -33,20 +46,19 @@ async function main() {
     let router;
     let treasury;
     let distributor;
-    let deployOrAttach = true;
-    let deployAndSetTokens = true;
-    let setGLBDVault = true;
-    let mint10GLBD = true;
+    let GLBDBUSDLPADDRESS = "";
+    let stakingWarmup;
+    let staking;
+    let stakingHelper;
+    let globalDAOBondingCalculator;
+    let redeemHelper;
+    let deploy = false;
+    let SetGLBDVaultandMint10GLBD = true;
     let settersTestnet = true;
     let largeApproval = '100000000000000000000000000000000';
-    let GLBDBUSDLPADDRESS = "";
-    let StakingWarmup;
-    let staking;
-    let StakingHelper;
-    let GlobalDAOBondingCalculator;
-    let RedeemHelper;
 
-    const Router = await ethers.getContractFactory("Router");
+    const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
+    const sGLBDT = await ethers.getContractFactory('GlobalDAOToken');
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // Quants blocs dura el epoch (staking)
@@ -57,49 +69,21 @@ async function main() {
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address + '. Multisig account: ' + MULTISIG_ADDRESS + '.');
 
-    // Deploy GLBD
-    console.log("[Deploying GLBD SC]");
-    const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
-    if (deployOrAttach) {
+    // SCs
+    if (deploy) {
+        // Testnet
+        // Deploy GLBD
+        console.log("[Deploying GLBD SC]");
         GLBD = await GLBDT.deploy();
         console.log("[GLBD deployed]: " + GLBD.address + ".");
-    } else {
-        GLBD = await GLBDT.attach(GLBD_ADDRESS);
-        console.log("[GLBD attached]: " + GLBD_ADDRESS + ".");
-    }
-    await new Promise(r => setTimeout(() => r(), 3000));
+        await new Promise(r => setTimeout(() => r(), 3000));
 
-    // Deploy sGLBD
-    console.log("[Deploying sGLBD SC]");
-    const sGLBDT = await ethers.getContractFactory('GlobalDAOToken');
-    if (deployOrAttach) {
+        // Deploy sGLBD
+        console.log("[Deploying sGLBD SC]");
         sGLBD = await sGLBDT.deploy();
         console.log("[sGLBD deployed]: " + sGLBD.address + ".");
-    } else {
-        sGLBD = await sGLBDT.attach(sGLBD_ADDRESS);
-        console.log("[sGLBD attached]: " + sGLBD_ADDRESS + ".");
-    }
-    await new Promise(r => setTimeout(() => r(), 3000));
-
-    // Set deployer as a vault for GLBD Token
-    if (setGLBDVault) {
-        console.log("[Set deployer as a vault for GLBD Token]");
-        await GLBD.setVault(DEPLOYER_ADDRESS);
-        console.log("[Success]");
         await new Promise(r => setTimeout(() => r(), 3000));
-    }
 
-    // Mint 10 GLBD
-    if (mint10GLBD) {
-        console.log("[Deployer mints (extra?) 10 GLBD]");
-        await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
-        console.log("[Success]");
-        await new Promise(r => setTimeout(() => r(), 3000));
-    }
-
-    // SCs
-    if (deployOrAttach) {
-        // Testnet
         // Deploy factory
         console.log("[Deploying factory SC]");
         factory = await deployFactory(DEPLOYER_ADDRESS);
@@ -124,14 +108,18 @@ async function main() {
         console.log("[Success]");
         await new Promise(r => setTimeout(() => r(), 3000));
 
+        // set deployer as GLBD vault and mint 10 GLBD.
+        if (SetGLBDVaultandMint10GLBD)
+            await setGLBDVaultandMint10GLBD(GLBD);
+
         // Deploy BUSD
         console.log("[Deploying BUSD SC]");
         busd = await BUSD.deploy();
         console.log("[BUSDt deployed]: " + busd.address + ".");
 
-        // Deployer mints 10 BUSD
-        console.log("[Deployer mints 10 BUSD]");
-        await busd.mint(INITIAL_SUPPLY);
+        // Deployer mints 100 BUSD
+        console.log("[Deployer mints 100 BUSD]");
+        await busd.mint(INITIAL_SUPPLY_B);
         await new Promise(r => setTimeout(() => r(), 3000));
         console.log("[Success]");
 
@@ -208,16 +196,116 @@ async function main() {
         redeemHelper = await RedeemHelper.deploy();
         console.log("[Redeem helper deployed]: " + redeemHelper.address + ".");
         await new Promise(r => setTimeout(() => r(), 3000));
-
     } else {
+        // Testnet
 
+        // Attach GLBD
+        console.log("[Attaching GLBD SC]");
+        GLBD = await GLBDT.attach(GLBD_ADDRESS);
+        console.log("[GLBD attached]: " + GLBD_ADDRESS + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach sGLBD
+        console.log("[Attaching sGLBD SC]");
+        sGLBD = await sGLBDT.attach(SGLBD_ADDRESS);
+        console.log("[sGLBD attached]: " + SGLBD_ADDRESS + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach factory
+        console.log("[Attaching factory SC]");
+        const Factory = await ethers.getContractFactory("Factory");
+        factory = await Factory.attach(FACTORY_ADDRESS);
+        console.log("[Factory attached]: " + factory.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach Router
+        console.log("[Attaching Router SC]");
+        const Router = await ethers.getContractFactory("Router");
+        router = await Router.attach(ROUTER_BEGLOBAL_ADDRESS);
+        console.log("[Router attached]: " + router.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Approve RouterBeGlobal as spender of GLB for Deployer
+        console.log("[Approve RouterBeGlobal as spender of GLB for Deployer] [D]");
+        console.log("[Success]");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach BUSD
+        console.log("[Attaching BUSD SC]");
+        busd = await BUSD.attach(BUSD_ADDRESS);
+        console.log("[BUSDt attached]: " + busd.address + ".");
+
+        // set deployer as GLBD vault and mint 10 GLBD - We don't know how many we have.
+        if (SetGLBDVaultandMint10GLBD)
+            await setGLBDVaultandMint10GLBD(GLBD);
+
+        // Deployer mints 100 BUSD - We don't know how many we have.
+        console.log("[Deployer mints 100 BUSD]");
+        await busd.mint(INITIAL_SUPPLY_B);
+        await new Promise(r => setTimeout(() => r(), 1000));
+        console.log("[Success]");
+
+        // Approve BUSDt to be used in the BeGlobal router by the deployer
+        console.log("[Approve BUSDt to be used in the BeGlobal router by the deployer] [D]");
+        console.log("[Success]");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // AddLiquidity
+        console.log("[Create and add liquidity GLBD-BUSD in BeGlobal router] [D]");
+        console.log("[Success] GLBD-BUSD LP address: ", GLBD_BUSD_LP_ADDRESS, ".");
+
+        // Attach treasury
+        console.log("[Attaching Treasury SC]");
+        const Treasury = await ethers.getContractFactory('GlobalDAOTreasury');
+        treasury = await Treasury.attach(TREASURY_ADDRESS);
+        console.log("[Treasury attached]: " + treasury.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach distributor
+        console.log("[Attaching distributor SC]");
+        const Distributor = await ethers.getContractFactory('Distributor');
+        distributor = await Distributor.attach(DISTRIBUTOR_ADDRESS);
+        console.log("[Distributor attached]: " + distributor.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach Staking
+        console.log("[Attaching Staking]");
+        const Staking = await ethers.getContractFactory('GlobalDAOStaking');
+        staking = await Staking.attach(STAKING_ADDRESS);
+        console.log("[Staking attached]: " + staking.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach StakingHelper
+        console.log("[Attaching StakingHelper]");
+        const StakingHelper = await ethers.getContractFactory('StakingHelper');
+        stakingHelper = await StakingHelper.attach(STAKING_HELPER_ADDRESS);
+        console.log("[StakingHelper attached]: " + stakingHelper.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach StakingHelper
+        console.log("[Attaching WarmUp]");
+        const StakingWarmup = await ethers.getContractFactory('StakingWarmup');
+        stakingWarmup = await StakingWarmup.attach(STAKING_WARMUP_ADDRESS);
+        console.log("[WarmUp attached]: " + stakingWarmup.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach bonding calculator
+        console.log("[Attaching bonding calculator]");
+        const GlobalDAOBondingCalculator = await ethers.getContractFactory('GlobalDAOBondingCalculator');
+        globalDAOBondingCalculator = await GlobalDAOBondingCalculator.attach(BONDING_CALCULATOR_ADDRESS);
+        console.log("[GlobalDAOBondingCalculator attached]: " + globalDAOBondingCalculator.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
+
+        // Attach Redeem helper
+        console.log("[Attaching redeem helper]");
+        const RedeemHelper = await ethers.getContractFactory('RedeemHelper');
+        redeemHelper = await RedeemHelper.attach(REDEEM_HELPER_ADDRESS);
+        console.log("[Redeem helper attached]: " + redeemHelper.address + ".");
+        await new Promise(r => setTimeout(() => r(), 1000));
     }
 
 if (settersTestnet){
-    // Set Treasury as GLBD vault
-    console.log(1,"/",TOTAL_STEPS, ". Set Treasury as GLBD vault.");
-    await glbd.setVault(TREASURY_ADDRESS);
-    await new Promise(r => setTimeout(() => r(), 5000));
+// QUEUE, TOGGLE-..
 }
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED -> copy BUSD, GLBD & sGLBD addresses and addLiquidity to the router");
@@ -234,6 +322,20 @@ let deployRouter = async function (factory, weth) {
     await router.deployed();
     return router;
 };
+let setGLBDVaultandMint10GLBD = async function (GLBD){
+    // Set deployer as a vault for GLBD Token
+    console.log("[Set deployer as a vault for GLBD Token]");
+    await GLBD.setVault(DEPLOYER_ADDRESS);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), 3000));
+
+    // Mint 10 GLBD
+    console.log("[Deployer mints (extra?) 10 GLBD]");
+    await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), 3000));
+}
+
 
 main()
     .then(() => process.exit())
@@ -242,23 +344,3 @@ main()
         process.exit(1);
 })
 
-
-/*
-
-    const BUSD = await ethers.getContractFactory('BEP20Token');
-    //const busd = await BUSD.deploy();
-    const busd = await BUSD.attach(BUSD_ADDRESS);
-    //await busd.mint(INITIAL_SUPPLY);
-    //console.log( "BUSD: " + busd.address );
-    await busd.approve(ROUTER_BEGLOBAL_ADDRESS, INITIAL_SUPPLY_B);
-    console.log( "BUSD approved.");
-    await new Promise(r => setTimeout(() => r(), 10000));
-
-
-        let date = new Date();
-const timestamp = date.setTime(date.getTime());
-
-//await glbd.approve(ROUTER_BEGLOBAL_ADDRESS, INITIAL_SUPPLY);
-//console.log( "GLBD approved.");
-
-*/
