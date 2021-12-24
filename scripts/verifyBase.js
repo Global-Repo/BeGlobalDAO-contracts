@@ -10,8 +10,9 @@ const {
     BONDING_CALCULATOR_ADDRESS,
     REDEEM_HELPER_ADDRESS,
     BUSD_ADDRESS,
-    GLBD_BUSD_LP_ADDRESS
-} = require("./addresses_mainnet");
+    GLBD_BUSD_LP_ADDRESS,
+    MULTISIG_ADDRESS
+} = require("./addresses_testnet");
 
 async function main() {
 
@@ -19,7 +20,7 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstEpochBlock = '8961000'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
+    const firstEpochBlock = '15242123'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
 
     // What epoch will be first epoch
     //const firstEpochNumber = '338';
@@ -28,14 +29,14 @@ async function main() {
     // How many blocks are in each epoch
     //const epochLengthInBlocks = '2200';
     const epochLengthInBlocks = '9600';
-/*
-    await hre.run("verify:verify", {
+
+    /*await hre.run("verify:verify", {
         address: BUSD_ADDRESS,
         constructorArguments: [
         ],
     });
     console.log( "BUSD verified: " + BUSD_ADDRESS );
-*/
+
 
     await hre.run("verify:verify", {
         address: GLBD_ADDRESS,
@@ -60,7 +61,7 @@ async function main() {
             0
         ],
     });
-    console.log( "TREASURY verified: " + TREASURY_ADDRESS );
+    console.log( "TREASURY verified: " + TREASURY_ADDRESS );*/
 
     await hre.run("verify:verify", {
         address: DISTRIBUTOR_ADDRESS,
@@ -117,6 +118,31 @@ async function main() {
         ],
     });
     console.log( "REDEEM_HELPER verified: " + REDEEM_HELPER_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: BUSD_BOND_ADDRESS,
+        constructorArguments: [
+            GLBD_ADDRESS,
+            BUSD_ADDRESS,
+            TREASURY_ADDRESS,
+            MULTISIG_ADDRESS,
+            BONDING_CALCULATOR_ADDRESS,
+            BUSD_BOND_ADDRESS
+        ],
+    });
+    console.log( "BUSD_BOND verified: " + BUSD_BOND_ADDRESS );
+
+    await hre.run("verify:verify", {
+        address: GLBD_BUSD_BOND_ADDRESS,
+        constructorArguments: [
+            GLBD_ADDRESS,
+            GLBD_BUSD_LP_ADDRESS,
+            TREASURY_ADDRESS,
+            MULTISIG_ADDRESS,
+            BONDING_CALCULATOR_ADDRESS
+        ],
+    });
+    console.log( "GLBD_BUSD_BOND verified: " + GLBD_BUSD_BOND_ADDRESS );
 
     console.log("VERIFICATION SUCCESSFULLY FINISHED");
 }
