@@ -11,7 +11,9 @@ const {
     REDEEM_HELPER_ADDRESS,
     BUSD_ADDRESS,
     GLBD_BUSD_LP_ADDRESS,
-    MULTISIG_ADDRESS
+    MULTISIG_ADDRESS,
+    BUSD_BOND_ADDRESS,
+    GLBD_BUSD_BOND_ADDRESS
 } = require("./addresses_testnet");
 
 async function main() {
@@ -30,28 +32,34 @@ async function main() {
     //const epochLengthInBlocks = '2200';
     const epochLengthInBlocks = '9600';
 
-    /*await hre.run("verify:verify", {
+    console.log("VERIFYING: ", BUSD_ADDRESS);
+    await hre.run("verify:verify", {
         address: BUSD_ADDRESS,
         constructorArguments: [
         ],
     });
     console.log( "BUSD verified: " + BUSD_ADDRESS );
+    console.log("Success");
 
-
+    console.log("VERIFYING: ", GLBD_ADDRESS);
     await hre.run("verify:verify", {
         address: GLBD_ADDRESS,
         constructorArguments: [
         ],
     });
     console.log( "GLBD verified: " + GLBD_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", SGLBD_ADDRESS);
     await hre.run("verify:verify", {
         address: SGLBD_ADDRESS,
         constructorArguments: [
         ],
     });
     console.log( "SGLBD verified: " + SGLBD_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", TREASURY_ADDRESS);
     await hre.run("verify:verify", {
         address: TREASURY_ADDRESS,
         constructorArguments: [
@@ -61,8 +69,10 @@ async function main() {
             0
         ],
     });
-    console.log( "TREASURY verified: " + TREASURY_ADDRESS );*/
+    console.log( "TREASURY verified: " + TREASURY_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", DISTRIBUTOR_ADDRESS);
     await hre.run("verify:verify", {
         address: DISTRIBUTOR_ADDRESS,
         constructorArguments: [
@@ -73,7 +83,9 @@ async function main() {
         ],
     });
     console.log( "DISTRIBUTOR verified: " + DISTRIBUTOR_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", STAKING_ADDRESS);
     await hre.run("verify:verify", {
         address: STAKING_ADDRESS,
         constructorArguments: [
@@ -85,7 +97,9 @@ async function main() {
         ],
     });
     console.log( "STAKING verified: " + STAKING_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", STAKING_HELPER_ADDRESS);
     await hre.run("verify:verify", {
         address: STAKING_HELPER_ADDRESS,
         constructorArguments: [
@@ -94,7 +108,9 @@ async function main() {
         ],
     });
     console.log( "STAKING_HELPER verified: " + STAKING_HELPER_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", STAKING_WARMUP_ADDRESS);
     await hre.run("verify:verify", {
         address: STAKING_WARMUP_ADDRESS,
         constructorArguments: [
@@ -103,7 +119,9 @@ async function main() {
         ],
     });
     console.log( "STAKING_WARMUP verified: " + STAKING_WARMUP_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", BONDING_CALCULATOR_ADDRESS);
     await hre.run("verify:verify", {
         address: BONDING_CALCULATOR_ADDRESS,
         constructorArguments: [
@@ -111,14 +129,18 @@ async function main() {
         ],
     });
     console.log( "BONDING_CALCULATOR verified: " + BONDING_CALCULATOR_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", REDEEM_HELPER_ADDRESS);
     await hre.run("verify:verify", {
         address: REDEEM_HELPER_ADDRESS,
         constructorArguments: [
         ],
     });
     console.log( "REDEEM_HELPER verified: " + REDEEM_HELPER_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", BUSD_BOND_ADDRESS);
     await hre.run("verify:verify", {
         address: BUSD_BOND_ADDRESS,
         constructorArguments: [
@@ -131,7 +153,9 @@ async function main() {
         ],
     });
     console.log( "BUSD_BOND verified: " + BUSD_BOND_ADDRESS );
+    console.log("Success");
 
+    console.log("VERIFYING: ", GLBD_BUSD_BOND_ADDRESS);
     await hre.run("verify:verify", {
         address: GLBD_BUSD_BOND_ADDRESS,
         constructorArguments: [
@@ -143,6 +167,7 @@ async function main() {
         ],
     });
     console.log( "GLBD_BUSD_BOND verified: " + GLBD_BUSD_BOND_ADDRESS );
+    console.log("Success");
 
     console.log("VERIFICATION SUCCESSFULLY FINISHED");
 }
