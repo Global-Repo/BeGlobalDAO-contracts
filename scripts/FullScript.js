@@ -23,7 +23,7 @@ const {
 
 const TOKEN_DECIMALS = 9;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
-const INITIAL_SUPPLY = BigNumber.from(10).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER);
+const INITIAL_SUPPLY = BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER);
 
 const TOKEN_DECIMALS_B = 18;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_B = BigNumber.from(10).pow(TOKEN_DECIMALS_B);
@@ -534,13 +534,13 @@ async function main() {
 
     // Approve GLBD-BUSD LP to be used in the GLBD-BUSD LP Bond by the deployer
     console.log("[Approve GLBD-BUSD LP to be used in the GLBD-BUSD LP Bond by the deployer]");
-    await glbdbusdLP.approve(glbdbusdBond.address,'largeApproval');
+    await glbdbusdLP.approve(glbdbusdBond.address,largeApproval);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
 
     // Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer
     console.log("[Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer]");
-    await glbdbusdLP.deposit('140000000000000000','2613',DEPLOYER_ADDRESS);
+    await glbdbusdBond.deposit('140000000000000000','2613',DEPLOYER_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
 
@@ -576,7 +576,7 @@ async function main() {
 
     // Approve treasury as spender of glbdbusdLP for Deployer
     console.log("[Toggle GLB_BUSD_LP as liquidity token]");
-    await glbdbusdLP.approve(treasury.address,'largeApproval');
+    await glbdbusdLP.approve(treasury.address,largeApproval);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
 
@@ -634,8 +634,8 @@ let setGLBDVaultandMint10GLBD = async function (GLBD){
 
     console.log(await GLBD.vault())
 
-    // Mint 10 GLBD
-    console.log("[Deployer mints (extra?) 10 GLBD]");
+    // Mint 100000 GLBD
+    console.log("[Deployer mints (extra?) 100000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 3000));
