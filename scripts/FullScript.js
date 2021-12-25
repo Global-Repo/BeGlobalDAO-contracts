@@ -55,7 +55,7 @@ async function main() {
     let busdBond;
     let glbdbusdBond;
     let redeemHelper;
-    let deploy = true;
+    let deploy = false;
     let testnet = true;
     let SetGLBDVaultandMint10GLBD = true;
     let largeApproval = '100000000000000000000000000000000';
@@ -350,7 +350,7 @@ async function main() {
         console.log("[WarmUp attached]: " + stakingWarmup.address);
         await new Promise(r => setTimeout(() => r(), 1000));
     }
-
+/*
     // set deployer as GLBD vault and mint 10 GLBD.
     if (SetGLBDVaultandMint10GLBD)
         await setGLBDVaultandMint10GLBD(GLBD);
@@ -414,7 +414,7 @@ async function main() {
     await treasury.toggle('4', glbdbusdBond.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
-
+*/
     // Queue GLBD_BUSD_LP as liquidity token
     console.log("[Queue GLBD_BUSD_LP as liquidity token]");
     await treasury.queue('5', glbdbusdLP.address);
@@ -426,7 +426,7 @@ async function main() {
     await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
-
+/*
     // Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%.
     console.log("[Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%]");
     await distributor.addRecipient(staking.address, initialRewardRateForEpoch);
@@ -537,7 +537,7 @@ async function main() {
     await glbdbusdLP.approve(glbdbusdBond.address,largeApproval);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
-
+*/
     // Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer
     console.log("[Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer]");
     await glbdbusdBond.deposit('140000000000000000','2613',DEPLOYER_ADDRESS);

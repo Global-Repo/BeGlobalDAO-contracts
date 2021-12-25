@@ -22,17 +22,17 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstEpochBlock = '15242123'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
+    const firstEpochBlock = '15269252'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
 
     // What epoch will be first epoch
     //const firstEpochNumber = '338';
-    const firstEpochNumber = '6'; //TODO pendent a posar el bloc del dia 25 quan (comença a comptar el staking???)
+    const firstEpochNumber = '0'; //TODO pendent a posar el bloc del dia 25 quan (comença a comptar el staking???)
 
     // How many blocks are in each epoch
     //const epochLengthInBlocks = '2200';
-    const epochLengthInBlocks = '9600';
+    const epochLengthInBlocks = '20';
 
-    console.log("VERIFYING: ", BUSD_ADDRESS);
+    console.log("VERIFYING BUSD: ", BUSD_ADDRESS);
     await hre.run("verify:verify", {
         address: BUSD_ADDRESS,
         constructorArguments: [
@@ -41,7 +41,7 @@ async function main() {
     console.log( "BUSD verified: " + BUSD_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", GLBD_ADDRESS);
+    console.log("VERIFYING GLBD_ADDRESS: ", GLBD_ADDRESS);
     await hre.run("verify:verify", {
         address: GLBD_ADDRESS,
         constructorArguments: [
@@ -50,7 +50,7 @@ async function main() {
     console.log( "GLBD verified: " + GLBD_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", SGLBD_ADDRESS);
+    console.log("VERIFYING SGLBD_ADDRESS: ", SGLBD_ADDRESS);
     await hre.run("verify:verify", {
         address: SGLBD_ADDRESS,
         constructorArguments: [
@@ -59,7 +59,7 @@ async function main() {
     console.log( "SGLBD verified: " + SGLBD_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", TREASURY_ADDRESS);
+    console.log("VERIFYING TREASURY_ADDRESS: ", TREASURY_ADDRESS);
     await hre.run("verify:verify", {
         address: TREASURY_ADDRESS,
         constructorArguments: [
@@ -72,7 +72,7 @@ async function main() {
     console.log( "TREASURY verified: " + TREASURY_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", DISTRIBUTOR_ADDRESS);
+    console.log("VERIFYING DISTRIBUTOR_ADDRESS: ", DISTRIBUTOR_ADDRESS);
     await hre.run("verify:verify", {
         address: DISTRIBUTOR_ADDRESS,
         constructorArguments: [
@@ -85,7 +85,7 @@ async function main() {
     console.log( "DISTRIBUTOR verified: " + DISTRIBUTOR_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", STAKING_ADDRESS);
+    console.log("VERIFYING STAKING_ADDRESS: ", STAKING_ADDRESS);
     await hre.run("verify:verify", {
         address: STAKING_ADDRESS,
         constructorArguments: [
@@ -99,7 +99,7 @@ async function main() {
     console.log( "STAKING verified: " + STAKING_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", STAKING_HELPER_ADDRESS);
+    console.log("VERIFYING STAKING_HELPER_ADDRESS: ", STAKING_HELPER_ADDRESS);
     await hre.run("verify:verify", {
         address: STAKING_HELPER_ADDRESS,
         constructorArguments: [
@@ -110,7 +110,7 @@ async function main() {
     console.log( "STAKING_HELPER verified: " + STAKING_HELPER_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", STAKING_WARMUP_ADDRESS);
+    console.log("VERIFYING STAKING_WARMUP_ADDRESS: ", STAKING_WARMUP_ADDRESS);
     await hre.run("verify:verify", {
         address: STAKING_WARMUP_ADDRESS,
         constructorArguments: [
@@ -121,7 +121,7 @@ async function main() {
     console.log( "STAKING_WARMUP verified: " + STAKING_WARMUP_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", BONDING_CALCULATOR_ADDRESS);
+    console.log("VERIFYING BONDING_CALCULATOR_ADDRESS: ", BONDING_CALCULATOR_ADDRESS);
     await hre.run("verify:verify", {
         address: BONDING_CALCULATOR_ADDRESS,
         constructorArguments: [
@@ -131,7 +131,7 @@ async function main() {
     console.log( "BONDING_CALCULATOR verified: " + BONDING_CALCULATOR_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", REDEEM_HELPER_ADDRESS);
+    console.log("VERIFYING REDEEM_HELPER_ADDRESS: ", REDEEM_HELPER_ADDRESS);
     await hre.run("verify:verify", {
         address: REDEEM_HELPER_ADDRESS,
         constructorArguments: [
@@ -140,7 +140,7 @@ async function main() {
     console.log( "REDEEM_HELPER verified: " + REDEEM_HELPER_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", BUSD_BOND_ADDRESS);
+    console.log("VERIFYING BUSD_BOND_ADDRESS: ", BUSD_BOND_ADDRESS);
     await hre.run("verify:verify", {
         address: BUSD_BOND_ADDRESS,
         constructorArguments: [
@@ -148,14 +148,13 @@ async function main() {
             BUSD_ADDRESS,
             TREASURY_ADDRESS,
             MULTISIG_ADDRESS,
-            BONDING_CALCULATOR_ADDRESS,
-            BUSD_BOND_ADDRESS
+            BONDING_CALCULATOR_ADDRESS
         ],
     });
     console.log( "BUSD_BOND verified: " + BUSD_BOND_ADDRESS );
     console.log("Success");
 
-    console.log("VERIFYING: ", GLBD_BUSD_BOND_ADDRESS);
+    console.log("VERIFYING GLBD_BUSD_BOND_ADDRESS: ", GLBD_BUSD_BOND_ADDRESS);
     await hre.run("verify:verify", {
         address: GLBD_BUSD_BOND_ADDRESS,
         constructorArguments: [
