@@ -77,7 +77,7 @@ async function main() {
     const bondVestingLength = '144000';
 
     // Min bond price
-    const minBondPrice = '2600';
+    const minBondPrice = '500';
 
     // Max bond payout
     const maxBondPayout = '50'
@@ -95,7 +95,7 @@ async function main() {
     const intialBUSDBondDebt = '6000000000000';
 
     // Initial Bond debt
-    const intialGLBDBUSDBondDebt = '3000000000000';
+    const intialGLBDBUSDBondDebt = '10000000000000';
 
     // Quin bloc serà el primer que doni staking
     let firstBlockEpoch = '15269252';
@@ -350,7 +350,7 @@ async function main() {
         console.log("[WarmUp attached]: " + stakingWarmup.address);
         await new Promise(r => setTimeout(() => r(), 1000));
     }
-/*
+
     // set deployer as GLBD vault and mint 10 GLBD.
     if (SetGLBDVaultandMint10GLBD)
         await setGLBDVaultandMint10GLBD(GLBD);
@@ -414,7 +414,7 @@ async function main() {
     await treasury.toggle('4', glbdbusdBond.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
-*/
+
     // Queue GLBD_BUSD_LP as liquidity token
     console.log("[Queue GLBD_BUSD_LP as liquidity token]");
     await treasury.queue('5', glbdbusdLP.address);
@@ -426,7 +426,7 @@ async function main() {
     await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
-/*
+
     // Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%.
     console.log("[Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%]");
     await distributor.addRecipient(staking.address, initialRewardRateForEpoch);
@@ -537,10 +537,22 @@ async function main() {
     await glbdbusdLP.approve(glbdbusdBond.address,largeApproval);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
-*/
+
+    // Queue GLBD_BUSD_LP as liquidity token
+    console.log("[Queue GLBD_BUSD_LP as liquidity token]");
+    await treasury.queue('5', glbdbusdLP.address);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), 1000));
+
+    // Toggle GLBD_BUSD_LP as liquidity token
+    console.log("[Toggle GLBD_BUSD_LP as liquidity token]");
+    await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), 1000));
+
     // Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer
     console.log("[Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer]");
-    await glbdbusdBond.deposit('140000000000000000','2613',DEPLOYER_ADDRESS);
+    await glbdbusdBond.deposit('5000000000000','1000000000000000000000',DEPLOYER_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
 
@@ -569,13 +581,13 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), 1000));
 
     // Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer
-    /*console.log("[Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer]");
-    await glbdbusdLP.deposit('140000000000000000','2613',DEPLOYER_ADDRESS);
-    console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), 1000));*/
+    //console.log("[Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer]");
+    //await glbdbusdLP.deposit('140000000000000000','2613',DEPLOYER_ADDRESS);
+    //console.log("[Success]");
+    //await new Promise(r => setTimeout(() => r(), 1000));
 
     // Approve treasury as spender of glbdbusdLP for Deployer
-    console.log("[Toggle GLB_BUSD_LP as liquidity token]");
+    console.log("[Approve GLB_BUSD_LP as liquidity token]");
     await glbdbusdLP.approve(treasury.address,largeApproval);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
@@ -595,7 +607,7 @@ async function main() {
     // Deposit GLBD_BUSD_LP to treasury
     // Això hauria de ser DESDE EL BOND.
     console.log("[Deposit GLBD_BUSD_LP to treasury -- el 2n número ha de tenir 9 zeros menys!]");
-    await treasury.deposit('281248608016090207', glbdbusdLP.address, '18503555522970');
+    await treasury.deposit('500000000000000000', glbdbusdLP.address, '400000000');
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
 
