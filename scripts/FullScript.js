@@ -55,7 +55,7 @@ async function main() {
     let busdBond;
     let glbdbusdBond;
     let redeemHelper;
-    let deploy = false;
+    let deploy = true;
     let testnet = true;
     let SetGLBDVaultandMint10GLBD = true;
     let largeApproval = '100000000000000000000000000000000';
@@ -98,7 +98,7 @@ async function main() {
     const intialGLBDBUSDBondDebt = '3000000000000';
 
     // Quin bloc serà el primer que doni staking
-    let firstBlockEpoch = await ethers.provider.getBlockNumber();
+    let firstBlockEpoch = '15269252';
 
     // Initial reward rate for epoch. 5000 = 0.5%. Used for staking.
     let initialRewardRateForEpoch = '800'; //META ho te a 435 en un inici
@@ -354,7 +354,7 @@ async function main() {
     // set deployer as GLBD vault and mint 10 GLBD.
     if (SetGLBDVaultandMint10GLBD)
         await setGLBDVaultandMint10GLBD(GLBD);
-/*
+
     // Initialize sOHM
     console.log("[Initialize sOHM]");
     await sGLBD.initialize(staking.address);
@@ -492,7 +492,7 @@ async function main() {
     await GLBD.approve(router.address, largeApproval);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
-*/
+
     // Approve RouterBeGlobal as spender of LBD-BUSD LP for Deployer
     console.log("[Approve GLBD-BUSD LP to be used in the BeGlobal router by the deployer]");
     await glbdbusdLP.approve(router.address, largeApproval);
