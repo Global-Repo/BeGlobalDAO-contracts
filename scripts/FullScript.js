@@ -55,7 +55,7 @@ async function main() {
     let busdBond;
     let glbdbusdBond;
     let redeemHelper;
-    let deploy = false;
+    let deploy = true;
     let testnet = true;
     let SetGLBDVaultandMint10GLBD = true;
     let largeApproval = '100000000000000000000000000000000';
