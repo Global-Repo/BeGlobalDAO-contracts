@@ -751,7 +751,7 @@ contract GlobalDAOBondDepository is Ownable {
             require( _input <= 1000, "Payout cannot be above 1 percent" );
             terms.maxPayout = _input;
         } else if ( _parameter == PARAMETER.FEE ) { // 2
-            require( _input <= 10000, "DAO fee cannot exceed payout" );
+            require( _input <= 20000, "DAO fee cannot exceed payout" );
             terms.fee = _input;
         } else if ( _parameter == PARAMETER.DEBT ) { // 3
             terms.maxDebt = _input;

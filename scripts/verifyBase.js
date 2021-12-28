@@ -22,7 +22,7 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstEpochBlock = '15269252'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
+    const firstEpochBlock = '15323719'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
 
     // What epoch will be first epoch
     //const firstEpochNumber = '338';
@@ -30,7 +30,7 @@ async function main() {
 
     // How many blocks are in each epoch
     //const epochLengthInBlocks = '2200';
-    const epochLengthInBlocks = '20';
+    const epochLengthInBlocks = '14400';
 
     try {
         console.log("VERIFYING BUSD: ", BUSD_ADDRESS);

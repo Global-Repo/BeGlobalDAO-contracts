@@ -64,8 +64,8 @@ async function main() {
     const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
-    // Quants blocs dura el epoch (staking)
-    let epochLengthInBlocks = '20';
+    // Quants blocs dura el epoch (staking): 12h.
+    let epochLengthInBlocks = '14400';
 
     // BUSD bond BCV
     const busdBondBCV = '300';
@@ -98,10 +98,10 @@ async function main() {
     const intialGLBDBUSDBondDebt = '10000000000000';
 
     // Quin bloc serà el primer que doni staking
-    let firstBlockEpoch = '15269252';
+    let firstBlockEpoch = '15323719';
 
     // Initial reward rate for epoch. 5000 = 0.5%. Used for staking.
-    let initialRewardRateForEpoch = '800'; //META ho te a 435 en un inici
+    let initialRewardRateForEpoch = '10000'; //META ho te a 435 en un inici
 
     // Initial staking index
     const initialIndex = '10';
@@ -291,7 +291,7 @@ async function main() {
         // Deploy distributor
         console.log("[Deploying distributor SC]");
         const Distributor = await ethers.getContractFactory('Distributor');
-        distributor = await Distributor.deploy(treasury.address, GLBD.address, epochLengthInBlocks, firstBlockEpoch); // 3r: número de blocs que dura epoch, 4rt: primer block que farà epoch (staking, no?)
+        distributor = await Distributor.deploy(treasury.address, GLBD.address, epochLengthInBlocks, firstBlockEpoch); // 3r: número de blocs que dura epoch, posem 12h, 4rt: primer block que farà staking
         console.log("[Distributor deployed]: " + distributor.address);
         await new Promise(r => setTimeout(() => r(), 3000));
     } else {
@@ -310,6 +310,8 @@ async function main() {
         staking = await Staking.deploy(GLBD.address, sGLBD.address, epochLengthInBlocks, 0, firstBlockEpoch);
         console.log("[Staking deployed]: " + staking.address);
         await new Promise(r => setTimeout(() => r(), 3000));
+        staking.setWarmup(2);
+
     } else {
         // Attach Staking
         console.log("[Attaching Staking]");
@@ -317,6 +319,8 @@ async function main() {
         staking = await Staking.attach(STAKING_ADDRESS);
         console.log("[Staking attached]: " + staking.address);
         await new Promise(r => setTimeout(() => r(), 1000));
+        staking.setWarmup(2);
+        await new Promise(r => setTimeout(() => r(), 3000));
     }
 
     if (deploy) {
@@ -416,7 +420,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), 1000));
 
     // Queue GLBD_BUSD_LP as liquidity token
-    console.log("[Queue GLBD_BUSD_LP as liquidity token]");
+   /* console.log("[Queue GLBD_BUSD_LP as liquidity token]");
     await treasury.queue('5', glbdbusdLP.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
@@ -425,7 +429,7 @@ async function main() {
     console.log("[Toggle GLBD_BUSD_LP as liquidity token]");
     await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), 1000));
+    await new Promise(r => setTimeout(() => r(), 1000));*/
 
     // Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%.
     console.log("[Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%]");
@@ -456,6 +460,7 @@ async function main() {
     await busdBond.setStaking(stakingHelper.address, true);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
+
 
     // Setting GLBD-BUSD LP Bond terms
     console.log('Setting GLBD-BUSD LP Bond terms');
@@ -510,10 +515,10 @@ async function main() {
     const addLiq = await router.addLiquidity(
         GLBD.address,
         busd.address,
-        bep20Amount(3000),
-        bep20Amount_B(105000),
-        bep20Amount(3000),
-        bep20Amount_B(105000),
+        bep20Amount(10000),
+        bep20Amount_B(200000),
+        bep20Amount(10000),
+        bep20Amount_B(200000),
         DEPLOYER_ADDRESS,
         (new Date()).setTime((new Date()).getTime())
     );
@@ -525,6 +530,7 @@ async function main() {
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
 
+    // TODO
     // Deposit 5$ to treasury, profit 4.5$ -- el 2n número ha de tenir 9 zeros menys!!!
     // Això hauria de ser DESDE EL BOND.
     console.log("[Deposit 5$ to treasury, profit 4.5$ -- el 2n número ha de tenir 9 zeros menys!]");
@@ -538,18 +544,7 @@ async function main() {
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
 
-    // Queue GLBD_BUSD_LP as liquidity token
-    console.log("[Queue GLBD_BUSD_LP as liquidity token]");
-    await treasury.queue('5', glbdbusdLP.address);
-    console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), 1000));
-
-    // Toggle GLBD_BUSD_LP as liquidity token
-    console.log("[Toggle GLBD_BUSD_LP as liquidity token]");
-    await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
-    console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), 1000));
-
+    // todo script apart per fer bond de part dels presalers.
     // Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer
     console.log("[Deposit GLBD-BUSD LP to the GLBD-BUSD LP Bond by the deployer]");
     await glbdbusdBond.deposit('5000000000000','1000000000000000000000',DEPLOYER_ADDRESS);
@@ -606,6 +601,7 @@ async function main() {
 
     // Deposit GLBD_BUSD_LP to treasury
     // Això hauria de ser DESDE EL BOND.
+    // Té pinta de test.
     console.log("[Deposit GLBD_BUSD_LP to treasury -- el 2n número ha de tenir 9 zeros menys!]");
     await treasury.deposit('500000000000000000', glbdbusdLP.address, '400000000');
     console.log("[Success]");
@@ -647,7 +643,7 @@ let setGLBDVaultandMint10GLBD = async function (GLBD){
     console.log(await GLBD.vault())
 
     // Mint 100000 GLBD
-    console.log("[Deployer mints (extra?) 100000 GLBD]");
+    console.log("[Deployer mints (extra?) 200000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 3000));
