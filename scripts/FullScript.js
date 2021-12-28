@@ -243,7 +243,7 @@ async function main() {
         // Deploy bonding depository BUSD
         console.log("[Deploy bonding depository BUSD]");
         const BUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
-        busdBond = await BUSDBond.deploy(GLBD.address, busd.address, treasury.address, MULTISIG_ADDRESS, globalDAOBondingCalculator.address);
+        busdBond = await BUSDBond.deploy(GLBD.address, busd.address, treasury.address, MULTISIG_ADDRESS, '0x0000000000000000000000000000000000000000');
         console.log("[GlobalDAOBondDepository BUSD deployed]: " + busdBond.address);
         await new Promise(r => setTimeout(() => r(), 3000));
     } else {
