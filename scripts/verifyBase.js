@@ -14,7 +14,7 @@ const {
     MULTISIG_ADDRESS,
     BUSD_BOND_ADDRESS,
     GLBD_BUSD_BOND_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 async function main() {
 
@@ -214,7 +214,7 @@ async function main() {
                 BUSD_ADDRESS,
                 TREASURY_ADDRESS,
                 MULTISIG_ADDRESS,
-                BONDING_CALCULATOR_ADDRESS
+                '0x0000000000000000000000000000000000000000'
             ],
         });
         console.log( "BUSD_BOND verified: " + BUSD_BOND_ADDRESS );
