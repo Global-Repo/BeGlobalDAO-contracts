@@ -47,6 +47,20 @@ async function main() {
     }
 
     try {
+        console.log("VERIFYING GLBD_BUSD: ", GLBD_BUSD_LP_ADDRESS);
+        //// Verify contract on bsc
+        await hre.run("verify:verify", {
+            address: GLBD_BUSD_LP_ADDRESS,
+            constructorArguments: [
+            ],
+        });
+        console.log( "GLBD_BUSD verified: " + GLBD_BUSD_LP_ADDRESS );
+        console.log("Success");
+    } catch (err) {
+        console.log(err.message);
+    }
+
+    try {
         console.log("VERIFYING GLBD_ADDRESS: ", GLBD_ADDRESS);
         //// Verify contract on bsc
         await hre.run("verify:verify", {

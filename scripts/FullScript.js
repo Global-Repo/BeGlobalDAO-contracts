@@ -251,7 +251,7 @@ async function main() {
         console.log("[Attaching bonding depository BUSD]");
         const BUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
         busdBond = await BUSDBond.attach(BUSD_BOND_ADDRESS);
-        console.log("[GlobalDAOBondDepository BUSD attached]: " + busdBond.address);
+        console.log("[GlobalDAOBondDepository BUSD attached]: " + BUSD_BOND_ADDRESS);
         await new Promise(r => setTimeout(() => r(), 1000));
     }
 
@@ -267,7 +267,7 @@ async function main() {
         console.log("[Attaching bonding depository GLBD-BUSD LP]");
         const GLBDBUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
         glbdbusdBond = await GLBDBUSDBond.attach(GLBD_BUSD_BOND_ADDRESS);
-        console.log("[GlobalDAOBondDepository GLBD-BUSD LP attached]: " + busdBond.address);
+        console.log("[GlobalDAOBondDepository GLBD-BUSD LP attached]: " + GLBD_BUSD_BOND_ADDRESS);
         await new Promise(r => setTimeout(() => r(), 1000));
     }
 
@@ -420,7 +420,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), 1000));
 
     // Queue GLBD_BUSD_LP as liquidity token
-   /* console.log("[Queue GLBD_BUSD_LP as liquidity token]");
+    console.log("[Queue GLBD_BUSD_LP as liquidity token]");
     await treasury.queue('5', glbdbusdLP.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 1000));
@@ -429,7 +429,20 @@ async function main() {
     console.log("[Toggle GLBD_BUSD_LP as liquidity token]");
     await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), 1000));*/
+    await new Promise(r => setTimeout(() => r(), 1000));
+
+    // Queue GLBD_BUSD_LP as liquidity token
+    console.log("[Queue GLBD_BUSD_LP as liquidity token]");
+    await treasury.queue('5', glbdbusdLP.address);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), 1000));
+
+    // Toggle GLBD_BUSD_LP as liquidity token
+    console.log("[Toggle GLBD_BUSD_LP as liquidity token]");
+    await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), 1000));
+
 
     // Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%.
     console.log("[Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%]");
