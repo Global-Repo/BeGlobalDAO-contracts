@@ -100,7 +100,7 @@ async function main() {
     const intialGLBDBUSDBondDebt = '10000000000000';
 
     // Quin bloc serà el primer que doni staking
-    let firstBlockEpoch = '15408119';
+    let firstBlockEpoch = '15431654';
 
     // Initial reward rate for epoch. 5000 = 0.5%. Used for staking.
     let initialRewardRateForEpoch = '1250'; //META ho te a 435 en un inici
@@ -401,7 +401,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Queue deployer as reserve depositor
-    /*console.log("[Queue deployer as reserve depositor]");
+    console.log("[Queue deployer as reserve depositor]");
     await treasury.queue('0', deployer.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -410,7 +410,7 @@ async function main() {
     console.log("[Toggle deployer as reserve depositor]");
     await treasury.toggle('0', deployer.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Queue LP Bond Depository as liquidity depositor
     console.log("[Queue LP Bond Depository as liquidity depositor]");
@@ -551,10 +551,10 @@ async function main() {
     // TODO
     // Deposit 5$ to treasury, profit 4.5$ -- el 2n número ha de tenir 9 zeros menys!!!
     // Això hauria de ser DESDE EL BOND.
-    /*console.log("[Deposit 5$ to treasury, profit 4.5$ -- el 2n número ha de tenir 9 zeros menys!]");
+    console.log("[Deposit 5$ to treasury, profit 4.5$ -- el 2n número ha de tenir 9 zeros menys!]");
     await treasury.deposit(bep20Amount_B(200000), busd.address, bep20Amount(200000)); // La diferencia és el que s'ha cobrat de comisió
     console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Approve GLBD-BUSD LP to be used in the GLBD-BUSD LP Bond by the deployer
     console.log("[Approve GLBD-BUSD LP to be used in the GLBD-BUSD LP Bond by the deployer]");
@@ -594,7 +594,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Toggle deployer as liquidity depositor
-    /*console.log("[Toggle deployer as liquidity depositor]");
+    console.log("[Toggle deployer as liquidity depositor]");
     await treasury.toggle('4', deployer.address, globalDAOBondingCalculator.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -605,7 +605,7 @@ async function main() {
     console.log("[Deposit GLBD_BUSD_LP to treasury -- el 2n número ha de tenir 9 zeros menys!]");
     await treasury.deposit('500000000000000000', glbdbusdLP.address, '400000000');
     console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Audit Reserves
     console.log("[Audit Reserves]");

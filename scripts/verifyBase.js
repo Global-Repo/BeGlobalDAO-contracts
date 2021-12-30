@@ -22,7 +22,7 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstEpochBlock = '15408119'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
+    const firstEpochBlock = '15431654'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
 
     // What epoch will be first epoch
     //const firstEpochNumber = '338';
