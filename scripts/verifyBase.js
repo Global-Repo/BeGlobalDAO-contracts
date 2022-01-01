@@ -13,7 +13,7 @@ const {
     GLBD_BUSD_LP_ADDRESS,
     MULTISIG_ADDRESS,
     BUSD_BOND_ADDRESS,
-    GLBD_BUSD_BOND_ADDRESS
+    GLBD_BUSD_BOND_ADDRESS, DEPLOYER_ADDRESS, FACTORY_ADDRESS, WETH_ADDRESS, ROUTER_BEGLOBAL_ADDRESS
 } = require("./addresses_testnet");
 
 async function main() {
@@ -31,6 +31,38 @@ async function main() {
     // How many blocks are in each epoch
     //const epochLengthInBlocks = '2200';
     const epochLengthInBlocks = '200';
+
+    try {
+        console.log("VERIFYING FACTORY: ", FACTORY_ADDRESS);
+        //// Verify contract on bsc
+        await hre.run("verify:verify", {
+            address: FACTORY_ADDRESS,
+            constructorArguments: [
+                DEPLOYER_ADDRESS
+            ],
+        });
+        console.log( "FACTORY verified: " + FACTORY_ADDRESS );
+        console.log("Success");
+    } catch (err) {
+        console.log(err.message);
+    }
+    try {
+        console.log("VERIFYING ROUTER: ", ROUTER_BEGLOBAL_ADDRESS);
+        //// Verify contract on bsc
+        await hre.run("verify:verify", {
+            address: ROUTER_BEGLOBAL_ADDRESS,
+            constructorArguments: [
+                FACTORY_ADDRESS,
+                WETH_ADDRESS
+            ],
+        });
+        console.log( "ROUTER verified: " + ROUTER_BEGLOBAL_ADDRESS );
+        console.log("Success");
+    } catch (err) {
+        console.log(err.message);
+    }
+
+
 
     try {
         console.log("VERIFYING BUSD: ", BUSD_ADDRESS);
