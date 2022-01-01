@@ -6,110 +6,60 @@ import "../Modifiers/Trusted.sol";
 import "../Libraries/SafeMath.sol";
 import "../Tokens/IBEP20.sol";
 import "../Libraries/SafeBEP20.sol";
-import "../Tokens/NativeToken.sol";
+import "./BEP20.sol";
 
-contract Presale is Ownable, Trusted{
+contract Presale is Trusted{
 
     using SafeBEP20 for uint16;
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
 
-    NativeToken public nativeToken;
-    uint public whitelistBegins;
-    uint public whitelistEnds;
-    uint public publicBegins;
-    uint public publicEnds;
+    BEP20 public busdToken;
+    uint public presaleBegins;
+    uint public presaleEnds;
 
-    uint hardcap = 7345e18;
-    uint public bnbacc = 0;
+    uint public hardcap = 400e18;
+    uint public busdAcc = 0;
 
     mapping (address => uint) private quantityBought;
     address[] private buyers;
 
-    event TokensBought(address buyer, uint256 amountBNB, uint256 globalAmount, uint256 bnb_Acc);
+    event TokensBought(address buyer, uint256 amount, uint256 busdAcc);
     event AdminTokenRecovery(address tokenRecovered, uint256 amount);
 
-    constructor(address _token, uint _whitelistBegins, uint _publicBegins) public {
-        nativeToken = NativeToken(_token);
+    constructor(address _token, uint _presaleBegins, uint _presaleEnds) public {
+        busdToken = BEP20(_token);
 
-        whitelistBegins = _whitelistBegins;
-        whitelistEnds = whitelistBegins.add(5 days);
-
-        publicBegins = _publicBegins;
-        publicEnds = publicBegins.add(2 days);
+        presaleBegins = _presaleBegins;
+        presaleEnds = _presaleEnds;
     }
 
-    function changeWhitelistBegins(uint _whitelistBegins) public onlyOwner {
-        whitelistBegins = _whitelistBegins;
-        whitelistEnds = whitelistBegins.add(5 days);
+    function changePresalePeriod(uint _presaleBegins, uint _presaleEnds) public onlyOwner {
+        presaleBegins = _presaleBegins;
+        presaleEnds = _presaleEnds;
     }
 
-    function changePublicBegins(uint _publicBegins) public onlyOwner {
-        publicBegins = _publicBegins;
-        publicEnds = publicBegins.add(2 days);
+    function getStatus() public view returns (bool) {
+        return presaleBegins < block.timestamp && block.timestamp < presaleEnds;
     }
 
-    receive() external payable {
-        buyTokens(msg.value, msg.sender);
-    }
+    function buyTokens(uint256 amount, address buyer) public onlyHuman {
+        require(presaleBegins < block.timestamp && block.timestamp < presaleEnds && whitelist[buyer], "[ERROR: YOU ARE NOT ALLOWED TO BUY]");
+        require(quantityBought[buyer].add(amount) <= hardcap, '[ERROR: THANK YOU FOR YOUR KIND SUPPORT, BUT YOU CAN NOT BUY SO MANY TOKENS. Wait for launch to purchase more]');
 
-    function getStatus() public view returns (uint whitelistStep) {
-        if (block.timestamp < whitelistBegins) return 2;
-        if (block.timestamp < whitelistEnds) return 0;
-        if (block.timestamp < publicBegins) return 2;
-        if (block.timestamp < publicEnds) return 1;
-        return 2;
-    }
-
-    function buyTokens(uint256 quantity, address buyer) private onlyHuman {
-        require((getStatus() == 0 && whitelist[buyer] && bnbacc < hardcap) || (getStatus() == 1 && bnbacc < hardcap) || (getStatus() == 1 && publicBegins.add(2 hours) > block.timestamp) , "[ERROR: YOU ARE NOT ALLOWED TO BUY]");
-
-        uint globalToReceive = 0;
-
-        if (getStatus() == 0 && whitelist[buyer] && bnbacc < hardcap){
-            globalToReceive = quantity.mul(4700);
-            nativeToken.mints(buyer, globalToReceive);
-            bnbacc = bnbacc.add(quantity);
-            if(quantityBought[buyer]==0)
-            {
-                buyers.push(buyer);
-            }
-            quantityBought[buyer] = quantityBought[buyer].add(quantity);
-            emit TokensBought(buyer, quantity, globalToReceive, bnbacc);
-        }
-        else if(getStatus() == 1 && bnbacc < hardcap)
+        busdToken.transferFrom(buyer, address(this), amount);
+        if(quantityBought[buyer]==0)
         {
-            globalToReceive = quantity.mul(4350);
-            nativeToken.mints(buyer, globalToReceive);
-            bnbacc = bnbacc.add(quantity);
-            if(quantityBought[buyer]==0)
-            {
-                buyers.push(buyer);
-            }
-            quantityBought[buyer] = quantityBought[buyer].add(quantity);
-            emit TokensBought(buyer, quantity, globalToReceive, bnbacc);
+            buyers.push(buyer);
         }
-        else if(getStatus() == 1 && publicBegins.add(2 hours) > block.timestamp)
-        {
-            globalToReceive = quantity.mul(4100);
-            nativeToken.mints(buyer, globalToReceive);
-            bnbacc = bnbacc.add(quantity);
-            if(quantityBought[buyer]==0)
-            {
-                buyers.push(buyer);
-            }
-            quantityBought[buyer] = quantityBought[buyer].add(quantity);
-            emit TokensBought(buyer, quantity, globalToReceive, bnbacc);
-        }
+        quantityBought[buyer] = quantityBought[buyer].add(amount);
+        busdAcc = busdAcc.add(amount);
+        emit TokensBought(buyer, amount, busdAcc);
     }
 
-    function transferTokenOwnership(address _masterchef) public onlyOwner {
-        nativeToken.transferOwnership(_masterchef);
-    }
-
-    function transferBNBsAcc(uint amount) public onlyOwner {
-        payable(address(msg.sender)).transfer(amount);
-        bnbacc = bnbacc.sub(amount);
+    function transferBUSDsAcc(uint _amount) external onlyOwner {
+        payable(address(msg.sender)).transfer(_amount);
+        emit AdminTokenRecovery(address(busdToken), _amount);
     }
 
     function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
