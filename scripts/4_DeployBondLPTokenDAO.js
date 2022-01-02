@@ -3,33 +3,27 @@ const { BigNumber } = require("@ethersproject/bignumber");
 const {
     MULTISIG_ADDRESS,
     GLBD_ADDRESS,
-    SGLBD_ADDRESS,
     BUSD_ADDRESS,
     TREASURY_ADDRESS,
     GLBD_BUSD_LP_ADDRESS,
-    REDEEM_HELPER_ADDRESS, BONDING_CALCULATOR_ADDRESS
+    REDEEM_HELPER_ADDRESS,
+    STAKING_HELPER_ADDRESS,
+    BONDING_CALCULATOR_ADDRESS,
+    ROUTER_BEGLOBAL_ADDRESS,
+    DEPLOYER_ADDRESS
 } = require("./addresses_testnet");
-
-const TOKEN_DECIMALS = 9;
-const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
 
 async function main() {
 
     const [deployer] = await ethers.getSigners();
-    let GLBD;
-    let sGLBD;
     let busd;
     let treasury;
     let glbdbusdLP;
-    let stakingHelper;
-    let globalDAOBondingCalculator;
     let busdBond;
     let glbdbusdBond;
     let redeemHelper;
     let timeoutPeriod = 5000;
 
-    const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
-    const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // GLBD-BUSD bond BCV
@@ -53,30 +47,20 @@ async function main() {
     // Initial Bond debt
     const intialGLBDBUSDBondDebt = '6000000000000';
 
+    let largeApproval = '100000000000000000000000000000000';
+
+    console.log('[Deploying LP bond from ', DEPLOYER_ADDRESS,']');
+
     // Attach BUSD
     console.log("[Attaching BUSD SC]");
     busd = await BUSD.attach(BUSD_ADDRESS);
     console.log("[BUSDt attached]: " + busd.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    console.log('Deploying contracts. Deployer account: ' + deployer.address + '. Multisig account: ' + MULTISIG_ADDRESS + '.');
-
-    // Attach GLBD
-    console.log("[Attaching GLBD SC]");
-    GLBD = await GLBDT.attach(GLBD_ADDRESS);
-    console.log("[GLBD attached]: " + GLBD_ADDRESS);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    // Attach sGLBD
-    console.log("[Attaching sGLBD SC]");
-    sGLBD = await sGLBDT.attach(SGLBD_ADDRESS);
-    console.log("[sGLBD attached]: " + SGLBD_ADDRESS);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
     const GLBDBUSDLP = await ethers.getContractFactory('PancakeERC20');
     glbdbusdLP = await GLBDBUSDLP.attach(GLBD_BUSD_LP_ADDRESS);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+/*
     // Attach Redeem helper
     console.log("[Attaching redeem helper]");
     const RedeemHelper = await ethers.getContractFactory('RedeemHelper');
@@ -91,24 +75,10 @@ async function main() {
     console.log("[Treasury attached]: " + treasury.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    // Attach bonding calculator
-    console.log("[Attaching bonding calculator]");
-    const GlobalDAOBondingCalculator = await ethers.getContractFactory('GlobalDAOBondingCalculator');
-    globalDAOBondingCalculator = await GlobalDAOBondingCalculator.attach(BONDING_CALCULATOR_ADDRESS);
-    console.log("[GlobalDAOBondingCalculator attached]: " + globalDAOBondingCalculator.address);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    // Deploy bonding depository BUSD
-    console.log("[Deploy bonding depository BUSD]");
-    const BUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
-    busdBond = await BUSDBond.deploy(GLBD.address, busd.address, treasury.address, MULTISIG_ADDRESS, '0x0000000000000000000000000000000000000000');
-    console.log("[GlobalDAOBondDepository BUSD deployed]: " + busdBond.address);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
     // Deploy bonding depository GLBD-BUSD LP
     console.log("[Deploy bonding depository GLBD-BUSD LP]");
     const GLBDBUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
-    glbdbusdBond = await GLBDBUSDBond.deploy(GLBD.address, glbdbusdLP.address, treasury.address, MULTISIG_ADDRESS, globalDAOBondingCalculator.address);
+    glbdbusdBond = await GLBDBUSDBond.deploy(GLBD_ADDRESS, GLBD_BUSD_LP_ADDRESS, TREASURY_ADDRESS, MULTISIG_ADDRESS, BONDING_CALCULATOR_ADDRESS);
     console.log("[GlobalDAOBondDepository GLBD-BUSD LP deployed]: " + glbdbusdBond.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -120,7 +90,7 @@ async function main() {
 
     // Setting staking for GLBD-BUSD LP Bond
     console.log('Setting staking for GLBD-BUSD LP Bond');
-    await glbdbusdBond.setStaking(stakingHelper.address, true);
+    await glbdbusdBond.setStaking(STAKING_HELPER_ADDRESS, true);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -130,7 +100,6 @@ async function main() {
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-
     // Queue LP Bond Depository as liquidity depositor
     console.log("[Queue LP Bond Depository as liquidity depositor]");
     await treasury.queue('4', glbdbusdBond.address);
@@ -139,41 +108,41 @@ async function main() {
 
     // Toggle LP Bond Depository as liquidity depositor
     console.log("[Toggle LP Bond Depository as liquidity depositor]");
-    await treasury.toggle('4', glbdbusdBond.address, globalDAOBondingCalculator.address);
+    await treasury.toggle('4', glbdbusdBond.address, BONDING_CALCULATOR_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Queue GLBD_BUSD_LP as liquidity token
     console.log("[Queue GLBD_BUSD_LP as liquidity token]");
-    await treasury.queue('5', glbdbusdLP.address);
+    await treasury.queue('5', GLBD_BUSD_LP_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Toggle GLBD_BUSD_LP as liquidity token
     console.log("[Toggle GLBD_BUSD_LP as liquidity token]");
-    await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
+    await treasury.toggle('5', GLBD_BUSD_LP_ADDRESS, BONDING_CALCULATOR_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Queue GLBD_BUSD_LP as liquidity token
     console.log("[Queue GLBD_BUSD_LP as liquidity token]");
-    await treasury.queue('5', glbdbusdLP.address);
+    await treasury.queue('5', GLBD_BUSD_LP_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Toggle GLBD_BUSD_LP as liquidity token
     console.log("[Toggle GLBD_BUSD_LP as liquidity token]");
-    await treasury.toggle('5', glbdbusdLP.address, globalDAOBondingCalculator.address);
+    await treasury.toggle('5', GLBD_BUSD_LP_ADDRESS, BONDING_CALCULATOR_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+*/
     // Approve RouterBeGlobal as spender of LBD-BUSD LP for Deployer
     console.log("[Approve GLBD-BUSD LP to be used in the BeGlobal router by the deployer]");
-    await glbdbusdLP.approve(router.address, largeApproval);
+    await glbdbusdLP.approve(ROUTER_BEGLOBAL_ADDRESS, largeApproval);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    console.log("DEPLOYMENT SUCCESSFULLY FINISHED -> copy BUSD, GLBD & sGLBD addresses and addLiquidity to the router");
+    console.log("[LP bond deployed successfully]");
 }
 
 main()

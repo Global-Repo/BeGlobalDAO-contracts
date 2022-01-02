@@ -41,7 +41,9 @@ async function main() {
     let epochLengthInBlocks = '600'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
 
     // Quin bloc serà el primer que doni staking [!]
-    let firstBlockEpoch = '15497303'; // TODO posar el block 24h després d'arrancar (launch).
+    let firstBlockEpoch = '15497524'; // TODO posar el block 24h després d'arrancar (launch).
+
+    console.log("[Deploying from " + deployer.address + "]");
 
     // SETUP AMM ENVIRONMENT
     if (!originalAMM) {
@@ -95,8 +97,6 @@ async function main() {
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
         console.log("[Success]");
     }
-
-    console.log('Deploying contracts. Deployer account: ' + deployer.address + '. Multisig account: ' + MULTISIG_ADDRESS + '.');
 
     // Deploy GLBD
     console.log("[Deploying GLBD SC]");
@@ -171,7 +171,7 @@ async function main() {
     console.log("[WarmUp deployed]: " + stakingWarmup.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    console.log("DEPLOYMENT SUCCESSFULLY FINISHED -> copy BUSD, GLBD & sGLBD addresses");
+    console.log("[Deploy sucessfull]");
 }
 let deployFactory = async function (feeSetter) {
     const Factory = await ethers.getContractFactory("Factory");

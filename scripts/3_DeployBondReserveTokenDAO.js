@@ -3,31 +3,22 @@ const { BigNumber } = require("@ethersproject/bignumber");
 const {
     MULTISIG_ADDRESS,
     GLBD_ADDRESS,
-    SGLBD_ADDRESS,
     BUSD_ADDRESS,
     TREASURY_ADDRESS,
-    GLBD_BUSD_LP_ADDRESS,
-    REDEEM_HELPER_ADDRESS
+    REDEEM_HELPER_ADDRESS,
+    BONDING_CALCULATOR_ADDRESS,
+    STAKING_HELPER_ADDRESS, DEPLOYER_ADDRESS
 } = require("./addresses_testnet");
-
-const TOKEN_DECIMALS = 9;
-const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
 
 async function main() {
 
     const [deployer] = await ethers.getSigners();
-    let GLBD;
-    let sGLBD;
     let busd;
     let treasury;
-    let glbdbusdLP;
-    let stakingHelper;
     let busdBond;
     let redeemHelper;
     let timeoutPeriod = 5000;
 
-    const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
-    const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // BUSD bond BCV
@@ -51,28 +42,12 @@ async function main() {
     // Initial Bond debt
     const intialBUSDBondDebt = '6000000000000';
 
+    console.log('[Deploying BUSD bond from ', DEPLOYER_ADDRESS,']');
+
     // Attach BUSD
     console.log("[Attaching BUSD SC]");
     busd = await BUSD.attach(BUSD_ADDRESS);
     console.log("[BUSDt attached]: " + busd.address);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    console.log('Deploying contracts. Deployer account: ' + deployer.address + '. Multisig account: ' + MULTISIG_ADDRESS + '.');
-
-    // Attach GLBD
-    console.log("[Attaching GLBD SC]");
-    GLBD = await GLBDT.attach(GLBD_ADDRESS);
-    console.log("[GLBD attached]: " + GLBD_ADDRESS);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    // Attach sGLBD
-    console.log("[Attaching sGLBD SC]");
-    sGLBD = await sGLBDT.attach(SGLBD_ADDRESS);
-    console.log("[sGLBD attached]: " + SGLBD_ADDRESS);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    const GLBDBUSDLP = await ethers.getContractFactory('PancakeERC20');
-    glbdbusdLP = await GLBDBUSDLP.attach(GLBD_BUSD_LP_ADDRESS);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Attach Redeem helper
@@ -91,8 +66,20 @@ async function main() {
     // Deploy bonding depository BUSD
     console.log("[Deploy bonding depository BUSD]");
     const BUSDBond = await ethers.getContractFactory('GlobalDAOBondDepository');
-    busdBond = await BUSDBond.deploy(GLBD.address, busd.address, treasury.address, MULTISIG_ADDRESS, '0x0000000000000000000000000000000000000000');
+    busdBond = await BUSDBond.deploy(GLBD_ADDRESS, BUSD_ADDRESS, TREASURY_ADDRESS, MULTISIG_ADDRESS, '0x0000000000000000000000000000000000000000');
     console.log("[GlobalDAOBondDepository BUSD deployed]: " + busdBond.address);
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Queue reserve depository
+    console.log("[Queue busdBond as reserve depository]");
+    await treasury.queue('0', busdBond.address);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Toggle reserve depository
+    console.log("[Toggle busdBond as reserve depository]");
+    await treasury.toggle('0', busdBond.address, BONDING_CALCULATOR_ADDRESS);
+    console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Setting BUSD Bond terms
@@ -103,7 +90,7 @@ async function main() {
 
     // Setting staking for BUSD Bond
     console.log('Setting staking for BUSD Bond');
-    await busdBond.setStaking(stakingHelper.address, true);
+    await busdBond.setStaking(STAKING_HELPER_ADDRESS, true);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -113,7 +100,7 @@ async function main() {
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    console.log("DEPLOYMENT SUCCESSFULLY FINISHED -> copy BUSD, GLBD & sGLBD addresses and addLiquidity to the router");
+    console.log("[BUSD Bond deployed successfully]");
 }
 
 main()
