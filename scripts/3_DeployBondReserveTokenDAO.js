@@ -27,10 +27,10 @@ async function main() {
     // Bond vesting length in blocks. 33110 ~ 5 days
     const bondVestingLength = '600';  // TODO Posar 144000 pel deploy a producció (5 dies)
 
-    // Min bond price EN GLBD
-    const minBondPrice = '500';
+    // Min bond price EN GLBD. 500 = 5$
+    const minBondPrice = '1800';
 
-    // Max bond payout - 1% of totalSupply
+    // Max bond payout - Max GLBDs al preu del bond. Per exemple, si bond = 5$, 1000 = 5000 BUSD disponible.
     const maxBondPayout = '1000'
 
     // DAO fee for bond 10000 = 10%

@@ -60,7 +60,7 @@ async function main() {
     const GLBDBUSDLP = await ethers.getContractFactory('PancakeERC20');
     glbdbusdLP = await GLBDBUSDLP.attach(GLBD_BUSD_LP_ADDRESS);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-/*
+
     // Attach Redeem helper
     console.log("[Attaching redeem helper]");
     const RedeemHelper = await ethers.getContractFactory('RedeemHelper');
@@ -135,7 +135,7 @@ async function main() {
     await treasury.toggle('5', GLBD_BUSD_LP_ADDRESS, BONDING_CALCULATOR_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-*/
+
     // Approve RouterBeGlobal as spender of LBD-BUSD LP for Deployer
     console.log("[Approve GLBD-BUSD LP to be used in the BeGlobal router by the deployer]");
     await glbdbusdLP.approve(ROUTER_BEGLOBAL_ADDRESS, largeApproval);
