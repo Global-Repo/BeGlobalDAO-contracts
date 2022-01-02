@@ -22,15 +22,13 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstEpochBlock = '15431654'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
-
-    // What epoch will be first epoch
-    //const firstEpochNumber = '338';
-    const firstEpochNumber = '0'; //TODO pendent a posar el bloc del dia 25 quan (comença a comptar el staking???)
+    const firstBlockEpoch = '15431654'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
 
     // How many blocks are in each epoch
-    //const epochLengthInBlocks = '2200';
-    const epochLengthInBlocks = '200';
+    const epochLengthInBlocks = '600'; //TODO pendent posar 14400 quan arranquem
+
+    // What epoch will be first epoch
+    const firstEpochNumber = '0';
 
     try {
         console.log("VERIFYING BUSD: ", BUSD_ADDRESS);
@@ -115,7 +113,7 @@ async function main() {
                 TREASURY_ADDRESS,
                 GLBD_ADDRESS,
                 epochLengthInBlocks,
-                firstEpochBlock
+                firstBlockEpoch
             ],
         });
         console.log( "DISTRIBUTOR verified: " + DISTRIBUTOR_ADDRESS );
@@ -134,7 +132,7 @@ async function main() {
                 SGLBD_ADDRESS,
                 epochLengthInBlocks,
                 firstEpochNumber,
-                firstEpochBlock
+                firstBlockEpoch
             ],
         });
         console.log( "STAKING verified: " + STAKING_ADDRESS );

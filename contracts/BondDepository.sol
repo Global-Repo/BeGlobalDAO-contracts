@@ -608,21 +608,13 @@ contract GlobalDAOBondDepository is Ownable {
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-
-
-
     /* ======== EVENTS ======== */
-
     event BondCreated( uint deposit, uint indexed payout, uint indexed expires, uint indexed priceInUSD );
     event BondRedeemed( address indexed recipient, uint payout, uint remaining );
     event BondPriceChanged( uint indexed priceInUSD, uint indexed internalPrice, uint indexed debtRatio );
     event ControlVariableAdjustment( uint initialBCV, uint newBCV, uint adjustment, bool addition );
 
-
-
-
     /* ======== STATE VARIABLES ======== */
-
     address public immutable GLBD; // token given as payment for bond
     address public immutable principle; // token used to create bond
     address public immutable treasury; // mints GLBD when receives principle
@@ -674,8 +666,6 @@ contract GlobalDAOBondDepository is Ownable {
         uint buffer; // minimum length (in blocks) between adjustments
         uint lastBlock; // block when last adjustment made
     }
-
-
 
 
     /* ======== INITIALIZATION ======== */
@@ -797,9 +787,6 @@ contract GlobalDAOBondDepository is Ownable {
             staking = _staking;
         }
     }
-
-
-    
 
     /* ======== USER FUNCTIONS ======== */
 
