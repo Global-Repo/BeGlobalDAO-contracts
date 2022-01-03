@@ -34,7 +34,7 @@ async function main() {
     const maxBondPayout = '1000'
 
     // DAO fee for bond 10000 = 10%
-    const bondFee = '20000';
+    const bondFee = '10000';
 
     // Max debt bond can take on
     const maxBUSDBondDebt = '120000000000000';
