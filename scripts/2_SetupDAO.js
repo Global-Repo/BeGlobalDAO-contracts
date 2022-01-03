@@ -80,7 +80,7 @@ async function main() {
     staking = await Staking.attach(STAKING_ADDRESS);
     console.log("[Staking attached]: " + staking.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-/*
+
     // set warmup to unstake rewards
     staking.setWarmup(0); // TODO, posar un 2 per deploy a mainnet final
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -101,7 +101,13 @@ async function main() {
     await sGLBD.initialize(STAKING_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-*/
+
+    // Set Treasury as GLBD vault
+    console.log("[Set Treasury as GLBD vault]");
+    await GLBD.setVault(TREASURY_ADDRESS);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
     // Set index
     console.log("[Set index]");
     await sGLBD.setIndex(initialIndex);
