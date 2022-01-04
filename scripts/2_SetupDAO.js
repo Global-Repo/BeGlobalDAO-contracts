@@ -91,7 +91,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), 5000));
 
     // Mint 100000 GLBD
-    console.log("[Deployer mints (extra?) 200000 GLBD]");
+    console.log("[Deployer mints (extra?) 100000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), 5000));

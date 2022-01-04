@@ -38,10 +38,10 @@ async function main() {
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // Quants blocs dura el epoch (staking): 12h.
-    let epochLengthInBlocks = '600'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
+    let epochLengthInBlocks = '400'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
 
     // Quin bloc serà el primer que doni staking [!]
-    let firstBlockEpoch = '15497524'; // TODO posar el block 24h després d'arrancar (launch).
+    let firstBlockEpoch = '15556783'; // TODO posar el block 24h després d'arrancar (launch).
 
     console.log("[Deploying from " + deployer.address + "]");
 

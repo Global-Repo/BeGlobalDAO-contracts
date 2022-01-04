@@ -24,16 +24,15 @@ async function main() {
     let timeoutPeriod = 5000;
 
     // GLB-BUSD bond BCV
-    const glbbusdBondBCV = '100';
+    const glbbusdBondBCV = '200';
 
     // Bond vesting length in blocks. 33110 ~ 5 days
-    const bondVestingLength = '600';  // TODO Posar 144000 pel deploy a producció (5 dies)
+    const bondVestingLength = '450';  // TODO Posar 144000 pel deploy a producció (5 dies)
 
     // Min bond price EN GLBD
     const minBondPrice = '500';
 
-    // Max bond payout - 1% of totalSupply
-    const maxBondPayout = '1000'
+    const maxBondPayout = '2000'
 
     // DAO fee for bond 10000 = 10%
     const bondFee = '20000';
@@ -42,7 +41,7 @@ async function main() {
     const maxGLBBUSDBondDebt = '120000000000000';
 
     // Initial Bond debt
-    const intialGLBBUSDBondDebt = '6000000000000';
+    const intialGLBBUSDBondDebt = '0';
 
     let largeApproval = '100000000000000000000000000000000';
 
