@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
+pragma solidity >=0.6.0 <0.8.0;
 
 import "../Modifiers/Ownable.sol";
 import "../Modifiers/Trusted.sol";
@@ -7,8 +7,9 @@ import "../Libraries/SafeMath.sol";
 import "../Tokens/IBEP20.sol";
 import "../Libraries/SafeBEP20.sol";
 import "./BEP20.sol";
+import "./IPresale.sol";
 
-contract Presale is Trusted{
+contract Presale is Trusted, IPresale{
 
     using SafeBEP20 for uint16;
     using SafeMath for uint256;
@@ -38,8 +39,11 @@ contract Presale is Trusted{
         presaleBegins = _presaleBegins;
         presaleEnds = _presaleEnds;
     }
+    function getBusdAcc() override external view returns (uint) {
+        return busdAcc;
+    }
 
-    function getStatus() public view returns (bool) {
+    function getStatus() override external view returns (bool) {
         return presaleBegins < block.timestamp && block.timestamp < presaleEnds;
     }
 
@@ -58,7 +62,7 @@ contract Presale is Trusted{
     }
 
     function transferBUSDsAcc(uint _amount) external onlyOwner {
-        payable(address(msg.sender)).transfer(_amount);
+        busdToken.transfer(msg.sender,_amount);
         emit AdminTokenRecovery(address(busdToken), _amount);
     }
 
@@ -67,19 +71,19 @@ contract Presale is Trusted{
         emit AdminTokenRecovery(_tokenAddress, _tokenAmount);
     }
 
-    function getQuantityBought(address buyer) external view returns(uint) {
+    function getQuantityBought(address buyer) override external view returns(uint) {
         return quantityBought[buyer];
     }
 
-    function getBuyer(uint position) external view returns(address) {
+    function getBuyer(uint position) override external view returns(address) {
         return buyers[position];
     }
 
-    function getBuyers() external view returns(address[] memory) {
+    function getBuyers() override external view returns(address[] memory) {
         return buyers;
     }
 
-    function getQuantities() external view returns(uint[] memory) {
+    function getQuantities() override external view returns(uint[] memory) {
         uint[] memory quantities = new uint[](buyers.length);
         for(uint i=0;i<buyers.length;i++)
         {

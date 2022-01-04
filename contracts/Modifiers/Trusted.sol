@@ -64,7 +64,7 @@ contract Trusted is Context, Ownable {
      * @param addr address
      * @return success true if the address was added to the whitelist, false if the address was already in the whitelist
      */
-    function isAddressWhitelisted(address addr) onlyOwner public view returns(bool success) {
+    function isAddressWhitelisted(address addr) public view returns(bool success) {
         success = whitelist[addr];
     }
 

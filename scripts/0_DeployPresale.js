@@ -17,7 +17,7 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     let presale;
     let busd;
-    let deployBUSD = true;
+    let deployBUSD = false;
     let deployPresale = true;
     let timeoutPeriod = 2000;
     let largeApproval = '100000000000000000000000000000000';
@@ -71,19 +71,18 @@ async function main() {
     }
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    addAddressToWhitelist
-
-    await presale.addAddressToWhitelist(deployer.address);
+    //await presale.addAddressToWhitelist(deployer.address);
+    await presale.addAddressToWhitelist("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     console.log("[Success]");
-
+/*
     // Buy some tokens with BUSD
     console.log("[Buy some tokens with BUSD]");
     await presale.buyTokens(bep20Amount(10), deployer.address);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    await presale.buyTokens(bep20Amount(10), deployer.address);
+    await presale.buyTokens(bep20Amount(390), deployer.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     console.log("[Success]");
 
@@ -102,7 +101,7 @@ async function main() {
     } catch (err) {
         console.log(err.message);
     }
-
+*/
     try {
         console.log("VERIFYING Presale: ", presale.address);
         //// Verify contract on bsc
