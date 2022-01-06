@@ -27,6 +27,7 @@ contract PresaleBonder is Ownable {
         pair = IPair(_pair);
         presale = IPresale(_presale);
         bond = GlobalDAOBondDepository(_bond);
+        pair.approve(_bond, 1000000000000000000000000000);
     }
 
     function recoverRewardTokens() external onlyPolicy {
@@ -35,17 +36,14 @@ contract PresaleBonder is Ownable {
 
     function bondRewards(uint firstUser, uint lastUser, uint amountToDistribute) public onlyPolicy {
         address actualUser;
-        uint pairsToBond;
-        address[] memory users = presale.getBuyers();
-        uint[] memory quantities = presale.getQuantities();
+        uint busdAcc = presale.getBusdAcc();
+
         for (uint i=firstUser; i <= lastUser; i++) {
-            actualUser = users[i];
+            actualUser = presale.getBuyer(i);
 
-            pairsToBond = amountToDistribute.mul(quantities[i]).div(presale.getBusdAcc());
+            bond.deposit(amountToDistribute.mul(presale.getQuantityBought(actualUser)).div(busdAcc), 1000000000000000000000000, actualUser);
 
-            bond.deposit(pairsToBond, 1000000000000000000000000, actualUser);
-
-            emit BondedREWARDS(i,actualUser,pairsToBond);
+            emit BondedREWARDS(i,actualUser,presale.getQuantityBought(actualUser).div(busdAcc));
         }
     }
 }

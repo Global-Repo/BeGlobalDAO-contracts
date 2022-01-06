@@ -94,7 +94,7 @@ async function main() {
     staking = await Staking.attach(STAKING_ADDRESS);
     console.log("[Staking attached]: " + staking.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-/*
+
     // set warmup to unstake rewards
     staking.setWarmup(1); // TODO, posar un 2 per deploy a mainnet final
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -139,7 +139,7 @@ async function main() {
     await treasury.toggle('0', DEPLOYER_ADDRESS, DEPLOYER_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-*/
+
     // Approve BUSDt to be used in the treasury by the deployer
     console.log("[Approve BUSDt to be used in the treasury by the deployer]");
     await busd.approve(TREASURY_ADDRESS, largeApproval);

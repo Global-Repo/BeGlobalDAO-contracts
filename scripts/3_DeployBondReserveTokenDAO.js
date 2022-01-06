@@ -22,7 +22,7 @@ async function main() {
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // BUSD bond BCV
-    const busdBondBCV = '40';
+    const busdBondBCV = '100';
 
     // Bond vesting length in blocks. 33110 ~ 5 days
     const bondVestingLength = '144000';  // TODO Posar 144000 pel deploy a producció (5 dies)
@@ -39,7 +39,7 @@ async function main() {
     const maxBUSDBondDebt = '1200000000000000';
 
     // Initial Bond debt
-    const intialBUSDBondDebt = '20000000000000';
+    const intialBUSDBondDebt = '8000000000000';
 
     console.log('[Deploying BUSD bond from ', DEPLOYER_ADDRESS,']');
 

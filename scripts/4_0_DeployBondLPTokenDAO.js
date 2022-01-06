@@ -33,7 +33,7 @@ async function main() {
     const bondVestingLength = '144000';  // TODO Posar 144000 pel deploy a producció (5 dies)
 
     // Min bond price EN GLBD
-    const minBondPrice = '1800';
+    const minBondPrice = '6';
 
     // Max 2% del supply (de GLBD)
     const maxBondPayout = '2000'
@@ -45,7 +45,7 @@ async function main() {
     const maxGLBDBUSDBondDebt = '120000000000000';
 
     // Initial Bond debt
-    const intialGLBDBUSDBondDebt = '2000000000000';
+    const intialGLBDBUSDBondDebt = '3843855421680';
 
     let largeApproval = '100000000000000000000000000000000';
 
