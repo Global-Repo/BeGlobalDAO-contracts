@@ -45,7 +45,7 @@ async function main() {
     const maxGLBDBUSDBondDebt = '120000000000000';
 
     // Initial Bond debt
-    const intialGLBDBUSDBondDebt = '3843855421680';
+    const intialGLBDBUSDBondDebt = '1721927710840';
 
     let largeApproval = '100000000000000000000000000000000';
 
