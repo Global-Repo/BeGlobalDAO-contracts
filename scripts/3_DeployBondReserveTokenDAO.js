@@ -17,28 +17,29 @@ async function main() {
     let treasury;
     let busdBond;
     let redeemHelper;
-    let timeoutPeriod = 5000;
+    let timeoutPeriod = 10000;
 
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // BUSD bond BCV
-    const busdBondBCV = '200';
+    const busdBondBCV = '40';
 
     // Bond vesting length in blocks. 33110 ~ 5 days
-    const bondVestingLength = '450';  // TODO Posar 144000 pel deploy a producció (5 dies)
+    const bondVestingLength = '144000';  // TODO Posar 144000 pel deploy a producció (5 dies)
 
     // Min bond price EN GLBD. 500 = 5$
     const minBondPrice = '1800';
 
+    // Max 2% del supply (de GLBD)
     const maxBondPayout = '2000'
 
     const bondFee = '10000';
 
     // Max debt bond can take on
-    const maxBUSDBondDebt = '120000000000000';
+    const maxBUSDBondDebt = '1200000000000000';
 
     // Initial Bond debt
-    const intialBUSDBondDebt = '0';
+    const intialBUSDBondDebt = '20000000000000';
 
     console.log('[Deploying BUSD bond from ', DEPLOYER_ADDRESS,']');
 
@@ -95,6 +96,12 @@ async function main() {
     // Adding BUSD Bond to redeem helper
     console.log('Adding BUSD Bond to redeem helper');
     await redeemHelper.addBondContract(busdBond.address);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Set adjustment to LP Bond
+    console.log("[Set adjustment to BUSD Bond]");
+    await busdBond.setAdjustment(false,'1','40','0');
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 

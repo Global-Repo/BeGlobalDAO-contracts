@@ -1,17 +1,11 @@
 const { ethers } = require("hardhat");
-const { BigNumber } = require("@ethersproject/bignumber");
 const {
-    MULTISIG_ADDRESS,
     ROUTER_BEGLOBAL_ADDRESS,
     DEPLOYER_ADDRESS,
     BUSD_ADDRESS,
     WETH_ADDRESS,
     FACTORY_ADDRESS,
 } = require("./addresses_testnet");
-
-const TOKEN_DECIMALS_B = 18;
-const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_B = BigNumber.from(10).pow(TOKEN_DECIMALS_B);
-const INITIAL_SUPPLY_B = BigNumber.from(100).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_B);
 
 async function main() {
 
@@ -38,10 +32,10 @@ async function main() {
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // Quants blocs dura el epoch (staking): 12h.
-    let epochLengthInBlocks = '400'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
+    let epochLengthInBlocks = '1200'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
 
     // Quin bloc serà el primer que doni staking [!]
-    let firstBlockEpoch = '15556783'; // TODO posar el block 24h després d'arrancar (launch).
+    const firstBlockEpoch = '15608787'; //TODO pendent a posar 14166229 que és el dia 7 a les 21h aprox
 
     console.log("[Deploying from " + deployer.address + "]");
 
@@ -88,14 +82,6 @@ async function main() {
         busd = await BUSD.attach(BUSD_ADDRESS);
         console.log("[BUSDt attached]: " + busd.address);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    }
-
-    if (deployBUSD) {
-        // Deployer mints 100 BUSD
-        console.log("[Deployer mints 100 BUSD]");
-        await busd.mint(INITIAL_SUPPLY_B);
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-        console.log("[Success]");
     }
 
     // Deploy GLBD

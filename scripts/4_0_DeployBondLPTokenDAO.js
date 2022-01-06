@@ -30,13 +30,13 @@ async function main() {
     const glbdbusdBondBCV = '100';
 
     // Bond vesting length in blocks. 33110 ~ 5 days
-    const bondVestingLength = '600';  // TODO Posar 144000 pel deploy a producció (5 dies)
+    const bondVestingLength = '144000';  // TODO Posar 144000 pel deploy a producció (5 dies)
 
     // Min bond price EN GLBD
-    const minBondPrice = '500';
+    const minBondPrice = '1800';
 
-    // Max bond payout - 1% of totalSupply
-    const maxBondPayout = '1000'
+    // Max 2% del supply (de GLBD)
+    const maxBondPayout = '2000'
 
     // DAO fee for bond 10000 = 10%
     const bondFee = '10000';
@@ -45,7 +45,7 @@ async function main() {
     const maxGLBDBUSDBondDebt = '120000000000000';
 
     // Initial Bond debt
-    const intialGLBDBUSDBondDebt = '6000000000000';
+    const intialGLBDBUSDBondDebt = '2000000000000';
 
     let largeApproval = '100000000000000000000000000000000';
 
@@ -57,6 +57,7 @@ async function main() {
     console.log("[BUSDt attached]: " + busd.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
+    // Attach LP
     const GLBDBUSDLP = await ethers.getContractFactory('PancakeERC20');
     glbdbusdLP = await GLBDBUSDLP.attach(GLBD_BUSD_LP_ADDRESS);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -139,6 +140,12 @@ async function main() {
     // Approve RouterBeGlobal as spender of LBD-BUSD LP for Deployer
     console.log("[Approve GLBD-BUSD LP to be used in the BeGlobal router by the deployer]");
     await glbdbusdLP.approve(ROUTER_BEGLOBAL_ADDRESS, largeApproval);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Set adjustment to LP Bond
+    console.log("[Set adjustment to LP Bond]");
+    await glbdbusdBond.setAdjustment(false,'2','40','0');
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 

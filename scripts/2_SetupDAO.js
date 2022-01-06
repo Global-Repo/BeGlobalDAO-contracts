@@ -14,9 +14,23 @@ const {
     BONDING_CALCULATOR_ADDRESS
 } = require("./addresses_testnet");
 
-const TOKEN_DECIMALS = 9;
-const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
-const INITIAL_SUPPLY = BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER);
+const TOKEN_DECIMALS_LITTLE = 9;
+const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE = BigNumber.from(10).pow(TOKEN_DECIMALS_LITTLE);
+
+const TOKEN_DECIMALS_BIG = 18;
+const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG = BigNumber.from(10).pow(TOKEN_DECIMALS_BIG);
+
+let bep20Amount_LITTLE = function (amount) {
+    return BigNumber.from(amount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE);
+}
+
+let bep20Amount_BIG = function (amount) {
+    return BigNumber.from(amount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+}
+
+const INITIAL_SUPPLY = BigNumber.from(50000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE);
+
+
 
 async function main() {
 
@@ -28,14 +42,14 @@ async function main() {
     let distributor;
     let staking;
     let timeoutPeriod = 5000;
-    let largeApproval = '100000000000000000000000000000000';
+    let largeApproval = '1000000000000000000000000000000000000';
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
     const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // Initial reward rate for epoch. 5000 = 0.5%. Used for staking.
-    let initialRewardRateForEpoch = '1250'; //META ho te a 435 en un inici
+    let initialRewardRateForEpoch = '286'; //META ho te a 435 en un inici
 
     // Initial staking index
     const initialIndex = '10';
@@ -80,21 +94,21 @@ async function main() {
     staking = await Staking.attach(STAKING_ADDRESS);
     console.log("[Staking attached]: " + staking.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+/*
     // set warmup to unstake rewards
-    staking.setWarmup(0); // TODO, posar un 2 per deploy a mainnet final
+    staking.setWarmup(1); // TODO, posar un 2 per deploy a mainnet final
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[Set deployer as a vault for GLBD Token]");
     await GLBD.setVault(DEPLOYER_ADDRESS);
     console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), 5000));
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    // Mint 100000 GLBD
+    // Mint GLBD
     console.log("[Deployer mints (extra?) 100000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
     console.log("[Success]");
-    await new Promise(r => setTimeout(() => r(), 5000));
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Initialize sOHM
     console.log("[Initialize sOHM]");
@@ -105,6 +119,37 @@ async function main() {
     // Set Treasury as GLBD vault
     console.log("[Set Treasury as GLBD vault]");
     await GLBD.setVault(TREASURY_ADDRESS);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Approve treasury as spender of GLB for Deployer
+    console.log("[Approve GLBD to be used in the treasury by the deployer]");
+    await GLBD.approve(TREASURY_ADDRESS, largeApproval);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Toggle deployer as reserve depositor
+    console.log("[Queue deployer as reserve depositor]");
+    await treasury.queue('0', DEPLOYER_ADDRESS);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Toggle deployer as reserve depositor
+    console.log("[Toggle deployer as reserve depositor]");
+    await treasury.toggle('0', DEPLOYER_ADDRESS, DEPLOYER_ADDRESS);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+*/
+    // Approve BUSDt to be used in the treasury by the deployer
+    console.log("[Approve BUSDt to be used in the treasury by the deployer]");
+    await busd.approve(TREASURY_ADDRESS, largeApproval);
+    console.log("[Success]");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    // Depositing in the treasury from the deployer
+    // TODO calcular si és la quantitat correcte
+    console.log("[Deposit 20.000 BUSD to treasury]");
+    await treasury.deposit(bep20Amount_BIG(20000), BUSD_ADDRESS, bep20Amount_LITTLE(20000));
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -140,7 +185,7 @@ async function main() {
 
     // Staking SetContract to StakingWarmUp
     console.log("[Staking SetContract to StakingWarmUp]");
-    await staking.setContract('1', STAKING_WARMUP_ADDRESS);
+    await staking.setContract('2', STAKING_WARMUP_ADDRESS);
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
