@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 const { BigNumber } = require("@ethersproject/bignumber");
 const {
     BUSD_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 const TOKEN_DECIMALS = 18;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
@@ -54,7 +54,7 @@ async function main() {
         console.log("[Deploying Presale]");
         const Presale = await ethers.getContractFactory('Presale');
         presale = await Presale.deploy(busd.address, presaleBegins, presaleEnds);
-        console.log("[Presale deployed]: " + presale.address);
+        console.log("[Presale deployed]: " + presale.address + " " + presaleBegins + " " + presaleEnds);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
         // Approve presale as spender of busd for Deployer
@@ -66,16 +66,16 @@ async function main() {
         // Attach Presale
         console.log("[Attaching Presale]");
         const Presale = await ethers.getContractFactory('Presale');
-        presale = await Presale.attach("");
+        presale = await Presale.attach("0x7AaFd8c4eD34daC6686E85b64c51Ed5B99d8fe6a");
         console.log("[Presale attached]: " + presale.address);
     }
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+/*
     //await presale.addAddressToWhitelist(deployer.address);
     await presale.addAddressToWhitelist("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     console.log("[Success]");
-/*
+
     // Buy some tokens with BUSD
     console.log("[Buy some tokens with BUSD]");
     await presale.buyTokens(bep20Amount(10), deployer.address);
