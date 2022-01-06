@@ -22,10 +22,10 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstBlockEpoch = '15497524'; //TODO pendent a posar el bloc del dia 23 (dia del arranque)
+    const firstBlockEpoch = '1200'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
 
     // How many blocks are in each epoch
-    const epochLengthInBlocks = '600'; //TODO pendent posar 14400 quan arranquem
+    const epochLengthInBlocks = '14400'; //TODO pendent posar 14400 quan arranquem
 
     // What epoch will be first epoch
     const firstEpochNumber = '0';
