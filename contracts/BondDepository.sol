@@ -1051,6 +1051,7 @@ contract GlobalDAOBondDepository is Ownable {
     /**
      *  @notice calculate how far into vesting a depositor is
      *  @param _depositor address
+     *  @param _depositor address
      *  @return percentVested_ uint
      */
     function percentVestedFor( address _depositor ) public view returns ( uint percentVested_ ) {
