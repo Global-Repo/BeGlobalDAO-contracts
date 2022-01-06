@@ -101,7 +101,7 @@ async function main() {
 
     // Set adjustment to LP Bond
     console.log("[Set adjustment to BUSD Bond]");
-    await busdBond.setAdjustment(false,'1','40','0');
+    await busdBond.setAdjustment(false,'2','40','0');
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
