@@ -30,6 +30,27 @@ async function main() {
     // What epoch will be first epoch
     const firstEpochNumber = '0';
 
+
+    try {
+        console.log("VERIFYING GLBD_BUSD_BOND_ADDRESS: ", GLBD_BUSD_BOND_ADDRESS);
+        //// Verify contract on bsc
+        await hre.run("verify:verify", {
+            address: GLBD_BUSD_BOND_ADDRESS,
+            constructorArguments: [
+                GLBD_ADDRESS,
+                GLBD_BUSD_LP_ADDRESS,
+                TREASURY_ADDRESS,
+                MULTISIG_ADDRESS,
+                BONDING_CALCULATOR_ADDRESS
+            ],
+        });
+        console.log( "GLBD_BUSD_BOND verified: " + GLBD_BUSD_BOND_ADDRESS );
+        console.log("Success");
+    } catch (err) {
+        console.log(err.message);
+    }
+
+
     try {
         console.log("VERIFYING FACTORY: ", FACTORY_ADDRESS);
         //// Verify contract on bsc
@@ -253,24 +274,7 @@ async function main() {
         console.log(err.message);
     }
 
-    try {
-        console.log("VERIFYING GLBD_BUSD_BOND_ADDRESS: ", GLBD_BUSD_BOND_ADDRESS);
-        //// Verify contract on bsc
-        await hre.run("verify:verify", {
-            address: GLBD_BUSD_BOND_ADDRESS,
-            constructorArguments: [
-                GLBD_ADDRESS,
-                GLBD_BUSD_LP_ADDRESS,
-                TREASURY_ADDRESS,
-                MULTISIG_ADDRESS,
-                BONDING_CALCULATOR_ADDRESS
-            ],
-        });
-        console.log( "GLBD_BUSD_BOND verified: " + GLBD_BUSD_BOND_ADDRESS );
-        console.log("Success");
-    } catch (err) {
-        console.log(err.message);
-    }
+
 
     console.log("VERIFICATION SUCCESSFULLY FINISHED");
 }
