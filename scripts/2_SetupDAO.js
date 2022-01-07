@@ -90,7 +90,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // set warmup to unstake rewards
-    staking.setWarmup(2); // TODO, posar un 2 per deploy a mainnet final
+    await staking.setWarmup(2); // TODO, posar un 2 per deploy a mainnet final
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[Set deployer as a vault for GLBD Token]");
