@@ -13,11 +13,11 @@ async function main() {
     const [deployer] = await ethers.getSigners();
     let presale;
     let deployPresale = false;
-    let inici = 61;
-    let final = 70;
+    let inici = 19;
+    let final = 26;
     let amount = BigNumber.from("530330085889909677");
     let amountA = 0;
-    let adjust = true;
+    let adjust = false;
 
     console.log("BIG NUMBER: " + BigNumber.from(amount));
     const GLBDBUSDLP = await ethers.getContractFactory('PancakeERC20');
@@ -45,19 +45,21 @@ async function main() {
         let bondDepository = await BondDepository.attach(GLBD_BUSD_BOND_ADDRESS);
         console.log("[bondDepository attached]: " + bondDepository.address);
 
-        console.log("[BondPrice abans in USD: " + (await bondDepository.bondPriceInUSD()).toString() + "]");
+        console.log("[BondPrice abans in USD: " + (await bondDepository.bondPriceInUSD()).toString() + "************************]");
+        console.log("[BondPrice abans: " + (await bondDepository.bondPrice()).toString() + "]");
         console.log("[BondPrice abans: " + (await bondDepository.bondPrice()).toString() + "]");
 
         amountA = await glbdbusdLP.balanceOf(PRESALEBONDER);
         console.log("[Balance restant abans: "+amountA.toString()+"]");
 
+        //await bondDepository.setBondTerms(4, 1800);
         //console.log("[CV1: " + (await bondDepository.terms.controlVariable).toString() + "]");
-        if (adjust) await bondDepository.setAdjustment(false, 1, 40, 0);
+        if (adjust) await bondDepository.setAdjustment(false, 10, 0, 0);
 
-        await presaleBonder.bondRewards(inici, final, BigNumber.from(amount));
+        await presaleBonder.bondRewards(inici, final, BigNumber.from(amount).div(2));
 
         //console.log("[CV2: " + (await bondDepository.terms.controlVariable).toString() + "]");
-        console.log("[BondPrice in USD: " + (await bondDepository.bondPriceInUSD()).toString() + "]");
+        console.log("[BondPrice in USD: " + (await bondDepository.bondPriceInUSD()).toString() + "*********************]");
         console.log("[BondPrice: " + (await bondDepository.bondPrice()).toString() + "]");
 
 

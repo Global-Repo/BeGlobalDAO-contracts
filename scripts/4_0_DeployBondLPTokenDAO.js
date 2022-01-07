@@ -27,7 +27,7 @@ async function main() {
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // GLBD-BUSD bond BCV
-    const glbdbusdBondBCV = '75';
+    const glbdbusdBondBCV = '0';
 
     // Bond vesting length in blocks. 33110 ~ 5 days
     const bondVestingLength = '144000';  // TODO Posar 144000 pel deploy a producció (5 dies)
@@ -135,7 +135,7 @@ async function main() {
 
     // Set adjustment to LP Bond
     console.log("[Set adjustment to LP Bond]");
-    await glbdbusdBond.setAdjustment(false,'2','40','0');
+     await glbdbusdBond.setAdjustment(true,'2','0','0');
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[LP bond deployed successfully]");
