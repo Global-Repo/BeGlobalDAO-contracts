@@ -25,7 +25,7 @@ async function main() {
     let redeemHelper;
     let deployBUSD = true;
     let originalAMM = false;
-    let timeoutPeriod = 0;
+    let timeoutPeriod = 5000;
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
     const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');

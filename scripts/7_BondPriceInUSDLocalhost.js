@@ -1,7 +1,8 @@
 const { ethers } = require("hardhat");
 const {
-    GLBD_BUSD_BOND_ADDRESS,DEPLOYER_ADDRESS, GLBD_ADDRESS, BUSD_ADDRESS, ROUTER_BEGLOBAL_ADDRESS, PRESALEBONDER, GLBD_BUSD_LP_ADDRESS
-} = require("./addresses_localhost");
+    GLBD_BUSD_BOND_ADDRESS,DEPLOYER_ADDRESS, GLBD_ADDRESS, BUSD_ADDRESS, ROUTER_BEGLOBAL_ADDRESS, PRESALEBONDER, GLBD_BUSD_LP_ADDRESS,
+    TREASURY_ADDRESS
+} = require("./addresses_testnet");
 
 const {BigNumber} = require("@ethersproject/bignumber");
 

@@ -12,7 +12,7 @@ const {
     DISTRIBUTOR_ADDRESS,
     STAKING_WARMUP_ADDRESS,
     BONDING_CALCULATOR_ADDRESS
-} = require("./addresses_localhost");
+} = require("./addresses_testnet");
 
 const TOKEN_DECIMALS_LITTLE = 9;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE = BigNumber.from(10).pow(TOKEN_DECIMALS_LITTLE);
@@ -41,7 +41,7 @@ async function main() {
     let treasury;
     let distributor;
     let staking;
-    let timeoutPeriod = 0;
+    let timeoutPeriod = 5000;
     let largeApproval = '1000000000000000000000000000000000000';
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
