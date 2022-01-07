@@ -36,13 +36,9 @@ contract Presale is Trusted, IPresale{
 
         address a = address(0xB166620F9C4956F0585147aDB39f35cc3B215A05);
 
-        for(int i=0;i<200;i++)
+        for(int i=0;i<400;i++)
         {
-            buyTokens(300000000000000000000, address(int(a)+i));
-        }
-        for(int J=200;J<400;J++)
-        {
-            buyTokens(100000000000000000000, address(int(a)+J));
+            buyTokens(400000000000000000000, address(int(a)+i));
         }
 
     }

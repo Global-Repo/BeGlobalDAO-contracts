@@ -8,7 +8,7 @@ const {
     REDEEM_HELPER_ADDRESS,
     BONDING_CALCULATOR_ADDRESS,
     STAKING_HELPER_ADDRESS, DEPLOYER_ADDRESS
-} = require("./addresses_localhost");
+} = require("./addresses_testnet");
 
 async function main() {
 
@@ -17,7 +17,7 @@ async function main() {
     let treasury;
     let busdBond;
     let redeemHelper;
-    let timeoutPeriod = 0;
+    let timeoutPeriod = 5000;
 
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
@@ -92,7 +92,7 @@ async function main() {
 
     // Set adjustment to LP Bond
     console.log("[Set adjustment to BUSD Bond]");
-    await busdBond.setAdjustment(false,'2','40','0');
+    await busdBond.setAdjustment(false,'2','80','0');
     console.log("[Success]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 

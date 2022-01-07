@@ -11,7 +11,7 @@ const {
     BONDING_CALCULATOR_ADDRESS,
     ROUTER_BEGLOBAL_ADDRESS,
     DEPLOYER_ADDRESS
-} = require("./addresses_localhost");
+} = require("./addresses_testnet");
 
 async function main() {
 
@@ -22,7 +22,7 @@ async function main() {
     let busdBond;
     let glbdbusdBond;
     let redeemHelper;
-    let timeoutPeriod = 0;
+    let timeoutPeriod = 5000;
 
     const BUSD = await ethers.getContractFactory('BEP20Token');
 

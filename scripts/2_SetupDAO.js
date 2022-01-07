@@ -12,7 +12,7 @@ const {
     DISTRIBUTOR_ADDRESS,
     STAKING_WARMUP_ADDRESS,
     BONDING_CALCULATOR_ADDRESS
-} = require("./addresses_localhost");
+} = require("./addresses_testnet");
 
 const TOKEN_DECIMALS_LITTLE = 9;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE = BigNumber.from(10).pow(TOKEN_DECIMALS_LITTLE);
@@ -41,7 +41,7 @@ async function main() {
     let treasury;
     let distributor;
     let staking;
-    let timeoutPeriod = 0;
+    let timeoutPeriod = 5000;
     let largeApproval = '1000000000000000000000000000000000000';
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
@@ -90,7 +90,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // set warmup to unstake rewards
-    staking.setWarmup(2); // TODO, posar un 2 per deploy a mainnet final
+    await staking.setWarmup(2); // TODO, posar un 2 per deploy a mainnet final
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[Set deployer as a vault for GLBD Token]");

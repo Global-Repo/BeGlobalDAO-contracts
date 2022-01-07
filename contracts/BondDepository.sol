@@ -709,7 +709,6 @@ contract GlobalDAOBondDepository is Ownable {
         uint _maxDebt,
         uint _initialDebt
     ) external onlyPolicy() {
-        require( terms.controlVariable == 0, "Bonds must be initialized from 0" );
         terms = Terms ({
             controlVariable: _controlVariable,
             vestingTerm: _vestingTerm,
@@ -763,7 +762,6 @@ contract GlobalDAOBondDepository is Ownable {
         uint _target,
         uint _buffer 
     ) external onlyPolicy() {
-
         adjustment = Adjust({
             add: _addition,
             rate: _increment,
