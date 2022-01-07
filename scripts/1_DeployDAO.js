@@ -43,7 +43,7 @@ async function main() {
     if (!originalAMM) {
         // Deploy factory
         factory = await deployFactory(DEPLOYER_ADDRESS);
-        console.log("[Factory deployed]: " + factory.address);
+        console.log("const FACTORY_ADDRESS = '" + factory.address+"';");
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     } else {
         // Attach factory
@@ -56,7 +56,7 @@ async function main() {
     if (!originalAMM) {
         // Deploy Router
         router = await deployRouter(factory.address, WETH_ADDRESS); // Direcció WETH random només per tal de que funcioni el router.
-        console.log("[Router deployed]: " + router.address);
+        console.log("const ROUTER_BEGLOBAL_ADDRESS = '" + router.address+"';");
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     } else {
         // Attach Router
@@ -69,7 +69,7 @@ async function main() {
     if (deployBUSD) {
         // Deploy BUSD
         busd = await BUSD.deploy();
-        console.log("[BUSDt deployed]: " + busd.address);
+        console.log("const BUSD_ADDRESS = '" + busd.address+"';");
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     } else {
         // Attach BUSD
@@ -78,21 +78,22 @@ async function main() {
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     }
 
+
     // Deploy GLBD
     GLBD = await GLBDT.deploy();
-    console.log("[GLBD deployed]: " + GLBD.address);
+    console.log("const GLBD_ADDRESS = '" + GLBD.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy sGLBD
     sGLBD = await sGLBDT.deploy();
-    console.log("[sGLBD deployed]: " + sGLBD.address);
+    console.log("const SGLBD_ADDRESS = '" + sGLBD.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Create GLBD-BUSD pair
     const createPair = await factory.createPair(GLBD.address, busd.address);
     const createP = await createPair.wait();
     const lpAddress = createP.events[0].args.pair;
-    console.log("[GLBD-BUSD pair created]: " + lpAddress);
+    console.log("const GLBD_BUSD_LP_ADDRESS = '" + lpAddress+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     const GLBDBUSDLP = await ethers.getContractFactory('PancakeERC20');
@@ -102,43 +103,43 @@ async function main() {
     // Deploy treasury
     const Treasury = await ethers.getContractFactory('GlobalDAOTreasury');
     treasury = await Treasury.deploy(GLBD.address, busd.address, glbdbusdLP.address, 0);
-    console.log("[Treasury deployed]: " + treasury.address);
+    console.log("const TREASURY_ADDRESS = '" + treasury.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy bonding calculator
     const GlobalDAOBondingCalculator = await ethers.getContractFactory('GlobalDAOBondingCalculator');
     globalDAOBondingCalculator = await GlobalDAOBondingCalculator.deploy(GLBD.address);
-    console.log("[GlobalDAOBondingCalculator deployed]: " + globalDAOBondingCalculator.address);
+    console.log("const BONDING_CALCULATOR_ADDRESS = '" + globalDAOBondingCalculator.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Redeem helper
     const RedeemHelper = await ethers.getContractFactory('RedeemHelper');
     redeemHelper = await RedeemHelper.deploy();
-    console.log("[Redeem helper deployed]: " + redeemHelper.address);
+    console.log("const REDEEM_HELPER_ADDRESS = '" + redeemHelper.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy distributor
     const Distributor = await ethers.getContractFactory('Distributor');
     distributor = await Distributor.deploy(treasury.address, GLBD.address, epochLengthInBlocks, firstBlockEpoch); // 3r: número de blocs que dura epoch, posem 12h, 4rt: primer block que farà staking
-    console.log("[Distributor deployed]: " + distributor.address);
+    console.log("const DISTRIBUTOR_ADDRESS = '" + distributor.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy Staking
     const Staking = await ethers.getContractFactory('GlobalDAOStaking');
     staking = await Staking.deploy(GLBD.address, sGLBD.address, epochLengthInBlocks, 0, firstBlockEpoch);
-    console.log("[Staking deployed]: " + staking.address);
+    console.log("const STAKING_ADDRESS = '" + staking.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy StakingHelper
     const StakingHelper = await ethers.getContractFactory('StakingHelper');
     stakingHelper = await StakingHelper.deploy(staking.address, GLBD.address);
-    console.log("[StakingHelper deployed]: " + stakingHelper.address);
+    console.log("const STAKING_HELPER_ADDRESS = '" + stakingHelper.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy WarmUp
     const StakingWarmup = await ethers.getContractFactory('StakingWarmup');
     stakingWarmup = await StakingWarmup.deploy(staking.address, sGLBD.address);
-    console.log("[WarmUp deployed]: " + stakingWarmup.address);
+    console.log("const STAKING_WARMUP_ADDRESS = '" + stakingWarmup.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[Deploy sucessfull]");
