@@ -447,6 +447,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
 
         glbd.safeTransfer(_depositor, transferAmount);
 
+        Bond memory depositoryBond = bondInfo[ _depositor ];
         depositoryBond.payoutRemaining = depositoryBond.payoutRemaining.sub(transferAmount);
 
         // total debt is decreased
