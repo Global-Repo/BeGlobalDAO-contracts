@@ -16,7 +16,7 @@ async function main() {
     let treasury;
     let busdBond;
     let redeemHelper;
-    let timeoutPeriod = 5000;
+    let timeoutPeriod = 10000;
 
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
@@ -30,7 +30,7 @@ async function main() {
     const minBondPrice = '1800';
 
     // Max 2% del supply (de GLBD)
-    const maxBondPayout = '500'
+    const maxBondPayout = '2000'
 
     const bondFee = '10000';
 

@@ -18,10 +18,9 @@ async function main() {
     let busd;
     let treasury;
     let glbdbusdLP;
-    let busdBond;
     let glbdbusdBond;
     let redeemHelper;
-    let timeoutPeriod = 5000;
+    let timeoutPeriod = 10000;
 
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
@@ -35,7 +34,7 @@ async function main() {
     const minBondPrice = '400';
 
     // Max 2% del supply (de GLBD)
-    const maxBondPayout = '500'
+    const maxBondPayout = '2000'
 
     // DAO fee for bond 10000 = 10%
     const bondFee = '10000';

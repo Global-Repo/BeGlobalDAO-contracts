@@ -29,8 +29,6 @@ let bep20Amount_BIG = function (amount) {
 
 const INITIAL_SUPPLY = BigNumber.from(60000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE);
 
-
-
 async function main() {
 
     const [deployer] = await ethers.getSigners();
@@ -48,7 +46,6 @@ async function main() {
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // Initial reward rate for epoch. 5000 = 0.5%. Used for staking.
-    // TODO posar el número perque es vegi alguna cosa
     let initialRewardRateForEpoch = '3333'; //META ho te a 435 en un inici
 
     // Initial staking index
@@ -90,7 +87,8 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // set warmup to unstake rewards
-    await staking.setWarmup(2); // TODO, posar un 2 per deploy a mainnet final
+    await staking.setWarmup(2);
+    console.log("[WarmUp set to 2 epochs]");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[Set deployer as a vault for GLBD Token]");
@@ -98,7 +96,7 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Mint GLBD
-    console.log("[Deployer mints (extra?) 100000 GLBD]");
+    console.log("[Deployer mints (extra?) 60000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -133,7 +131,6 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Depositing in the treasury from the deployer
-    // TODO calcular si és la quantitat correcte
     console.log("[Deposit 35.000 BUSD to treasury]");
     await treasury.deposit(bep20Amount_BIG(35000), BUSD_ADDRESS, bep20Amount_LITTLE(35000));
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));

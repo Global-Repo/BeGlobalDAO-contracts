@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 const {
     GLBD_BUSD_BOND_ADDRESS,DEPLOYER_ADDRESS, GLBD_ADDRESS, BUSD_ADDRESS, ROUTER_BEGLOBAL_ADDRESS, PRESALEBONDER, GLBD_BUSD_LP_ADDRESS,
     TREASURY_ADDRESS
-} = require("./addresses_mainnet");
+} = require("../addresses_mainnet");
 
 const {BigNumber} = require("@ethersproject/bignumber");
 
@@ -32,6 +32,9 @@ async function main() {
     let largeApproval = '100000000000000000000000000000000';
     let addliq = false;
     let amount = 0;
+    let timeoutPeriod = 10000;
+    let busd;
+    let deployPresale = true;
 
     const BondDepository = await ethers.getContractFactory('GlobalDAOBondDepository');
     let bondDepository = await BondDepository.attach(GLBD_BUSD_BOND_ADDRESS);
@@ -84,6 +87,25 @@ async function main() {
     console.log("[BondPrice in USD: " + (await bondDepository.bondPriceInUSD()).toString() + "]");
     console.log("[BondPrice: " + (await bondDepository.bondPrice()).toString() + "]");
 
+
+
+
+
+    busd = await BUSD.attach(BUSD_ADDRESS);
+    console.log("[BUSDt attached]: " + busd.address);
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    console.log('Deploying contracts. Deployer account: ' + deployer.address);
+
+
+    if (deployPresale) {
+        // Deploy presaleBonder
+        console.log("[Deploying PresaleBonder]");
+        const PresaleBonder = await ethers.getContractFactory('PresaleBonder');
+        presaleBonder = await PresaleBonder.deploy(BUSD_ADDRESS, GLBD_BUSD_LP_ADDRESS, '0x7AaFd8c4eD34daC6686E85b64c51Ed5B99d8fe6a', GLBD_BUSD_BOND_ADDRESS);
+        console.log("[PresaleBonder deployed]: " + presaleBonder.address);
+        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    }
 }
 
 
