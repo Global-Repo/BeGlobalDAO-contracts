@@ -352,13 +352,109 @@ library SafeERC20 {
     }
 }
 
+interface IRouterV1 {
+    function factory() external pure returns (address);
+    function WETH() external pure returns (address);
+    function swapFeeReward() external pure returns (address);
+
+    function addLiquidity(
+        address tokenA,
+        address tokenB,
+        uint amountADesired,
+        uint amountBDesired,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountA, uint amountB, uint liquidity);
+    function addLiquidityETH(
+        address token,
+        uint amountTokenDesired,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline
+    ) external payable returns (uint amountToken, uint amountETH, uint liquidity);
+    function removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint liquidity,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountA, uint amountB);
+    function removeLiquidityETH(
+        address token,
+        uint liquidity,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline
+    ) external returns (uint amountToken, uint amountETH);
+    function removeLiquidityWithPermit(
+        address tokenA,
+        address tokenB,
+        uint liquidity,
+        uint amountAMin,
+        uint amountBMin,
+        address to,
+        uint deadline,
+        bool approveMax, uint8 v, bytes32 r, bytes32 s
+    ) external returns (uint amountA, uint amountB);
+    function removeLiquidityETHWithPermit(
+        address token,
+        uint liquidity,
+        uint amountTokenMin,
+        uint amountETHMin,
+        address to,
+        uint deadline,
+        bool approveMax, uint8 v, bytes32 r, bytes32 s
+    ) external returns (uint amountToken, uint amountETH);
+    function swapExactTokensForTokens(
+        uint amountIn,
+        uint amountOutMin,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external returns (uint[] memory amounts);
+    function swapTokensForExactTokens(
+        uint amountOut,
+        uint amountInMax,
+        address[] calldata path,
+        address to,
+        uint deadline
+    ) external returns (uint[] memory amounts);
+    function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
+    external
+    payable
+    returns (uint[] memory amounts);
+    function swapTokensForExactETH(uint amountOut, uint amountInMax, address[] calldata path, address to, uint deadline)
+    external
+    returns (uint[] memory amounts);
+    function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline)
+    external
+    returns (uint[] memory amounts);
+    function swapETHForExactTokens(uint amountOut, address[] calldata path, address to, uint deadline)
+    external
+    payable
+    returns (uint[] memory amounts);
+
+    function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
+    function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut, uint swapFee) external pure returns (uint amountOut);
+    function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut, uint swapFee) external pure returns (uint amountIn);
+    function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
+    function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
+}
+
 contract BondDepositoryGlbBusdLP is Ownable {
     using SafeMath for uint;
     using SafeERC20 for IERC20;
 
-    IERC20 public glbd;
+    address public glbd;
     address public busd;
-    IPair public pair;
+    address public pair;
+    address public router;
 
     uint public bondHarvestTime;
     uint public bondRatioLP;
@@ -383,12 +479,14 @@ contract BondDepositoryGlbBusdLP is Ownable {
         address _glbd,
         address _busd,
         address _pair,
+        address _router,
         uint _bondHarvestTime,
         uint _bondRatioLP
     ) {
-        glbd = IERC20(_glbd);
+        glbd = _glbd;
         busd = _busd;
-        pair = IPair(_pair);
+        pair = _pair;
+        router = _router;
         bondHarvestTime = _bondHarvestTime;
         bondRatioLP = _bondRatioLP;
         totalDebt = 0;
@@ -409,18 +507,28 @@ contract BondDepositoryGlbBusdLP is Ownable {
     ) external returns ( uint ) {
         require( _depositor != address(0), "Invalid address" );
 
-        uint reserve;
-        ( uint reserve0, uint reserve1, ) = IPair( pair ).getReserves();
+        IPair(pair).transferFrom( msg.sender, address(this), _amount );
 
-        if ( IPair( pair ).token0() == busd ) {
+        ( uint reserve0, uint reserve1) = IRouterV1(router).removeLiquidity(
+            IPair(pair).token0(),
+            IPair(pair).token1(),
+            _amount,
+            0,
+            0,
+            address(this),
+            block.timestamp
+        );
+
+        uint reserve;
+
+        if ( IPair(pair).token0() == busd ) {
             reserve = reserve1;
         } else {
             reserve = reserve0;
         }
-        uint actualPayout = _amount.mul(reserve).div(IPair( pair ).totalSupply()).div(bondRatioLP);
-        require( actualPayout <= excessReserves(), "Not enough GLBDs available" );
 
-        pair.transferFrom( msg.sender, address(this), _amount );
+        uint actualPayout = reserve.div(bondRatioLP);
+        require( actualPayout <= excessReserves(), "Not enough GLBDs available" );
 
         bondInfo[ _depositor ] = Bond({
             deposited: bondInfo[ _depositor ].deposited.add(_amount),
@@ -445,39 +553,39 @@ contract BondDepositoryGlbBusdLP is Ownable {
     ) external returns ( uint ) {
         uint transferAmount = availableToRedeem(_depositor);
 
-        glbd.safeTransfer(_depositor, transferAmount);
+        IERC20(glbd).safeTransfer(_depositor, transferAmount);
 
-        Bond memory depositoryBond = bondInfo[ _depositor ];
-        depositoryBond.payoutRemaining = depositoryBond.payoutRemaining.sub(transferAmount);
+        bondInfo[ _depositor ].payoutRemaining = bondInfo[ _depositor ].payoutRemaining.sub(transferAmount);
 
         // total debt is decreased
         totalDebt = totalDebt.sub( transferAmount );
 
         // indexed events are emitted
-        emit BondRedeemed( _depositor, transferAmount, depositoryBond.payoutRemaining, depositoryBond.payout);
+        emit BondRedeemed( _depositor, transferAmount, bondInfo[ _depositor ].payoutRemaining, bondInfo[ _depositor ].payout);
 
         return transferAmount;
     }
 
     function recoverRewardTokens(uint _amount) external onlyPolicy {
-        require(glbd.balanceOf(address(this)).sub(totalDebt)>=_amount, "Not enough GLBDs available");
-        glbd.transfer(address(msg.sender), _amount);
+        require(IERC20(glbd).balanceOf(address(this)).sub(totalDebt)>=_amount, "Not enough GLBDs available");
+        IERC20(glbd).transfer(address(msg.sender), _amount);
     }
 
     function recoverRewardTokens() external onlyPolicy {
-        glbd.transfer(address(msg.sender), glbd.balanceOf(address(this)).sub(totalDebt));
+        IERC20(glbd).transfer(address(msg.sender), IERC20(glbd).balanceOf(address(this)).sub(totalDebt));
     }
 
-    function recoverLPs(uint _amount) external onlyPolicy {
-        pair.transfer(address(msg.sender), _amount);
+    function recoverLiquidityToken(address _token, uint _amount) external onlyPolicy {
+        IERC20(_token).transfer(address(msg.sender), _amount);
     }
 
-    function recoverLPs() external onlyPolicy {
-        pair.transfer(address(msg.sender), pair.balanceOf(address(this)));
+    function recoverLiquidityToken(address _token) external onlyPolicy {
+        IERC20 token = IERC20(_token);
+        token.transfer(address(msg.sender), token.balanceOf(address(this)));
     }
 
     function excessReserves() public view returns ( uint ) {
-        return glbd.balanceOf(address(this)).sub( totalDebt );
+        return IERC20(glbd).balanceOf(address(this)).sub( totalDebt );
     }
 
     function availableToRedeem(address _depositor) public view returns ( uint ) {
