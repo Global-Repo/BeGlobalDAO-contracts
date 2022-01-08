@@ -4,7 +4,7 @@ const {
     BUSD_ADDRESS,
     GLBD_BUSD_BOND_ADDRESS,
     GLBD_BUSD_LP_ADDRESS
-} = require("./addresses_mainnet");
+} = require("../addresses_mainnet");
 
 const TOKEN_DECIMALS = 18;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);
@@ -77,7 +77,7 @@ async function main() {
         // Deploy presaleBonder
         console.log("[Deploying PresaleBonder]");
         const PresaleBonder = await ethers.getContractFactory('PresaleBonder');
-        presaleBonder = await PresaleBonder.deploy(busd.address, GLBD_BUSD_LP_ADDRESS, '0x820dF737AEa4165B0dDED5e011d925CA672e5993', GLBD_BUSD_BOND_ADDRESS);
+        presaleBonder = await PresaleBonder.deploy(BUSD_ADDRESS, GLBD_BUSD_LP_ADDRESS, '0x7AaFd8c4eD34daC6686E85b64c51Ed5B99d8fe6a', GLBD_BUSD_BOND_ADDRESS);
         console.log("[PresaleBonder deployed]: " + presaleBonder.address);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     }

@@ -7,7 +7,6 @@ const {
     FACTORY_ADDRESS,
 } = require("./addresses_mainnet");
 
-// TODO POSAR EL DEPLOYBUSD A FALS
 async function main() {
 
     const [deployer] = await ethers.getSigners();
@@ -24,9 +23,9 @@ async function main() {
     let stakingHelper;
     let globalDAOBondingCalculator;
     let redeemHelper;
-    let deployBUSD = true;
+    let deployBUSD = false;
 
-    // let originalAMM = false;
+    let originalAMM = true;
     let timeoutPeriod = 10000;
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
