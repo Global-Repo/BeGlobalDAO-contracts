@@ -1,7 +1,6 @@
 const { ethers } = require("hardhat");
 const { BigNumber } = require("@ethersproject/bignumber");
 const {
-    MULTISIG_ADDRESS,
     ROUTER_BEGLOBAL_ADDRESS,
     DEPLOYER_ADDRESS,
     GLBD_ADDRESS,
@@ -12,7 +11,7 @@ const {
     DISTRIBUTOR_ADDRESS,
     STAKING_WARMUP_ADDRESS,
     BONDING_CALCULATOR_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 const TOKEN_DECIMALS_LITTLE = 9;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE = BigNumber.from(10).pow(TOKEN_DECIMALS_LITTLE);
@@ -41,7 +40,7 @@ async function main() {
     let treasury;
     let distributor;
     let staking;
-    let timeoutPeriod = 5000;
+    let timeoutPeriod = 10000;
     let largeApproval = '1000000000000000000000000000000000000';
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
@@ -49,7 +48,8 @@ async function main() {
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // Initial reward rate for epoch. 5000 = 0.5%. Used for staking.
-    let initialRewardRateForEpoch = '286'; //META ho te a 435 en un inici
+    // TODO posar el número perque es vegi alguna cosa
+    let initialRewardRateForEpoch = '3333'; //META ho te a 435 en un inici
 
     // Initial staking index
     const initialIndex = '10';
@@ -134,8 +134,8 @@ async function main() {
 
     // Depositing in the treasury from the deployer
     // TODO calcular si és la quantitat correcte
-    console.log("[Deposit 20.000 BUSD to treasury]");
-    await treasury.deposit(bep20Amount_BIG(25000), BUSD_ADDRESS, bep20Amount_LITTLE(25000));
+    console.log("[Deposit 35.000 BUSD to treasury]");
+    await treasury.deposit(bep20Amount_BIG(35000), BUSD_ADDRESS, bep20Amount_LITTLE(35000));
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Set index
@@ -153,8 +153,7 @@ async function main() {
     await treasury.toggle('8', DISTRIBUTOR_ADDRESS, BONDING_CALCULATOR_ADDRESS);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    // Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%.
-    console.log("[Add staking contract as distributor recipient. Show rebase/epoch. 5000 = 0.5%]");
+    console.log("[Add staking contract as distributor recipient]");
     await distributor.addRecipient(STAKING_ADDRESS, initialRewardRateForEpoch);
     console.log("[Success] InitialRewardRateForEpoch: ", initialRewardRateForEpoch, ".");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));

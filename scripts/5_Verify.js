@@ -14,7 +14,7 @@ const {
     MULTISIG_ADDRESS,
     BUSD_BOND_ADDRESS,
     GLBD_BUSD_BOND_ADDRESS, DEPLOYER_ADDRESS, FACTORY_ADDRESS, WETH_ADDRESS, ROUTER_BEGLOBAL_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 async function main() {
 
@@ -22,7 +22,7 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstBlockEpoch = '1200'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
+    const firstBlockEpoch = '14223893'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
 
     // How many blocks are in each epoch
     const epochLengthInBlocks = '14400'; //TODO pendent posar 14400 quan arranquem

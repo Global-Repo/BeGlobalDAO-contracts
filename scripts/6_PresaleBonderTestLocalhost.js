@@ -4,7 +4,7 @@ const {
     GLBD_BUSD_BOND_ADDRESS,
     GLBD_BUSD_LP_ADDRESS,
     PRESALEBONDER, STAKING_WARMUP_ADDRESS, STAKING_ADDRESS, SGLBD_ADDRESS, PRESALE
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 const {BigNumber} = require("ethers");
 
 async function main() {

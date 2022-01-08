@@ -1,5 +1,4 @@
 const { ethers } = require("hardhat");
-const { BigNumber } = require("@ethersproject/bignumber");
 const {
     MULTISIG_ADDRESS,
     GLBD_ADDRESS,
@@ -11,7 +10,7 @@ const {
     BONDING_CALCULATOR_ADDRESS,
     ROUTER_BEGLOBAL_ADDRESS,
     DEPLOYER_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 async function main() {
 
@@ -29,14 +28,14 @@ async function main() {
     // GLBD-BUSD bond BCV
     const glbdbusdBondBCV = '0';
 
-    // Bond vesting length in blocks. 33110 ~ 5 days
-    const bondVestingLength = '144000';  // TODO Posar 144000 pel deploy a producció (5 dies)
+    // Bond vesting length in blocks.
+    const bondVestingLength = '144000';
 
     // Min bond price EN GLBD
     const minBondPrice = '400';
 
     // Max 2% del supply (de GLBD)
-    const maxBondPayout = '2000'
+    const maxBondPayout = '500'
 
     // DAO fee for bond 10000 = 10%
     const bondFee = '10000';
@@ -135,7 +134,7 @@ async function main() {
 
     // Set adjustment to LP Bond
     console.log("[Set adjustment to LP Bond]");
-     await glbdbusdBond.setAdjustment(true,'2','0','0');
+    await glbdbusdBond.setAdjustment(true,'2','0','0');
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[LP bond deployed successfully]");

@@ -5,7 +5,7 @@ const {
     GLBD_BUSD_LP_ADDRESS,
     PRESALEBONDER,
     TREASURY_ADDRESS
-} = require("./addresses_localhost");
+} = require("./addresses_mainnet");
 const {BigNumber} = require("ethers");
 
 async function main() {

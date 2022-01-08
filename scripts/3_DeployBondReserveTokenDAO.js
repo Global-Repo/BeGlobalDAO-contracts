@@ -1,5 +1,4 @@
 const { ethers } = require("hardhat");
-const { BigNumber } = require("@ethersproject/bignumber");
 const {
     MULTISIG_ADDRESS,
     GLBD_ADDRESS,
@@ -8,7 +7,7 @@ const {
     REDEEM_HELPER_ADDRESS,
     BONDING_CALCULATOR_ADDRESS,
     STAKING_HELPER_ADDRESS, DEPLOYER_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 async function main() {
 
@@ -24,8 +23,8 @@ async function main() {
     // BUSD bond BCV
     const busdBondBCV = '100';
 
-    // Bond vesting length in blocks. 33110 ~ 5 days
-    const bondVestingLength = '144000';  // TODO Posar 144000 pel deploy a producció (5 dies)
+    // Bond vesting length in blocks.
+    const bondVestingLength = '144000';
 
     // Min bond price EN GLBD. 500 = 5$
     const minBondPrice = '1800';

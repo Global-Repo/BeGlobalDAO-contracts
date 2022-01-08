@@ -4,7 +4,7 @@ const {
     BUSD_ADDRESS,
     GLBD_BUSD_BOND_ADDRESS,
     GLBD_BUSD_LP_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 
 const TOKEN_DECIMALS = 18;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER = BigNumber.from(10).pow(TOKEN_DECIMALS);

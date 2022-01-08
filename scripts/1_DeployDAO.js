@@ -5,8 +5,9 @@ const {
     BUSD_ADDRESS,
     WETH_ADDRESS,
     FACTORY_ADDRESS,
-} = require("./addresses_localhost");
+} = require("./addresses_mainnet");
 
+// TODO POSAR EL DEPLOYBUSD A FALS
 async function main() {
 
     const [deployer] = await ethers.getSigners();
@@ -24,18 +25,19 @@ async function main() {
     let globalDAOBondingCalculator;
     let redeemHelper;
     let deployBUSD = true;
-    let originalAMM = false;
-    let timeoutPeriod = 5000;
+
+    // let originalAMM = false;
+    let timeoutPeriod = 10000;
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
     const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
     const BUSD = await ethers.getContractFactory('BEP20Token');
 
     // Quants blocs dura el epoch (staking): 12h.
-    let epochLengthInBlocks = '1200'; // TODO Posar 14400 per indicar 12h al deploy de mainnet final.
+    let epochLengthInBlocks = '14400';
 
     // Quin bloc serà el primer que doni staking [!]
-    const firstBlockEpoch = '15608787'; //TODO pendent a posar 14166229 que és el dia 7 a les 21h aprox
+    const firstBlockEpoch = '14223893';
 
     console.log("[Deploying from " + deployer.address + "]");
 
@@ -65,6 +67,7 @@ async function main() {
         console.log("[Router attached]: " + router.address);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     }
+
 
     if (deployBUSD) {
         // Deploy BUSD
