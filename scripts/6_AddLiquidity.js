@@ -27,7 +27,7 @@ async function main() {
     const BUSD = await ethers.getContractFactory('BEP20Token');
     const Router = await ethers.getContractFactory("Router");
     const GLBDBUSDLP = await ethers.getContractFactory('PancakeERC20');
-    const timeoutPeriod = 5000;
+    const timeoutPeriod = 15000;
 
     let largeApproval = '100000000000000000000000000000000';
     let amount = 0;
@@ -55,6 +55,7 @@ async function main() {
     // Approve BUSDt to be used in the BeGlobal router by the deployer
     console.log("[Approve BUSDt to be used in the BeGlobal router by the deployer]");
     await busd.approve(router.address, largeApproval);
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // AddLiquidity
     console.log("[Create and add liquidity GLBD-BUSD in BeGlobal router]");
