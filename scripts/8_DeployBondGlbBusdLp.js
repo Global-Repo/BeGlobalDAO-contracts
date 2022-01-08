@@ -13,6 +13,7 @@ const INITIAL_SUPPLY = BigNumber.from(60000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTI
 async function main() {
 
     const [deployer] = await ethers.getSigners();
+
     let harvestTime = 300; //259200;
     let ratioLP = 200;
     let timeoutPeriod = 10000;
@@ -85,6 +86,9 @@ async function main() {
     } catch (err) {
         console.log(err.message);
     }
+
+
+
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
 }

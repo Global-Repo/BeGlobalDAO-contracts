@@ -89,16 +89,16 @@ async function main() {
     // set warmup to unstake rewards
     await staking.setWarmup(2);
     console.log("[WarmUp set to 2 epochs]");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    await new Promise(r => setTimeout(() => r(), timeoPeriod));
 
     console.log("[Set deployer as a vault for GLBD Token]");
     await GLBD.setVault(DEPLOYER_ADDRESS);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    await new Promise(r => setTimeout(() => r(), timeoutPeod));
 
     // Mint GLBD
     console.log("[Deployer mints (extra?) 60000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    await new Promise(r => setTimeout(() => r(), teoutPeriod));
 
     // Initialize sOHM
     console.log("[Initialize sOHM]");
@@ -132,7 +132,7 @@ async function main() {
 
     // Depositing in the treasury from the deployer
     console.log("[Deposit 35.000 BUSD to treasury]");
-    await treasury.deposit(bep20Amount_BIG(35000), BUSD_ADDRESS, bep20Amount_LITTLE(35000));
+    await treasury.deposit(bep20Amount_BIG(10000), BUSD_ADDRESS, bep20Amount_LITTLE(10000));
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Set index
@@ -162,7 +162,7 @@ async function main() {
 
     // Staking SetContract to StakingWarmUp
     console.log("[Staking SetContract to StakingWarmUp]");
-    await staking.setContract('2', STAKING_WARMUP_ADDRESS);
+    await staking.setContract('1', STAKING_WARMUP_ADDRESS);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Approve RouterBeGlobal as spender of GLB for Deployer
