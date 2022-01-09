@@ -451,6 +451,8 @@ contract BondDepositoryGlbBusdLP is Ownable {
     using SafeMath for uint;
     using SafeERC20 for IERC20;
 
+    uint public constant DUST = 1000;
+
     address public glbd;
     address public busd;
     address public pair;
@@ -458,6 +460,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
 
     uint public bondHarvestTime;
     uint public bondRatioLP;
+    uint public bondMaxDeposit;
     uint public totalDebt;
 
     mapping( address => Bond ) public bondInfo; // stores bond information for depositors
@@ -470,6 +473,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
         uint depositTime; // Timestamp on deposit
         uint harvestTime; // HarvestTime on deposit
         uint ratioLP; // For front end viewing
+        uint maxDeposit; // For front end viewing
     }
 
     event BondCreated(address indexed _depositor, uint deposited, uint totalDeposited, uint payout, uint totalPayout, uint harvestTime, uint ratioLP);
@@ -481,7 +485,8 @@ contract BondDepositoryGlbBusdLP is Ownable {
         address _pair,
         address _router,
         uint _bondHarvestTime,
-        uint _bondRatioLP
+        uint _bondRatioLP,
+        uint _bondMaxDeposit
     ) {
         glbd = _glbd;
         busd = _busd;
@@ -489,7 +494,15 @@ contract BondDepositoryGlbBusdLP is Ownable {
         router = _router;
         bondHarvestTime = _bondHarvestTime;
         bondRatioLP = _bondRatioLP;
+        bondMaxDeposit = _bondMaxDeposit;
         totalDebt = 0;
+
+        IPair(pair).safeApprove(_router, uint(0));
+        IPair(pair).safeApprove(_router, uint(~0));
+    }
+
+    function setBondHarvestTime( uint _bondHarvestTime ) external onlyPolicy {
+        bondHarvestTime = _bondHarvestTime;
     }
 
     function setBondRatioLP( uint _bondRatioLP ) external onlyPolicy {
@@ -497,22 +510,25 @@ contract BondDepositoryGlbBusdLP is Ownable {
         bondRatioLP = _bondRatioLP;
     }
 
-    function setBondHarvestTime( uint _bondHarvestTime ) external onlyPolicy {
-        bondHarvestTime = _bondHarvestTime;
+    function setBondMaxDeposit( uint _bondMaxDeposit ) external onlyPolicy {
+        bondMaxDeposit = _bondMaxDeposit;
     }
 
     function deposit(
         uint _amount,
         address _depositor
     ) external returns ( uint ) {
+        require(  bondInfo[ _depositor ].deposited < bondMaxDeposit, "You cannot deposit more tokens" );
         require( _depositor != address(0), "Invalid address" );
 
-        IPair(pair).transferFrom( msg.sender, address(this), _amount );
+        uint amount = bondMaxDeposit.sub(bondInfo[ _depositor ].deposited)>_amount ? _amount : bondMaxDeposit.sub(bondInfo[ _depositor ].deposited);
+
+        IPair(pair).transferFrom( msg.sender, address(this), amount );
 
         ( uint reserve0, uint reserve1) = IRouterV1(router).removeLiquidity(
             IPair(pair).token0(),
             IPair(pair).token1(),
-            _amount,
+            amount,
             0,
             0,
             address(this),
@@ -531,11 +547,12 @@ contract BondDepositoryGlbBusdLP is Ownable {
         require( actualPayout <= excessReserves(), "Not enough GLBDs available" );
 
         bondInfo[ _depositor ] = Bond({
-            deposited: bondInfo[ _depositor ].deposited.add(_amount),
+            deposited: bondInfo[ _depositor ].deposited.add(amount),
             payout: bondInfo[ _depositor ].payoutRemaining.add( actualPayout ),
             payoutRemaining: bondInfo[ _depositor ].payoutRemaining.add( actualPayout ),
             depositTime: block.timestamp,
             harvestTime: bondHarvestTime,
+            maxDeposit: bondMaxDeposit,
             ratioLP: bondRatioLP
         });
 
@@ -543,7 +560,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
         totalDebt = totalDebt.add( actualPayout );
 
         // indexed events are emitted
-        emit BondCreated( _depositor, _amount, bondInfo[ _depositor ].deposited , actualPayout,  bondInfo[ _depositor ].payout, bondHarvestTime, bondRatioLP );
+        emit BondCreated( _depositor, amount, bondInfo[ _depositor ].deposited , actualPayout,  bondInfo[ _depositor ].payout, bondHarvestTime, bondRatioLP );
 
         return actualPayout;
     }
@@ -555,7 +572,15 @@ contract BondDepositoryGlbBusdLP is Ownable {
 
         IERC20(glbd).safeTransfer(_depositor, transferAmount);
 
-        bondInfo[ _depositor ].payoutRemaining = bondInfo[ _depositor ].payoutRemaining.sub(transferAmount);
+        uint newPayoutRemaining = bondInfo[ _depositor ].payoutRemaining.sub(transferAmount);
+        if(newPayoutRemaining<DUST)
+        {
+            delete bondInfo[ _depositor ];
+        }
+        else
+        {
+            bondInfo[ _depositor ].payoutRemaining = newPayoutRemaining;
+        }
 
         // total debt is decreased
         totalDebt = totalDebt.sub( transferAmount );
@@ -586,6 +611,10 @@ contract BondDepositoryGlbBusdLP is Ownable {
 
     function excessReserves() public view returns ( uint ) {
         return IERC20(glbd).balanceOf(address(this)).sub( totalDebt );
+    }
+
+    function availableToDeposit(address _depositor) public view returns ( uint ) {
+        return bondMaxDeposit.sub(bondInfo[ _depositor ].deposited);
     }
 
     function availableToRedeem(address _depositor) public view returns ( uint ) {

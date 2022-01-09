@@ -17,6 +17,7 @@ async function main() {
     let harvestTime = 300; //259200;
     let ratioLP = 200;
     let timeoutPeriod = 10000;
+    let maxDeposit = BigNumber.from(1000000000000000000);
     let largeApproval = '1000000000000000000000000000000000000';
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
@@ -39,7 +40,7 @@ async function main() {
 
     console.log("[Deploying Bond GLB-BUSD LP SC]");
     const BOND = await ethers.getContractFactory('BondDepositoryGlbBusdLP');
-    let bond = await BOND.deploy(GLBD.address,BUSD_ADDRESS,GLB_BUSD_LP_ADDRESS,ROUTER_BEGLOBAL_ADDRESS,harvestTime,ratioLP);
+    let bond = await BOND.deploy(GLBD.address,BUSD_ADDRESS,GLB_BUSD_LP_ADDRESS,ROUTER_BEGLOBAL_ADDRESS,harvestTime,ratioLP,maxDeposit);
     console.log("[Bond GLB-BUSD LP deployed]: " + bond.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
