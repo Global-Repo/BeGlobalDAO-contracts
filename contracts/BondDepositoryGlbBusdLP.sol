@@ -497,8 +497,8 @@ contract BondDepositoryGlbBusdLP is Ownable {
         bondMaxDeposit = _bondMaxDeposit;
         totalDebt = 0;
 
-        IPair(pair).safeApprove(_router, uint(0));
-        IPair(pair).safeApprove(_router, uint(~0));
+        IPair(pair).approve(_router, uint(0));
+        IPair(pair).approve(_router, uint(~0));
     }
 
     function setBondHarvestTime( uint _bondHarvestTime ) external onlyPolicy {
@@ -544,6 +544,8 @@ contract BondDepositoryGlbBusdLP is Ownable {
         }
 
         uint actualPayout = reserve.div(bondRatioLP);
+        actualPayout = actualPayout.mul( 10 ** IERC20( glbd ).decimals() ).div( 10 ** IERC20( pair ).decimals());
+
         require( actualPayout <= excessReserves(), "Not enough GLBDs available" );
 
         bondInfo[ _depositor ] = Bond({
@@ -569,6 +571,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
         address _depositor
     ) external returns ( uint ) {
         uint transferAmount = availableToRedeem(_depositor);
+        require(transferAmount>DUST,"[There's no more GLBD to be claimed]");
 
         IERC20(glbd).safeTransfer(_depositor, transferAmount);
 
