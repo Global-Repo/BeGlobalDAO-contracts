@@ -447,9 +447,11 @@ interface IRouterV1 {
     function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }
 
+// Contract for partners of BeGlobal only.
 contract BondDepositoryGlbBusdLP is Ownable {
-    using SafeMath for uint;
+
     using SafeERC20 for IERC20;
+    using SafeMath for uint;
 
     uint public constant DUST = 1000;
 
@@ -463,8 +465,6 @@ contract BondDepositoryGlbBusdLP is Ownable {
     uint public bondMaxDeposit;
     uint public totalDebt;
 
-    mapping( address => Bond ) public bondInfo; // stores bond information for depositors
-
     // Info for bond holder
     struct Bond {
         uint deposited; // LPs deposited
@@ -475,6 +475,8 @@ contract BondDepositoryGlbBusdLP is Ownable {
         uint ratioLP; // For front end viewing
         uint maxDeposit; // For front end viewing
     }
+
+    mapping( address => Bond ) public bondInfo; // stores bond information for depositors
 
     event BondCreated(address indexed _depositor, uint deposited, uint totalDeposited, uint payout, uint totalPayout, uint harvestTime, uint ratioLP);
     event BondRedeemed( address indexed _depositor, uint amountTransfered, uint remaining, uint payout );

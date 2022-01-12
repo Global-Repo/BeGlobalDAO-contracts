@@ -17,15 +17,15 @@ async function main() {
 
     const [deployer] = await ethers.getSigners();
 
-    let harvestTime = 259200; //259200;
-    let ratio = 400;
-    let timeoutPeriod = 10000;
-    let maxDeposit = BigNumber.from(10).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    let harvestTime = 28800; //259200;
+    let ratio = 380;
+    let timeoutPeriod = 15000;
+    let maxDeposit = BigNumber.from(5000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     let largeApproval = '1000000000000000000000000000000000000';
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
 
-
+/*
     // Deploy GLBD
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
     let GLBD = await GLBDT.attach(GLBD_ADDRESS);
@@ -40,15 +40,16 @@ async function main() {
     // Mint GLBD
     console.log("[Deployer mints (extra?) 60000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
-
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+*/
 
     console.log("[Deploying Bond GLB SC]");
     const BOND = await ethers.getContractFactory('BondDepositoryGlb');
-    let bond = await BOND.deploy(GLBD_ADDRESS,GLB_ADDRESS,harvestTime,ratio,maxDeposit);
+    let bond = await BOND.deploy(GLBD_ADDRESS, GLB_ADDRESS, harvestTime, ratio, maxDeposit);
     console.log("[Bond GLB deployed]: " + bond.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
+    /*
     console.log("[Transfering GLBDs to bond]");
     await GLBD.transfer(bond.address, BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE));
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -61,7 +62,7 @@ async function main() {
     console.log("[approving GLB to bond]");
     await glb.approve(bond.address,largeApproval);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+*/
     try {
         console.log("VERIFYING Bond GLB: ", bond.address);
         //// Verify contract on bsc

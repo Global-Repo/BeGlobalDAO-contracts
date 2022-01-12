@@ -17,10 +17,10 @@ async function main() {
 
     const [deployer] = await ethers.getSigners();
 
-    let harvestTime = 259200; //259200;
-    let ratioLP = 200;
-    let timeoutPeriod = 10000;
-    let maxDeposit = BigNumber.from(2000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    let harvestTime = 28800; //259200 -> 3 dies.
+    let ratioLP = 190;
+    let timeoutPeriod = 15000;
+    let maxDeposit = BigNumber.from(10000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     let largeApproval = '1000000000000000000000000000000000000';
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
@@ -41,7 +41,7 @@ async function main() {
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-        console.log("[Deploying Bond GLB-BUSD LP SC]");
+    console.log("[Deploying Bond GLB-BUSD LP SC]");
     const BOND = await ethers.getContractFactory('BondDepositoryGlbBusdLP');
     let bond = await BOND.deploy(GLBD.address,BUSD_ADDRESS,GLB_BUSD_LP_ADDRESS,ROUTER_BEGLOBAL_ADDRESS,harvestTime,ratioLP,maxDeposit);
     console.log("[Bond GLB-BUSD LP deployed]: " + bond.address);
@@ -54,6 +54,7 @@ async function main() {
     console.log("[Bond GLB-BUSD LP deployed]: " + bond.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
+    /*
     console.log("[Transfering GLBDs to bond]");
     await GLBD.transfer(bond.address, BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE));
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -81,10 +82,10 @@ async function main() {
     }
 */
     try {
-        console.log("VERIFYING Bond GLB-BUSD LP: ", "0x888C6B24c38c1c3D4a2E85fe6bAC66CA071283cf");
+        console.log("VERIFYING Bond GLB-BUSD LP: ", "0x2C59b83F885E24B215a93e095B16C088E3c43e20");
         //// Verify contract on bsc
         await hre.run("verify:verify", {
-            address: "0x888C6B24c38c1c3D4a2E85fe6bAC66CA071283cf",
+            address: "0x2C59b83F885E24B215a93e095B16C088E3c43e20",
             constructorArguments: [
                 GLBD_ADDRESS,
                 BUSD_ADDRESS,
@@ -95,7 +96,7 @@ async function main() {
                 maxDeposit
             ],
         });
-        console.log( "Verified Bond GLB-BUSD LP: " + "0x888C6B24c38c1c3D4a2E85fe6bAC66CA071283cf" );
+        console.log( "Verified Bond GLB-BUSD LP: " + "0x2C59b83F885E24B215a93e095B16C088E3c43e20" );
     } catch (err) {
         console.log(err.message);
     }

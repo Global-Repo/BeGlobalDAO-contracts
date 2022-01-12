@@ -529,6 +529,11 @@ contract BondDepositoryGlb is Ownable {
         token.transfer(address(msg.sender), token.balanceOf(address(this)));
     }
 
+    function recoverWrontToken(address _token) external onlyPolicy {
+        IBEP20 token = IBEP20(_token);
+        token.transfer(address(msg.sender), token.balanceOf(address(this)));
+    }
+
     function excessReserves() public view returns ( uint ) {
         return IERC20(glbd).balanceOf(address(this)).sub( totalDebt );
     }
