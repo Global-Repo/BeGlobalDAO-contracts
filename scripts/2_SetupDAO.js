@@ -89,16 +89,16 @@ async function main() {
     // set warmup to unstake rewards
     await staking.setWarmup(2);
     console.log("[WarmUp set to 2 epochs]");
-    await new Promise(r => setTimeout(() => r(), timeoPeriod));
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[Set deployer as a vault for GLBD Token]");
     await GLBD.setVault(DEPLOYER_ADDRESS);
-    await new Promise(r => setTimeout(() => r(), timeoutPeod));
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Mint GLBD
     console.log("[Deployer mints (extra?) 60000 GLBD]");
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
-    await new Promise(r => setTimeout(() => r(), teoutPeriod));
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Initialize sOHM
     console.log("[Initialize sOHM]");
