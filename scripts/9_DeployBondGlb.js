@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 const {
     BUSD_ADDRESS,
     GLB_BUSD_LP_ADDRESS,
-    GLBD_ADDRESS, DEPLOYER_ADDRESS, ROUTER_BEGLOBAL_ADDRESS, GLB_ADDRESS
+    GLBD_ADDRESS, DEPLOYER_ADDRESS, ROUTER_BEGLOBAL_ADDRESS, GLB_ADDRESS, STAKING_HELPER_ADDRESS
 } = require("./addresses_mainnet");
 const {BigNumber} = require("@ethersproject/bignumber");
 
@@ -17,10 +17,10 @@ async function main() {
 
     const [deployer] = await ethers.getSigners();
 
-    let harvestTime = 28800; //259200;
+    let harvestTime = 6480000; //2.5 mesos
     let ratio = 380;
     let timeoutPeriod = 15000;
-    let maxDeposit = BigNumber.from(5000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    let maxDeposit = BigNumber.from(500000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     let largeApproval = '1000000000000000000000000000000000000';
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
@@ -42,18 +42,15 @@ async function main() {
     await GLBD.mint(DEPLOYER_ADDRESS, INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 */
-
     console.log("[Deploying Bond GLB SC]");
     const BOND = await ethers.getContractFactory('BondDepositoryGlb');
-    let bond = await BOND.deploy(GLBD_ADDRESS, GLB_ADDRESS, harvestTime, ratio, maxDeposit);
+    let bond = await BOND.deploy(GLBD_ADDRESS, GLB_ADDRESS, STAKING_HELPER_ADDRESS, harvestTime, ratio, maxDeposit);
     console.log("[Bond GLB deployed]: " + bond.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    /*
+/*
     console.log("[Transfering GLBDs to bond]");
     await GLBD.transfer(bond.address, BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE));
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
 
     const GLB = await ethers.getContractFactory('NativeToken');
     let glb = await GLB.attach(GLB_ADDRESS);
@@ -63,6 +60,7 @@ async function main() {
     await glb.approve(bond.address,largeApproval);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 */
+
     try {
         console.log("VERIFYING Bond GLB: ", bond.address);
         //// Verify contract on bsc
@@ -71,6 +69,7 @@ async function main() {
             constructorArguments: [
                 GLBD_ADDRESS,
                 GLB_ADDRESS,
+                STAKING_HELPER_ADDRESS,
                 harvestTime,
                 ratio,
                 maxDeposit

@@ -391,14 +391,38 @@ interface IBEP20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
+interface IStaking {
+    function stake( uint _amount, address _recipient ) external returns ( bool );
+    function claim( address _recipient ) external;
+}
+
+contract StakingHelper {
+
+    address public immutable staking;
+    address public immutable GLBD;
+
+    constructor ( address _staking, address _GLBD ) {
+        require( _staking != address(0) );
+        staking = _staking;
+        require( _GLBD != address(0) );
+        GLBD = _GLBD;
+    }
+
+    function stake( uint _amount, address _recipient ) external {
+        IERC20( GLBD ).transferFrom( msg.sender, address(this), _amount );
+        IERC20( GLBD ).approve( staking, _amount );
+        IStaking( staking ).stake( _amount, _recipient );
+        IStaking( staking ).claim( _recipient );
+    }
+}
+
 contract BondDepositoryGlb is Ownable {
     using SafeMath for uint;
     using SafeERC20 for IERC20;
 
-    uint public constant DUST = 1000;
-
     address public glbd;
     address public glb;
+    address public stakingHelper;
 
     uint public bondHarvestTime;
     uint public bondRatio;
@@ -424,16 +448,21 @@ contract BondDepositoryGlb is Ownable {
     constructor(
         address _glbd,
         address _glb,
+        address _stakingHelper,
         uint _bondHarvestTime,
         uint _bondRatio,
         uint _bondMaxDeposit
     ) {
         glbd = _glbd;
         glb = _glb;
+        stakingHelper = _stakingHelper;
         bondHarvestTime = _bondHarvestTime;
         bondRatio = _bondRatio;
         bondMaxDeposit = _bondMaxDeposit;
         totalDebt = 0;
+
+        IERC20( glbd ).approve(_stakingHelper, uint(0));
+        IERC20( glbd ).approve(_stakingHelper, uint(~0));
     }
 
     function setBondHarvestTime( uint _bondHarvestTime ) external onlyPolicy {
@@ -488,12 +517,12 @@ contract BondDepositoryGlb is Ownable {
         address _depositor
     ) external returns ( uint ) {
         uint transferAmount = availableToRedeem(_depositor);
-        require(transferAmount>DUST,"[There's no more GLBD to be claimed]");
+        require(transferAmount>0,"[There's no more GLBD to be claimed]");
 
-        IERC20(glbd).safeTransfer(_depositor, transferAmount);
+        StakingHelper(stakingHelper).stake(transferAmount, _depositor);
 
         uint newPayoutRemaining = bondInfo[ _depositor ].payoutRemaining.sub(transferAmount);
-        if(newPayoutRemaining<DUST)
+        if(newPayoutRemaining==0)
         {
             delete bondInfo[ _depositor ];
         }
