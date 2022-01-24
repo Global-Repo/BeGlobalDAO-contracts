@@ -447,18 +447,42 @@ interface IRouterV1 {
     function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }
 
+interface IStaking {
+    function stake( uint _amount, address _recipient ) external returns ( bool );
+    function claim( address _recipient ) external;
+}
+
+contract StakingHelper {
+
+    address public immutable staking;
+    address public immutable GLBD;
+
+    constructor ( address _staking, address _GLBD ) {
+        require( _staking != address(0) );
+        staking = _staking;
+        require( _GLBD != address(0) );
+        GLBD = _GLBD;
+    }
+
+    function stake( uint _amount, address _recipient ) external {
+        IERC20( GLBD ).transferFrom( msg.sender, address(this), _amount );
+        IERC20( GLBD ).approve( staking, _amount );
+        IStaking( staking ).stake( _amount, _recipient );
+        IStaking( staking ).claim( _recipient );
+    }
+}
+
 // Contract for partners of BeGlobal only.
 contract BondDepositoryGlbBusdLP is Ownable {
 
     using SafeERC20 for IERC20;
     using SafeMath for uint;
 
-    uint public constant DUST = 1000;
-
     address public glbd;
     address public busd;
     address public pair;
     address public router;
+    address public stakingHelper;
 
     uint public bondHarvestTime;
     uint public bondRatioLP;
@@ -468,6 +492,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
     // Info for bond holder
     struct Bond {
         uint deposited; // LPs deposited
+        uint depositedGLB; // GLBs deposited
         uint payout; // Total GLBD to be paid
         uint payoutRemaining; // GLBD remaining to be paid
         uint depositTime; // Timestamp on deposit
@@ -486,6 +511,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
         address _busd,
         address _pair,
         address _router,
+        address _stakingHelper,
         uint _bondHarvestTime,
         uint _bondRatioLP,
         uint _bondMaxDeposit
@@ -494,13 +520,17 @@ contract BondDepositoryGlbBusdLP is Ownable {
         busd = _busd;
         pair = _pair;
         router = _router;
+        stakingHelper = _stakingHelper;
         bondHarvestTime = _bondHarvestTime;
         bondRatioLP = _bondRatioLP;
         bondMaxDeposit = _bondMaxDeposit;
         totalDebt = 0;
 
-        IPair(pair).approve(_router, uint(0));
-        IPair(pair).approve(_router, uint(~0));
+        IPair( pair ).approve(_router, uint(0));
+        IPair( pair ).approve(_router, uint(~0));
+
+        IERC20( glbd ).approve(_stakingHelper, uint(0));
+        IERC20( glbd ).approve(_stakingHelper, uint(~0));
     }
 
     function setBondHarvestTime( uint _bondHarvestTime ) external onlyPolicy {
@@ -552,6 +582,7 @@ contract BondDepositoryGlbBusdLP is Ownable {
 
         bondInfo[ _depositor ] = Bond({
             deposited: bondInfo[ _depositor ].deposited.add(amount),
+            depositedGLB: bondInfo[ _depositor ].depositedGLB.add(reserve),
             payout: bondInfo[ _depositor ].payoutRemaining.add( actualPayout ),
             payoutRemaining: bondInfo[ _depositor ].payoutRemaining.add( actualPayout ),
             depositTime: block.timestamp,
@@ -573,12 +604,12 @@ contract BondDepositoryGlbBusdLP is Ownable {
         address _depositor
     ) external returns ( uint ) {
         uint transferAmount = availableToRedeem(_depositor);
-        require(transferAmount>DUST,"[There's no more GLBD to be claimed]");
+        require(transferAmount>0,"[There's no more GLBD to be claimed]");
 
-        IERC20(glbd).safeTransfer(_depositor, transferAmount);
+        StakingHelper(stakingHelper).stake(transferAmount, _depositor);
 
         uint newPayoutRemaining = bondInfo[ _depositor ].payoutRemaining.sub(transferAmount);
-        if(newPayoutRemaining<DUST)
+        if(newPayoutRemaining==0)
         {
             delete bondInfo[ _depositor ];
         }

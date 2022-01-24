@@ -2,7 +2,7 @@ const { ethers } = require("hardhat");
 const {
     BUSD_ADDRESS,
     GLB_BUSD_LP_ADDRESS,
-    GLBD_ADDRESS, DEPLOYER_ADDRESS, ROUTER_BEGLOBAL_ADDRESS
+    GLBD_ADDRESS, DEPLOYER_ADDRESS, ROUTER_BEGLOBAL_ADDRESS, STAKING_HELPER_ADDRESS
 } = require("./addresses_mainnet");
 const {BigNumber} = require("@ethersproject/bignumber");
 
@@ -17,10 +17,13 @@ async function main() {
 
     const [deployer] = await ethers.getSigners();
 
-    let harvestTime = 28800; //259200 -> 3 dies.
+    //let harvestTime = 5184000; // 2 mesos
+    //let harvestTime = 3456000; // 40 dies
+    //let harvestTime = 2160000; // 25 dies
+    let harvestTime = 1036800; // 12 dies
     let ratioLP = 190;
     let timeoutPeriod = 15000;
-    let maxDeposit = BigNumber.from(10000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    let maxDeposit = BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     let largeApproval = '1000000000000000000000000000000000000';
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
@@ -46,15 +49,17 @@ async function main() {
     let bond = await BOND.deploy(GLBD.address,BUSD_ADDRESS,GLB_BUSD_LP_ADDRESS,ROUTER_BEGLOBAL_ADDRESS,harvestTime,ratioLP,maxDeposit);
     console.log("[Bond GLB-BUSD LP deployed]: " + bond.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+*/
 
     console.log("[Deploying Bond GLB-BUSD LP SC]");
     const BOND = await ethers.getContractFactory('BondDepositoryGlbBusdLP');
-    let bond = await BOND.deploy(GLBD_ADDRESS,BUSD_ADDRESS,GLB_BUSD_LP_ADDRESS,ROUTER_BEGLOBAL_ADDRESS,harvestTime,ratioLP,maxDeposit);
+    let bond = await BOND.deploy(GLBD_ADDRESS,BUSD_ADDRESS,GLB_BUSD_LP_ADDRESS,ROUTER_BEGLOBAL_ADDRESS, STAKING_HELPER_ADDRESS, harvestTime,ratioLP,maxDeposit);
     console.log("[Bond GLB-BUSD LP deployed]: " + bond.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    /*
+
+/*
+
     console.log("[Transfering GLBDs to bond]");
     await GLBD.transfer(bond.address, BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE));
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -82,21 +87,22 @@ async function main() {
     }
 */
     try {
-        console.log("VERIFYING Bond GLB-BUSD LP: ", "0x2C59b83F885E24B215a93e095B16C088E3c43e20");
+        console.log("VERIFYING Bond GLB-BUSD LP: ", bond.address);
         //// Verify contract on bsc
         await hre.run("verify:verify", {
-            address: "0x2C59b83F885E24B215a93e095B16C088E3c43e20",
+            address: bond.address,
             constructorArguments: [
                 GLBD_ADDRESS,
                 BUSD_ADDRESS,
                 GLB_BUSD_LP_ADDRESS,
                 ROUTER_BEGLOBAL_ADDRESS,
+                STAKING_HELPER_ADDRESS,
                 harvestTime,
                 ratioLP,
                 maxDeposit
             ],
         });
-        console.log( "Verified Bond GLB-BUSD LP: " + "0x2C59b83F885E24B215a93e095B16C088E3c43e20" );
+        console.log( "Verified Bond GLB-BUSD LP: " + bond.address );
     } catch (err) {
         console.log(err.message);
     }
