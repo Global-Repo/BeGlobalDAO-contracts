@@ -1,25 +1,23 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.6.12;
+pragma solidity ^0.7.5;
 
-import '../Libraries/SafeMath.sol';
+import './Extras/SafeMath.sol';
 import './IBEP20.sol';
-import '../Libraries/SafeBEP20.sol';
-import '../Modifiers/ReentrancyGuard.sol';
+import './IERC20.sol';
+import './Extras/SafeBEP20.sol';
+import './Extras/ReentrancyGuard.sol';
 import '../Modifiers/Ownable.sol';
-import "../Modifiers/WhitelistUpgradeable.sol";
-import "../Modifiers/BlacklistUpgradeable.sol";
+import "../BondDepositoryGlb.sol";
+import "../BondDepositoryGlbBusdLP.sol";
+import "../BondDepositoryGlbBnbLP.sol";
 
 /**
- * @dev PantherSwap: Initial Panther Offering
- *
- * Website: https://pantherswap.com
- * Dex: https://dex.pantherswap.com
- * Twitter: https://twitter.com/PantherSwap
- *
+ * @dev BojiSwap: Initial Panther Offering
  */
 contract IPO is ReentrancyGuard, Ownable {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
 
     // Info of each user.
     struct UserInfo {
@@ -48,6 +46,8 @@ contract IPO is ReentrancyGuard, Ownable {
     // The block number when IPO ends
     uint256 public startClaim;
     // total amount of wGLBD needed to be deposited
+    uint256 public requiredGLB;
+    // total amount of wGLBD needed to be deposited
     uint256 public requiredWGLBD;
     // max amount of investment tokens that can invest any user
     uint256 public maxInvestment;
@@ -59,6 +59,9 @@ contract IPO is ReentrancyGuard, Ownable {
     mapping (address => UserInfo) public userInfo;
     // participators
     address[] public addressList;
+    address[] public bondGLBList;
+    address[] public bondGLBBUSDList;
+    address[] public bondGLBBNBList;
     mapping (address => bool) private whitelist;
     mapping (address => bool) private blacklist;
 
@@ -72,9 +75,9 @@ contract IPO is ReentrancyGuard, Ownable {
       uint256 _startPresale,
       uint256 _endPresale,
       uint256 _startClaim,
-      //uint256 _offeringAmount,
       uint256 _maxInvestment,
       uint256 _requiredWGLBD,
+      uint256 _requiredGLB,
       uint256 _raisingAmount
   ) public {
       wGLBD = _wGLBD;
@@ -83,9 +86,9 @@ contract IPO is ReentrancyGuard, Ownable {
       startPresale = _startPresale;
       endPresale = _endPresale;
       startClaim = _startClaim;
-      //offeringAmount = _offeringAmount;
       maxInvestment = _maxInvestment;
       requiredWGLBD = _requiredWGLBD;
+      requiredGLB = _requiredGLB;
       raisingAmount= _raisingAmount;
       totalAmountInvested = 0;
   }
@@ -106,34 +109,121 @@ contract IPO is ReentrancyGuard, Ownable {
         blacklist[_address] = _on;
     }
 
-  //function setOfferingAmount(uint256 _offerAmount) public onlyOwner {
-  //  require (block.number < startBlock, 'no');
-  //  offeringAmount = _offerAmount;
-  //}
+    function setMaxInvestment(uint256 _startPresale) public onlyOwner {
+        startPresale = _startPresale;
+    }
+
+    function setEndPresale(uint256 _endPresale) public onlyOwner {
+        endPresale = _endPresale;
+    }
+
+    function setStartClaim(uint256 _startClaim) public onlyOwner {
+        startClaim = _startClaim;
+    }
+
+    function setMaxInvestment(uint256 _maxInvestment) public onlyOwner {
+        maxInvestment = _maxInvestment;
+    }
 
     function setRequiredWGLBD(uint256 _requiredWGLBD) public onlyOwner {
-        requiredWGLBD= _requiredWGLBD;
+        requiredWGLBD = _requiredWGLBD;
+    }
+
+    function setRequiredGLB(uint256 _requiredGLB) public onlyOwner {
+        requiredGLB = _requiredGLB;
     }
 
     function setRaisingAmount(uint256 _raisingAmount) public onlyOwner {
-        raisingAmount= _raisingAmount;
+        raisingAmount = _raisingAmount;
+    }
+
+    function addBond(uint _typeBond, address _bond) public onlyOwner {
+        if(_typeBond==1)
+        {
+            bondGLBList.push(_bond);
+        }
+        else if(_typeBond==2)
+        {
+            bondGLBBUSDList.push(_bond);
+        }
+        else if(_typeBond==3)
+        {
+            bondGLBBNBList.push(_bond);
+        }
+    }
+
+    function deleteBond(uint _typeBond, address _bond) public onlyOwner {
+        if(_typeBond==1)
+        {
+            for (uint8 i = 0; i < bondGLBList.length; i++) {
+                if (bondGLBList[i] == _bond) {
+                    for (uint j = i; j<bondGLBList.length-1; j++)
+                    {
+                        bondGLBList[j] = bondGLBList[j+1];
+                    }
+                    bondGLBList.pop();
+                }
+            }
+        }
+        else if(_typeBond==2)
+        {
+            for (uint8 i = 0; i < bondGLBBUSDList.length; i++) {
+                if (bondGLBBUSDList[i] == _bond) {
+                    for (uint j = i; j<bondGLBBUSDList.length-1; j++)
+                    {
+                        bondGLBBUSDList[j] = bondGLBBUSDList[j+1];
+                    }
+                    bondGLBBUSDList.pop();
+                }
+            }
+        }
+        else if(_typeBond==3)
+        {
+            for (uint8 i = 0; i < bondGLBBNBList.length; i++) {
+                if (bondGLBBNBList[i] == _bond) {
+                    for (uint j = i; j<bondGLBBNBList.length-1; j++)
+                    {
+                        bondGLBBNBList[j] = bondGLBBNBList[j+1];
+                    }
+                    bondGLBBNBList.pop();
+                }
+            }
+        }
     }
 
     function canInvest(address _user) public view returns (bool)
     {
-        return true;
+        if(isWhitelist(_user))
+        {
+            return true;
+        }
+        else
+        {
+            uint amountMigrating = 0;
+            for (uint8 i = 0; i < bondGLBList.length; i++) {
+                amountMigrating = amountMigrating.add(BondDepositoryGlb(bondGLBList[i]).bondInfo(_user).deposited);
+            }
+            for (uint8 i = 0; i < bondGLBBUSDList.length; i++) {
+                amountMigrating = amountMigrating.add(BondDepositoryGlbBusdLP(bondGLBBUSDList[i]).bondInfo(_user).depositedGLB.mul(2));
+            }
+            for (uint8 i = 0; i < bondGLBBNBList.length; i++) {
+                amountMigrating = amountMigrating.add(BondDepositoryGlbBnbLP(bondGLBBNBList[i]).bondInfo(_user).depositedGLB.mul(2));
+            }
+
+            return amountMigrating>=requiredGLB;
+        }
     }
 
     function invest(uint256 _amount) public
     {
         require (block.number > startPresale && block.timestamp < endPresale, 'not presale time');
-        require (canInvest(msg.sender), 'you cannot invest'); // TODO comprovar si es tenen prous wGLBDs
+        require (canInvest(msg.sender) || IERC20(wGLBD).balanceOf(msg.sender)>=requiredWGLBD, 'you cannot invest'); //
         require (_amount > 0, 'need _amount > 0');
         require (userInfo[msg.sender].depositedInvestmentTokens.add(_amount) > maxInvestment, 'you cannot invest more');
 
         if(!canInvest(msg.sender))
         {
-            //wGLBD.safeTransferFrom(address(msg.sender), address(this), requiredWGLBD); TODO
+            IERC20(wGLBD).safeTransferFrom(address(msg.sender), address(this), requiredWGLBD);
             userInfo[msg.sender].depositedWGLBD = requiredWGLBD;
             userInfo[msg.sender].remainingWGLBD = requiredWGLBD;
         }
@@ -169,7 +259,7 @@ contract IPO is ReentrancyGuard, Ownable {
     function recoverWGLBD(address _depositor) external returns ( uint ) {
         uint transferAmount = availableToRecoverWGLBD(_depositor);
 
-        //wGLBD.safetransferfrom(address(this),_depositor, transferAmount); TODO
+        IERC20(wGLBD).safetransferfrom(address(this),_depositor, transferAmount);
 
         userInfo[_depositor].remainingWGLBD = userInfo[_depositor].remainingWGLBD.sub(transferAmount);
 
@@ -223,7 +313,7 @@ contract IPO is ReentrancyGuard, Ownable {
         uint256 claimAmount = userInfo[_user].claimableProjectTokens;
 
         if (claimAmount > 0) {
-            //projectToken.safeTransfer(_user, claimAmount); TODO
+            IBEP20(projectToken).safeTransfer(_user, claimAmount);
             userInfo[_user].claimableProjectTokens = 0;
             emit Claim(msg.sender, claimAmount);
         }
@@ -245,11 +335,11 @@ contract IPO is ReentrancyGuard, Ownable {
     }
 
     function withdrawProjectToken(uint256 _amount) public onlyOwner {
-        //require (_amount <= projectToken.balanceOf(address(this)), 'not enough project token'); TODO
-        //projectToken.safeTransfer(address(msg.sender), _amount); TODO
+        require (_amount <= IBEP20(projectToken).balanceOf(address(this)), 'not enough project token');
+        IBEP20(projectToken).safeTransfer(address(msg.sender), _amount);
     }
 
     function withdrawProjectToken() public onlyOwner {
-        //projectToken.safeTransfer(address(msg.sender), projectToken.balanceOf(address(this))); TODO
+        IBEP20(projectToken).safeTransfer(address(msg.sender), IBEP20(projectToken).balanceOf(address(this)));
     }
 }
