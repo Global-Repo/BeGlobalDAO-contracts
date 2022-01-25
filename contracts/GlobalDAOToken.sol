@@ -111,8 +111,8 @@ library EnumerableSet {
     return set_._values;
   }
 
-  // TODO needs insert function that maintains order.
-  // TODO needs NatSpec documentation comment.
+  // TO DO needs insert function that maintains order.
+  // TO DO needs NatSpec documentation comment.
   /**
    * Inserts new value by moving existing value at provided index to end of array and setting provided value at provided index
    */
@@ -308,7 +308,7 @@ library EnumerableSet {
   }
 
   /**
-   * TODO Might require explicit conversion of bytes32[] to address[].
+   * TO DO Might require explicit conversion of bytes32[] to address[].
    *  Might require iteration.
    */
   function getValues( AddressSet storage set_ ) internal view returns ( address[] memory ) {
@@ -601,7 +601,7 @@ abstract contract ERC20 is IERC20 {
 
   using SafeMath for uint256;
 
-  // TODO comment actual hash value.
+  // TO DO comment actual hash value.
   bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
     
   // Present in ERC777

@@ -259,7 +259,7 @@ abstract contract ERC20 is IERC20 {
 
     using SafeMath for uint256;
 
-    // TODO comment actual hash value.
+    // TO DO comment actual hash value.
     bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
     
     mapping (address => uint256) internal _balances;

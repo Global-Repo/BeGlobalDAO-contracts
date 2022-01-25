@@ -513,7 +513,7 @@ abstract contract ERC20
 
   using SafeMath for uint256;
 
-  // TODO comment actual hash value.
+  // TO DO comment actual hash value.
   bytes32 constant private ERC20TOKEN_ERC1820_INTERFACE_ID = keccak256( "ERC20Token" );
     
   // Present in ERC777
