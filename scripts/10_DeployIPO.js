@@ -14,6 +14,7 @@ const INITIAL_SUPPLY = BigNumber.from(60000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTI
 
 const TOKEN_DECIMALS_BIG = 18;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG = BigNumber.from(10).pow(TOKEN_DECIMALS_BIG);
+const INITIAL_SUPPLY_BIG = BigNumber.from(60000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE);
 
 async function main() {
 
@@ -23,7 +24,7 @@ async function main() {
     let ratio = 380;
     let timeoutPeriod = 5000;
     let maxDeposit = BigNumber.from(500000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
-    let deployBUSD = true;
+    let deployBUSD = false;
     let largeApproval = '1000000000000000000000000000000000000';
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
@@ -38,21 +39,23 @@ async function main() {
 
         // Deployer mints 100 BUSD
         console.log("[Deployer mints 100 BUSD]");
-        await busd.mint(INITIAL_SUPPLY);
+        await busd.mint(INITIAL_SUPPLY_BIG);
         await busd.transfer("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f",INITIAL_SUPPLY);
         console.log("[Success]");
     } else {
         // Attach BUSD
         console.log("[Attaching BUSD SC]");
-        busd = await BUSD.attach(BUSD_ADDRESS);
+        busd = await BUSD.attach("0x5A05328D3E9505859b51bEc77122FCCCe18E3402");
+        await busd.mint(INITIAL_SUPPLY_BIG);
+        await busd.transfer("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f",INITIAL_SUPPLY_BIG);
         console.log("[BUSDt attached]: " + busd.address);
     }
 
 
     // Deploy GLBD
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
-    //let GLBD = await GLBDT.attach(GLBD_ADDRESS);
-    let GLBD = await GLBDT.deploy();
+    let GLBD = await GLBDT.attach("0x5C78E9c9B1fb8B8a4cb5AD7D950e9289C571dFDF");
+    //let GLBD = await GLBDT.deploy();
     console.log("const GLBD_ADDRESS = '" + GLBD.address + "';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -67,7 +70,8 @@ async function main() {
 
     const sGLBDT = await ethers.getContractFactory('GlobalDAOToken');
     // Deploy sGLBD
-    sGLBD = await sGLBDT.deploy();
+    //sGLBD = await sGLBDT.deploy();
+    sGLBD = await sGLBDT.attach("0xcD952F3796DC00429732178b1cA00EB644764EC5");
     console.log("const sGLBD_ADDRESS = '" + sGLBD.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -79,14 +83,15 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     const WGLBDT = await ethers.getContractFactory('wGlobalDAOToken');
-    //let WGLBD = await WGLBDT.attach(WGLBD_ADDRESS);
-    let WGLBD = await WGLBDT.deploy(sGLBD.address); // TODO canviar per sGLBD
+    let WGLBD = await WGLBDT.attach("0x8AeB0d0F8eb35135eFB9aB9AFDB70F312C059f13");
+    //let WGLBD = await WGLBDT.deploy(sGLBD.address); // TODO canviar per sGLBD
     console.log("const WGLBD_ADDRESS = '" + WGLBD.address + "';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("[Deploying IPO GLB SC]");
     const IPO = await ethers.getContractFactory('IPO');
     let startTime = (new Date()).setTime((new Date()).getTime());
+    console.log("startTime = '" + startTime + "';");
     let ipo = await IPO.deploy(
         WGLBD.address,
         BUSD_ADDRESS,
@@ -94,8 +99,9 @@ async function main() {
         startTime,
         startTime+86400,
         startTime+172800,
+        BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
+        BigNumber.from(5).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(5).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
         BigNumber.from(500).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
     console.log("[IPO deployed]: " + ipo.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -112,8 +118,9 @@ async function main() {
                 startTime,
                 startTime+86400,
                 startTime+172800,
+                BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
+                BigNumber.from(5).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(5).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
                 BigNumber.from(500).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });

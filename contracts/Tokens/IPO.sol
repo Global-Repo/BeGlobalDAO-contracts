@@ -75,9 +75,9 @@ contract IPO is ReentrancyGuard, Ownable {
       uint256 _startPresale,
       uint256 _endPresale,
       uint256 _startClaim,
-      uint256 _maxInvestment,
       uint256 _requiredWGLBD,
       uint256 _requiredGLB,
+      uint256 _maxInvestment,
       uint256 _raisingAmount
   ) {
       wGLBD = _wGLBD;
@@ -86,9 +86,9 @@ contract IPO is ReentrancyGuard, Ownable {
       startPresale = _startPresale;
       endPresale = _endPresale;
       startClaim = _startClaim;
-      maxInvestment = _maxInvestment;
       requiredWGLBD = _requiredWGLBD;
       requiredGLB = _requiredGLB;
+      maxInvestment = _maxInvestment;
       raisingAmount= _raisingAmount;
       totalAmountInvested = 0;
   }
@@ -121,16 +121,16 @@ contract IPO is ReentrancyGuard, Ownable {
         startClaim = _startClaim;
     }
 
-    function setMaxInvestment(uint256 _maxInvestment) public onlyOwner {
-        maxInvestment = _maxInvestment;
-    }
-
     function setRequiredWGLBD(uint256 _requiredWGLBD) public onlyOwner {
         requiredWGLBD = _requiredWGLBD;
     }
 
     function setRequiredGLB(uint256 _requiredGLB) public onlyOwner {
         requiredGLB = _requiredGLB;
+    }
+
+    function setMaxInvestment(uint256 _maxInvestment) public onlyOwner {
+        maxInvestment = _maxInvestment;
     }
 
     function setRaisingAmount(uint256 _raisingAmount) public onlyOwner {
