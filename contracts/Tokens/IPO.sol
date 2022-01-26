@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.7.5;
 
-import './Extras/SafeMath.sol';
 import './IBEP20.sol';
 import './IERC20.sol';
-import './Extras/SafeBEP20.sol';
-import './Extras/ReentrancyGuard.sol';
+import '../Libraries/SafeBEP20.sol';
+import '../Libraries/SafeMath.sol';
+import '../Modifiers/ReentrancyGuard.sol';
 import '../Modifiers/Ownable.sol';
 import "../BondDepositoryGlb.sol";
 import "../BondDepositoryGlbBusdLP.sol";
@@ -79,7 +79,7 @@ contract IPO is ReentrancyGuard, Ownable {
       uint256 _requiredWGLBD,
       uint256 _requiredGLB,
       uint256 _raisingAmount
-  ) public {
+  ) {
       wGLBD = _wGLBD;
       investmentToken = _investmentToken;
       projectToken = _projectToken;
@@ -109,7 +109,7 @@ contract IPO is ReentrancyGuard, Ownable {
         blacklist[_address] = _on;
     }
 
-    function setMaxInvestment(uint256 _startPresale) public onlyOwner {
+    function setStartPresale(uint256 _startPresale) public onlyOwner {
         startPresale = _startPresale;
     }
 
@@ -200,14 +200,18 @@ contract IPO is ReentrancyGuard, Ownable {
         else
         {
             uint amountMigrating = 0;
+            uint newAmount = 0;
             for (uint8 i = 0; i < bondGLBList.length; i++) {
-                amountMigrating = amountMigrating.add(BondDepositoryGlb(bondGLBList[i]).bondInfo(_user).deposited);
+                (newAmount,,,,,,) = BondDepositoryGlb(bondGLBList[i]).bondInfo(_user);
+                amountMigrating = amountMigrating.add(newAmount);
             }
             for (uint8 i = 0; i < bondGLBBUSDList.length; i++) {
-                amountMigrating = amountMigrating.add(BondDepositoryGlbBusdLP(bondGLBBUSDList[i]).bondInfo(_user).depositedGLB.mul(2));
+                (newAmount,,,,,,,) = BondDepositoryGlbBusdLP(bondGLBBUSDList[i]).bondInfo(_user);
+                amountMigrating = amountMigrating.add(newAmount.mul(2));
             }
             for (uint8 i = 0; i < bondGLBBNBList.length; i++) {
-                amountMigrating = amountMigrating.add(BondDepositoryGlbBnbLP(bondGLBBNBList[i]).bondInfo(_user).depositedGLB.mul(2));
+                (newAmount,,,,,,,) = BondDepositoryGlbBnbLP(bondGLBBNBList[i]).bondInfo(_user);
+                amountMigrating = amountMigrating.add(newAmount.mul(2));
             }
 
             return amountMigrating>=requiredGLB;
@@ -259,7 +263,7 @@ contract IPO is ReentrancyGuard, Ownable {
     function recoverWGLBD(address _depositor) external returns ( uint ) {
         uint transferAmount = availableToRecoverWGLBD(_depositor);
 
-        IERC20(wGLBD).safetransferfrom(address(this),_depositor, transferAmount);
+        IERC20(wGLBD).safeTransferFrom(address(this),_depositor, transferAmount);
 
         userInfo[_depositor].remainingWGLBD = userInfo[_depositor].remainingWGLBD.sub(transferAmount);
 
@@ -299,7 +303,7 @@ contract IPO is ReentrancyGuard, Ownable {
 
     function distributeProjectTokens(uint _amount, uint256 start, uint256 end) public onlyOwner {
 
-        for (uint256 i = 0; i < addressList.length; i++)
+        for (uint256 i = start; i < end; i++)
         {
             userInfo[addressList[i]].claimableProjectTokens = getOfferingAmount(addressList[i],_amount);
         }

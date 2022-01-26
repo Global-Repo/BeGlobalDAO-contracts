@@ -1,7 +1,7 @@
 // File: @openzeppelin/contracts/utils/ReentrancyGuard.sol
 
 // SPDX-License-Identifier: Unlicensed
-pragma solidity 0.6.12;
+pragma solidity ^0.7.5;
 
 /**
  * @dev Contract module that helps prevent reentrant calls to a function.
@@ -36,7 +36,7 @@ abstract contract ReentrancyGuard {
 
     uint256 private _status;
 
-    constructor () internal {
+    constructor() {
         _status = _NOT_ENTERED;
     }
 
@@ -44,7 +44,7 @@ abstract contract ReentrancyGuard {
      * @dev Prevents a contract from calling itself, directly or indirectly.
      * Calling a `nonReentrant` function from another `nonReentrant`
      * function is not supported. It is possible to prevent this from happening
-     * by making the `nonReentrant` function external, and make it call a
+     * by making the `nonReentrant` function external, and making it call a
      * `private` function that does the actual work.
      */
     modifier nonReentrant() {

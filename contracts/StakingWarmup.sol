@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.7.5;
 
-import "./others/IERC20.sol";
+import "./Tokens/IERC20.sol";
 
 contract StakingWarmup {
 

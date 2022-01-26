@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.6.0 <0.8.0;
+pragma solidity ^0.7.5;
 
 import "../Modifiers/Ownable.sol";
 import "../Modifiers/Trusted.sol";
@@ -25,10 +25,7 @@ contract Presale is Trusted, IPresale{
     mapping (address => uint) private quantityBought;
     address[] private buyers;
 
-    event TokensBought(address buyer, uint256 amount, uint256 busdAcc);
-    event AdminTokenRecovery(address tokenRecovered, uint256 amount);
-
-    constructor(address _token, uint _presaleBegins, uint _presaleEnds) public {
+    constructor(address _token, uint _presaleBegins, uint _presaleEnds) {
         busdToken = BEP20(_token);
 
         presaleBegins = _presaleBegins;

@@ -1,13 +1,12 @@
-// SPDX-License-Identifier: Unlicensed
+// SPDX-License-Identifier: MIT
 
 import '../Modifiers/Ownable.sol';
-import '../Helpers/Context.sol';
-import '../Modifiers/DevPower.sol';
+import '../Libraries/Context.sol';
 import '../Libraries/Address.sol';
 import '../Libraries/SafeMath.sol';
 import './IBEP20.sol';
 
-pragma solidity 0.6.12;
+pragma solidity ^0.7.5;
 
 /**
  * @dev Implementation of the {IBEP20} interface.
@@ -33,7 +32,7 @@ pragma solidity 0.6.12;
  * functions have been added to mitigate the well-known issues around setting
  * allowances. See {IBEP20-approve}.
  */
-contract BEP20 is Context, IBEP20, Ownable, DevPower {
+contract BEP20 is Context, IBEP20, Ownable {
     using SafeMath for uint256;
     using Address for address;
 
@@ -56,9 +55,9 @@ contract BEP20 is Context, IBEP20, Ownable, DevPower {
      * All three of these values are immutable: they can only be set once during
      * construction.
      */
-    constructor(string memory name, string memory symbol) public {
-        _name = name;
-        _symbol = symbol;
+    constructor(string memory name_, string memory symbol_) {
+        _name = name_;
+        _symbol = symbol_;
         _decimals = 18;
     }
 

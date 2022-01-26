@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Unlicensed
-pragma solidity >=0.6.6;
+pragma solidity ^0.7.5;
 
 interface IRouterV1 {
     function factory() external pure returns (address);
