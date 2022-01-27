@@ -22,7 +22,7 @@ async function main() {
 
     let harvestTime = 6480000; //2.5 mesos
     let ratio = 380;
-    let timeoutPeriod = 5000;
+    let timeoutPeriod = 3000;
     let maxDeposit = BigNumber.from(500000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     let deployBUSD = false;
     let largeApproval = '1000000000000000000000000000000000000';
@@ -58,7 +58,7 @@ async function main() {
     //let GLBD = await GLBDT.deploy();
     console.log("const GLBD_ADDRESS = '" + GLBD.address + "';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+/*
     console.log("[Set deployer as a vault for GLBD Token]");
     await GLBD.setVault(deployer.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -67,30 +67,49 @@ async function main() {
     console.log("[Deployer mints (extra?) 60000 GLBD]");
     await GLBD.mint("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f", INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+*/
     const sGLBDT = await ethers.getContractFactory('GlobalDAOToken');
     // Deploy sGLBD
     //sGLBD = await sGLBDT.deploy();
     sGLBD = await sGLBDT.attach("0xcD952F3796DC00429732178b1cA00EB644764EC5");
     console.log("const sGLBD_ADDRESS = '" + sGLBD.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+/*
     console.log("[Set deployer as a vault for sGLBD Token]");
     await sGLBD.setVault(deployer.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    await sGLBD.mint("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f", INITIAL_SUPPLY);
+    await sGLBD.mint(deployer.address//"0xa978688CE4721f0e28CF85c4C2b0f55d3186736f"
+    , INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+*/
     const WGLBDT = await ethers.getContractFactory('wGlobalDAOToken');
     let WGLBD = await WGLBDT.attach("0x8AeB0d0F8eb35135eFB9aB9AFDB70F312C059f13");
     //let WGLBD = await WGLBDT.deploy(sGLBD.address); // TODO canviar per sGLBD
     console.log("const WGLBD_ADDRESS = '" + WGLBD.address + "';");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+/*
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));try {
+        console.log("VERIFYING WGLBD: ", WGLBD.address);
+        //// Verify contract on bsc
+        await hre.run("verify:verify", {
+            address: WGLBD.address,
+            constructorArguments: [
+                sGLBD.address
+            ],
+        });
+        console.log( "Verified WGLBD: " + WGLBD.address );
+    } catch (err) {
+        console.log(err.message);
+    }
 
+    await sGLBD.approve(WGLBD.address,largeApproval);
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    await WGLBD.wrap(INITIAL_SUPPLY);
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));/*
+*/
     console.log("[Deploying IPO GLB SC]");
     const IPO = await ethers.getContractFactory('IPO');
-    let startTime = (new Date()).setTime((new Date()).getTime());
+    let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
     let ipo = await IPO.deploy(
         WGLBD.address,
@@ -124,7 +143,7 @@ async function main() {
                 BigNumber.from(500).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });
-        console.log( "Verified Bond GLB: " + ipo.address );
+        console.log( "Verified IPO: " + ipo.address );
     } catch (err) {
         console.log(err.message);
     }

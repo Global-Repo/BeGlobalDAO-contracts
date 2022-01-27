@@ -220,10 +220,10 @@ contract IPO is ReentrancyGuard, Ownable {
 
     function invest(uint256 _amount) public
     {
-        require (block.number > startPresale && block.timestamp < endPresale, 'not presale time');
+        require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
         require (canInvest(msg.sender) || IERC20(wGLBD).balanceOf(msg.sender)>=requiredWGLBD, 'you cannot invest'); //
         require (_amount > 0, 'need _amount > 0');
-        require (userInfo[msg.sender].depositedInvestmentTokens.add(_amount) > maxInvestment, 'you cannot invest more');
+        require (userInfo[msg.sender].depositedInvestmentTokens.add(_amount) <= maxInvestment, 'you cannot invest more');
 
         if(!canInvest(msg.sender))
         {
