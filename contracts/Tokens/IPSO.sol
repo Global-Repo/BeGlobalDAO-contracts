@@ -12,9 +12,9 @@ import "../BondDepositoryGlbBusdLP.sol";
 import "../BondDepositoryGlbBnbLP.sol";
 
 /**
- * @dev BojiSwap: Initial Panther Offering
+ * @dev BeGlobalDAO: Initial Private Sale Offering
  */
-contract IPO is ReentrancyGuard, Ownable {
+contract IPSO is ReentrancyGuard, Ownable {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
     using SafeERC20 for IERC20;

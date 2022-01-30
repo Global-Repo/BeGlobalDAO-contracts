@@ -769,7 +769,7 @@ library SafeERC20 {
 }
 
 interface IsGLBDOLD {
-    function INDEX() external view returns (uint256);
+    function index() external view returns (uint256);
 }
 
 contract wGlobalDAOToken is ERC20 {
@@ -816,7 +816,7 @@ contract wGlobalDAOToken is ERC20 {
         @return uint
      */
     function wGLBDTosGLBD(uint256 _amount) public view returns (uint256) {
-        return _amount.mul(IsGLBDOLD(sGLBD).INDEX()).div(10**decimals());
+        return _amount.mul(IsGLBDOLD(sGLBD).index()).div(10**decimals());
     }
 
     /**
@@ -825,6 +825,6 @@ contract wGlobalDAOToken is ERC20 {
         @return uint
      */
     function sGLBDTowGLBD(uint256 _amount) public view returns (uint256) {
-        return _amount.mul(10**decimals()).div(IsGLBDOLD(sGLBD).INDEX());
+        return _amount.mul(10**decimals()).div(IsGLBDOLD(sGLBD).index());
     }
 }

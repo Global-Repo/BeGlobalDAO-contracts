@@ -5,7 +5,7 @@ const {
     BUSD_ADDRESS,
     WETH_ADDRESS,
     FACTORY_ADDRESS,
-} = require("./addresses_mainnet");
+} = require("./addresses_testnet");
 
 async function main() {
 
@@ -26,7 +26,7 @@ async function main() {
     let deployBUSD = false;
 
     let originalAMM = true;
-    let timeoutPeriod = 10000;
+    let timeoutPeriod = 3000;
 
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
     const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
@@ -36,7 +36,7 @@ async function main() {
     let epochLengthInBlocks = '14400';
 
     // Quin bloc serà el primer que doni staking [!]
-    const firstBlockEpoch = '14223893';
+    const firstBlockEpoch = '16322544';
 
     console.log("[Deploying from " + deployer.address + "]");
 
@@ -54,7 +54,7 @@ async function main() {
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     }
 
-    if (!originalAMM) {
+    /*if (!originalAMM) {
         // Deploy Router
         router = await deployRouter(factory.address, WETH_ADDRESS); // Direcció WETH random només per tal de que funcioni el router.
         console.log("const ROUTER_BEGLOBAL_ADDRESS = '" + router.address+"';");
@@ -65,7 +65,7 @@ async function main() {
         router = await Router.attach(ROUTER_BEGLOBAL_ADDRESS);
         console.log("[Router attached]: " + router.address);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    }
+    }*/
 
 
     if (deployBUSD) {

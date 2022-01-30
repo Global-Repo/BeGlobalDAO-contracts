@@ -4,7 +4,7 @@ const {
     DEPLOYER_ADDRESS,
     GLBD_ADDRESS,
     TREASURY_ADDRESS,
-} = require("./addresses_mainnet");
+} = require("./addresses_testnet");
 
 const TOKEN_DECIMALS_LITTLE = 9;
 const BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE = BigNumber.from(10).pow(TOKEN_DECIMALS_LITTLE);

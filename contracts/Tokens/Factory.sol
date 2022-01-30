@@ -2,8 +2,7 @@
 pragma solidity >= 0.6.12;
 
 import "./IFactory.sol";
-import "./Tokens/IPair.sol";
-import 'hardhat/console.sol';
+import "./Pair.sol";
 
 contract Factory is IFactory {
     address public override feeTo;
@@ -13,13 +12,11 @@ contract Factory is IFactory {
     mapping(address => mapping(address => address)) public override getPair;
     address[] public override allPairs;
 
-    event PairCreated(address indexed token0, address indexed token1, address pair, uint);
-
-    constructor(address _feeSetter) public {
+    constructor(address _feeSetter) {
         feeSetter = _feeSetter;
     }
 
-    function INIT_CODE_PAIR_HASH() external override view returns (bytes32) {
+    function INIT_CODE_PAIR_HASH() external override pure returns (bytes32) {
         return keccak256(abi.encodePacked(type(Pair).creationCode));
     }
 
