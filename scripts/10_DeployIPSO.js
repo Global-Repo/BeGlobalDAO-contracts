@@ -5,7 +5,7 @@ const {
     DEPLOYER_ADDRESS,
     GLB_ADDRESS,
     SGLBD_ADDRESS
-} = require("./addresses_testnet");
+} = require("./addresses_mainnet");
 const {BigNumber} = require("@ethersproject/bignumber");
 
 const TOKEN_DECIMALS_LITTLE = 9;
@@ -22,11 +22,11 @@ async function main() {
 
     let harvestTime = 6480000; //2.5 mesos
     let ratio = 380;
-    let timeoutPeriod = 3000;
+    let timeoutPeriod = 10000;
     let maxDeposit = BigNumber.from(500000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
-    let deployBUSD = false;
+    let deployBUSD = true;
     let largeApproval = '1000000000000000000000000000000000000';
-/*
+
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
     let busd;
     const BUSD = await ethers.getContractFactory('BEP20Token');
@@ -40,18 +40,18 @@ async function main() {
         // Deployer mints 100 BUSD
         console.log("[Deployer mints 100 BUSD]");
         await busd.mint(INITIAL_SUPPLY_BIG);
-        await busd.transfer("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f",INITIAL_SUPPLY);
+        //await busd.transfer("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f",INITIAL_SUPPLY);
         console.log("[Success]");
     } else {
         // Attach BUSD
         console.log("[Attaching BUSD SC]");
         busd = await BUSD.attach("0x5A05328D3E9505859b51bEc77122FCCCe18E3402");
         await busd.mint(INITIAL_SUPPLY_BIG);
-        await busd.transfer("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f",INITIAL_SUPPLY_BIG);
+        //await busd.transfer("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f",INITIAL_SUPPLY_BIG);
         console.log("[BUSDt attached]: " + busd.address);
     }
 
-*//*
+/*
     // Deploy GLBD
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
     //let GLBD = await GLBDT.attach("0x5C78E9c9B1fb8B8a4cb5AD7D950e9289C571dFDF");
@@ -71,7 +71,7 @@ async function main() {
     const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
     // Deploy sGLBD
     //sGLBD = await sGLBDT.deploy();
-    sGLBD = await sGLBDT.attach(SGLBD_ADDRESS);
+    sGLBD = await sGLBDT.attach("0xf3922fA91Bb2e2Bf9f694573B3C73cfA765fb1C3");
     console.log("const sGLBD_ADDRESS = '" + sGLBD.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 /*
@@ -85,7 +85,7 @@ async function main() {
 */
     const WGLBDT = await ethers.getContractFactory('wGlobalDAOToken');
     //let WGLBD = await WGLBDT.attach("0x8AeB0d0F8eb35135eFB9aB9AFDB70F312C059f13");
-    let WGLBD = await WGLBDT.deploy(SGLBD_ADDRESS); // TODO canviar per sGLBD
+    let WGLBD = await WGLBDT.deploy("0xf3922fA91Bb2e2Bf9f694573B3C73cfA765fb1C3"); // TODO canviar per sGLBD
     console.log("const WGLBD_ADDRESS = '" + WGLBD.address + "';");
 
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));try {
@@ -107,19 +107,18 @@ async function main() {
     await WGLBD.wrap(INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));/*
 */
-   /* console.log("[Deploying IPSO GLB SC]");
+    console.log("[Deploying IPSO GLB SC]");
     const IPSO = await ethers.getContractFactory('IPSO');
     let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
     let ipso = await IPSO.deploy(
         WGLBD.address,
-        BUSD_ADDRESS,
-        GLBD.address,
+        busd.address,
         startTime,
         startTime+86400,
         startTime+172800,
         BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
-        BigNumber.from(5).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+        BigNumber.from(50000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(500).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
     console.log("[IPSO deployed]: " + ipso.address);
@@ -132,13 +131,12 @@ async function main() {
             address: ipso.address,
             constructorArguments: [
                 WGLBD.address,
-                BUSD_ADDRESS,
-                GLBD.address,
+                busd.address,
                 startTime,
                 startTime+86400,
                 startTime+172800,
                 BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
-                BigNumber.from(5).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(50000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(500).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
@@ -147,7 +145,7 @@ async function main() {
     } catch (err) {
         console.log(err.message);
     }
-*/
+
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
 }
