@@ -83,7 +83,7 @@ async function main() {
     , INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 */
-    const WGLBDT = await ethers.getContractFactory('wGlobalDAOToken');
+    /*const WGLBDT = await ethers.getContractFactory('wGlobalDAOToken');
     //let WGLBD = await WGLBDT.attach("0x8AeB0d0F8eb35135eFB9aB9AFDB70F312C059f13");
     let WGLBD = await WGLBDT.deploy("0xf3922fA91Bb2e2Bf9f694573B3C73cfA765fb1C3"); // TODO canviar per sGLBD
     console.log("const WGLBD_ADDRESS = '" + WGLBD.address + "';");
@@ -100,24 +100,25 @@ async function main() {
         console.log( "Verified WGLBD: " + WGLBD.address );
     } catch (err) {
         console.log(err.message);
-    }
+    }*/
 /*
     await sGLBD.approve(WGLBD.address,largeApproval);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     await WGLBD.wrap(INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));/*
 */
-    /*console.log("[Deploying IPSO GLB SC]");
+    console.log("[Deploying IPSO GLB SC]");
     const IPSO = await ethers.getContractFactory('IPSO');
     let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
+    //let ipso = await IPSO.attach("0x37Cb9C9Bf6EF1Cf44A46b3f1eeD555B1EE3618BD");
     let ipso = await IPSO.deploy(
         "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
         "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
         startTime,
         1644008400,
         1644872400,
-        BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+        "7666666666666666666666666666",
         BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(5000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(40000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
@@ -125,23 +126,23 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("Bond added 0xa1dE39ef38b087877b34033d2FB5317c2A8092E6");
-    ipso.addbond(1,"0xa1dE39ef38b087877b34033d2FB5317c2A8092E6");
+    await ipso.addBond(1,"0xa1dE39ef38b087877b34033d2FB5317c2A8092E6");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("Bond added 0x130233f8f2641312B425621c27F6d4e156ecfFA8");
-    ipso.addbond(2,"0x130233f8f2641312B425621c27F6d4e156ecfFA8");
+    await ipso.addBond(2,"0x130233f8f2641312B425621c27F6d4e156ecfFA8");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("Bond added 0x08369c2dbeC0F2A976c338eb7F76AcD225578E17");
-    ipso.addbond(2,"0x08369c2dbeC0F2A976c338eb7F76AcD225578E17");
+    await ipso.addBond(2,"0x08369c2dbeC0F2A976c338eb7F76AcD225578E17");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("Bond added 0x8CBFDFaD4415d9D00c41AF6E807F536d07372351");
-    ipso.addbond(2,"0x8CBFDFaD4415d9D00c41AF6E807F536d07372351");
+    await ipso.addBond(2,"0x8CBFDFaD4415d9D00c41AF6E807F536d07372351");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     console.log("Bond added 0x0a61a4E810f5D15F9D347a67b5D5ED92a5A4d94C");
-    ipso.addbond(2,"0x0a61a4E810f5D15F9D347a67b5D5ED92a5A4d94C");
+    await ipso.addBond(2,"0x0a61a4E810f5D15F9D347a67b5D5ED92a5A4d94C");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     try {
@@ -155,7 +156,7 @@ async function main() {
                 startTime,
                 1644008400,
                 1644872400,
-                BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                "7666666666666666666666666666",
                 BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(5000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(40000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
@@ -164,7 +165,7 @@ async function main() {
         console.log( "Verified IPSO: " + ipso.address );
     } catch (err) {
         console.log(err.message);
-    }*/
+    }
 
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");

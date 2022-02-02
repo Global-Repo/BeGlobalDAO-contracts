@@ -279,7 +279,7 @@ contract IPSO is ReentrancyGuard, Ownable {
     function recoverWGLBD(address _depositor) external returns ( uint ) {
         uint transferAmount = availableToRecoverWGLBD(_depositor);
 
-        IERC20(wGLBD).safeTransferFrom(address(this),_depositor, transferAmount);
+        IERC20(wGLBD).safeTransfer(_depositor, transferAmount);
 
         userInfo[_depositor].remainingWGLBD = userInfo[_depositor].remainingWGLBD.sub(transferAmount);
 
