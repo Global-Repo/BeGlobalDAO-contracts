@@ -226,13 +226,22 @@ contract IPSO is ReentrancyGuard, Ownable {
         require (userInfo[msg.sender].depositedInvestmentTokens.add(_amount) <= maxInvestment, 'you cannot invest more');
         bool canInv = canInvest(msg.sender);
         require (canInv || IERC20(wGLBD).balanceOf(msg.sender)>=requiredWGLBD, 'you cannot invest'); //
-        require (!isBlacklist(msg.sender), 'you cannot invest'); //
+        require (!isBlacklist(msg.sender), 'YOU cannot invest'); //
 
         if(!canInv)
         {
             IERC20(wGLBD).safeTransferFrom(address(msg.sender), address(this), requiredWGLBD);
             userInfo[msg.sender].depositedWGLBD = requiredWGLBD;
             userInfo[msg.sender].remainingWGLBD = requiredWGLBD;
+            userInfo[msg.sender].depositWGLBD = true;
+        }
+        else if(whitelist[msg.sender])
+        {
+            userInfo[msg.sender].whitelisted = true;
+        }
+        else
+        {
+            userInfo[msg.sender].migrateGLB = true;
         }
 
         IBEP20(investmentToken).safeTransferFrom(address(msg.sender), address(this), _amount);
@@ -288,7 +297,9 @@ contract IPSO is ReentrancyGuard, Ownable {
         }
         else if(startClaim>block.timestamp)
         {
-            harvestingAmount = user.depositedWGLBD.mul(startClaim.sub(block.timestamp)).div(startClaim.sub(endPresale));
+            harvestingAmount = user.depositedWGLBD
+            .mul(startClaim.sub(block.timestamp))
+            .div(startClaim.sub(endPresale));
         }
 
         return user.remainingWGLBD.sub(harvestingAmount);
@@ -307,14 +318,14 @@ contract IPSO is ReentrancyGuard, Ownable {
 
     function distributeProjectTokens(uint _amount, uint256 start, uint256 end) public onlyOwner {
 
-        for (uint256 i = start; i < end; i++)
+        for (uint256 i = start; i <= end; i++)
         {
             userInfo[addressList[i]].claimableProjectTokens = getOfferingAmount(addressList[i],_amount);
         }
     }
 
     function distributeProjectTokens(uint _amount) public onlyOwner {
-        distributeProjectTokens(_amount,0,addressList.length);
+        distributeProjectTokens(_amount,0,addressList.length-1);
     }
 
     function claimProjectTokens(address _user) public nonReentrant {
@@ -349,5 +360,13 @@ contract IPSO is ReentrancyGuard, Ownable {
 
     function withdrawProjectToken() public onlyOwner {
         IBEP20(projectToken).safeTransfer(address(msg.sender), IBEP20(projectToken).balanceOf(address(this)));
+    }
+
+    function recoverWrongTokens(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
+        IBEP20(_tokenAddress).safeTransfer(address(msg.sender), _tokenAmount);
+    }
+
+    function recoverWrongTokens2(address _tokenAddress, uint256 _tokenAmount) external onlyOwner {
+        IERC20(_tokenAddress).safeTransfer(address(msg.sender), _tokenAmount);
     }
 }
