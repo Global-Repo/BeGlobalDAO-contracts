@@ -233,6 +233,8 @@ contract IPSO is ReentrancyGuard, Ownable {
             IERC20(wGLBD).safeTransferFrom(address(msg.sender), address(this), requiredWGLBD);
             userInfo[msg.sender].depositedWGLBD = requiredWGLBD;
             userInfo[msg.sender].remainingWGLBD = requiredWGLBD;
+
+            whitelist[address(msg.sender)] = true;
         }
 
         IBEP20(investmentToken).safeTransferFrom(address(msg.sender), address(this), _amount);
