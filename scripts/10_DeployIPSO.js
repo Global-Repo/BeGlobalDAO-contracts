@@ -26,7 +26,7 @@ async function main() {
     let maxDeposit = BigNumber.from(500000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     let deployBUSD = true;
     let largeApproval = '1000000000000000000000000000000000000';
-
+/*
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
     let busd;
     const BUSD = await ethers.getContractFactory('BEP20Token');
@@ -49,7 +49,7 @@ async function main() {
         await busd.mint(INITIAL_SUPPLY_BIG);
         //await busd.transfer("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f",INITIAL_SUPPLY_BIG);
         console.log("[BUSDt attached]: " + busd.address);
-    }
+    }*/
 
 /*
     // Deploy GLBD
@@ -68,12 +68,12 @@ async function main() {
     await GLBD.mint("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f", INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
 
-    const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
+    /*const sGLBDT = await ethers.getContractFactory('sGlobalDAOToken');
     // Deploy sGLBD
     //sGLBD = await sGLBDT.deploy();
     sGLBD = await sGLBDT.attach("0xf3922fA91Bb2e2Bf9f694573B3C73cfA765fb1C3");
     console.log("const sGLBD_ADDRESS = '" + sGLBD.address+"';");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
 /*
     console.log("[Set deployer as a vault for sGLBD Token]");
     await sGLBD.setVault(deployer.address);
@@ -94,7 +94,7 @@ async function main() {
         await hre.run("verify:verify", {
             address: WGLBD.address,
             constructorArguments: [
-                sGLBD.address
+                "0xf3922fA91Bb2e2Bf9f694573B3C73cfA765fb1C3"
             ],
         });
         console.log( "Verified WGLBD: " + WGLBD.address );
@@ -107,21 +107,41 @@ async function main() {
     await WGLBD.wrap(INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));/*
 */
-    console.log("[Deploying IPSO GLB SC]");
+    /*console.log("[Deploying IPSO GLB SC]");
     const IPSO = await ethers.getContractFactory('IPSO');
     let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
     let ipso = await IPSO.deploy(
-        WGLBD.address,
-        busd.address,
+        "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
+        "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
         startTime,
-        startTime+86400,
-        startTime+172800,
-        BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
-        BigNumber.from(50000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+        1644008400,
+        1644872400,
         BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(500).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
+        BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+        BigNumber.from(5000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+        BigNumber.from(40000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
     console.log("[IPSO deployed]: " + ipso.address);
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    console.log("Bond added 0xa1dE39ef38b087877b34033d2FB5317c2A8092E6");
+    ipso.addbond(1,"0xa1dE39ef38b087877b34033d2FB5317c2A8092E6");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    console.log("Bond added 0x130233f8f2641312B425621c27F6d4e156ecfFA8");
+    ipso.addbond(2,"0x130233f8f2641312B425621c27F6d4e156ecfFA8");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    console.log("Bond added 0x08369c2dbeC0F2A976c338eb7F76AcD225578E17");
+    ipso.addbond(2,"0x08369c2dbeC0F2A976c338eb7F76AcD225578E17");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    console.log("Bond added 0x8CBFDFaD4415d9D00c41AF6E807F536d07372351");
+    ipso.addbond(2,"0x8CBFDFaD4415d9D00c41AF6E807F536d07372351");
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    console.log("Bond added 0x0a61a4E810f5D15F9D347a67b5D5ED92a5A4d94C");
+    ipso.addbond(2,"0x0a61a4E810f5D15F9D347a67b5D5ED92a5A4d94C");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     try {
@@ -130,21 +150,21 @@ async function main() {
         await hre.run("verify:verify", {
             address: ipso.address,
             constructorArguments: [
-                WGLBD.address,
-                busd.address,
+                "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
+                "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
                 startTime,
-                startTime+86400,
-                startTime+172800,
-                BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
-                BigNumber.from(50000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                1644008400,
+                1644872400,
                 BigNumber.from(50).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(500).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+                BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(5000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(40000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });
         console.log( "Verified IPSO: " + ipso.address );
     } catch (err) {
         console.log(err.message);
-    }
+    }*/
 
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
