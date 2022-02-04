@@ -269,6 +269,7 @@ contract IPSO is ReentrancyGuard, Ownable {
     }
 
     function refundExcessInvestmentTokens(address _user) public nonReentrant {
+        require (block.timestamp > endPresale, 'not refund time');
         uint256 refundingTokenAmount = getExcessInvestmentTokens(_user);
         if (refundingTokenAmount > 0) {
             IBEP20(investmentToken).safeTransfer(_user, refundingTokenAmount);
