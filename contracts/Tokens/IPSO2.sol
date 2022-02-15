@@ -48,6 +48,8 @@ contract IPSO2 is ReentrancyGuard, Ownable {
     uint256 public ratioRequiredWGLBD;
     // amount of wglbd equivalent to being whitelisted
     uint256 public amountForWhitelisted;
+    // min amount of investment tokens that can invest any user
+    uint256 public minInvestment;
     // max amount of investment tokens that can invest any user
     uint256 public maxInvestment;
     // total amount of investment tokens need to be raised
@@ -74,6 +76,7 @@ contract IPSO2 is ReentrancyGuard, Ownable {
       uint256 _startClaim,
       uint256 _ratioRequiredWGLBD,
       uint256 _amountForWhitelisted,
+      uint256 _minInvestment,
       uint256 _maxInvestment,
       uint256 _raisingAmount
   ) {
@@ -84,6 +87,7 @@ contract IPSO2 is ReentrancyGuard, Ownable {
       startClaim = _startClaim;
       ratioRequiredWGLBD = _ratioRequiredWGLBD;
       amountForWhitelisted = _amountForWhitelisted;
+      minInvestment = _minInvestment;
       maxInvestment = _maxInvestment;
       raisingAmount= _raisingAmount;
       totalAmountInvested = 0;
@@ -130,6 +134,10 @@ contract IPSO2 is ReentrancyGuard, Ownable {
         amountForWhitelisted = _amountForWhitelisted;
     }
 
+    function setMinInvestment(uint256 _minInvestment) public onlyOwner {
+        minInvestment = _minInvestment;
+    }
+
     function setMaxInvestment(uint256 _maxInvestment) public onlyOwner {
         maxInvestment = _maxInvestment;
     }
@@ -151,6 +159,7 @@ contract IPSO2 is ReentrancyGuard, Ownable {
 
     function invest(uint256 _amount) public
     {
+        require (userInfo[msg.sender].depositedInvestmentTokens > 0 || minInvestment<=_amount, 'you need to invest more');
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
         require (_amount > 0, 'need _amount > 0');
         require (_amount <= canInvestAmount(msg.sender), 'you cannot invest so many tokens'); //
