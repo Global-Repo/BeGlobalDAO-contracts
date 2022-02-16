@@ -146,7 +146,13 @@ contract IPSO2 is ReentrancyGuard, Ownable {
         raisingAmount = _raisingAmount;
     }
 
-    function canInvestAmount(address _user) public view returns (uint)
+    function canInvestMin(address _user) public view returns (uint)
+    {
+
+        return (isWhitelist(_user) && !userInfo[msg.sender].whitelisted) || userInfo[msg.sender].depositWGLBD ? 0 : minInvestment.mul(ratioRequiredWGLBD);
+    }
+
+    function canInvestMax(address _user) public view returns (uint)
     {
         uint amountToInvest = isWhitelist(_user) && !userInfo[msg.sender].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(msg.sender)).mul(ratioRequiredWGLBD);
         return amountToInvest > maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) : amountToInvest;
@@ -154,10 +160,11 @@ contract IPSO2 is ReentrancyGuard, Ownable {
 
     function invest(uint256 _amount) public
     {
-        require (userInfo[msg.sender].depositWGLBD || minInvestment <= _amount.div(ratioRequiredWGLBD) || (whitelist[msg.sender] && !userInfo[msg.sender].whitelisted), 'you need to invest more');
+        //require (userInfo[msg.sender].depositWGLBD || minInvestment <= _amount.div(ratioRequiredWGLBD) || (whitelist[msg.sender] && !userInfo[msg.sender].whitelisted), 'you need to invest more');
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
         require (_amount > 0, 'need _amount > 0');
-        require (_amount <= canInvestAmount(msg.sender), 'you cannot invest so many tokens'); //
+        require (_amount >= canInvestMin(msg.sender), 'you need to invest more');
+        require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens'); //
         require (!isBlacklist(msg.sender), 'YOU cannot invest'); //
 
         if(whitelist[msg.sender] && !userInfo[msg.sender].whitelisted)
