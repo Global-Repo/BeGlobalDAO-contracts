@@ -146,36 +146,27 @@ contract IPSO2 is ReentrancyGuard, Ownable {
         raisingAmount = _raisingAmount;
     }
 
-    function canInvest(address _user) public view returns (bool)
-    {
-        return isWhitelist(_user);
-    }
-
     function canInvestAmount(address _user) public view returns (uint)
     {
-        uint amountToInvest = isWhitelist(_user) && !userInfo[msg.sender].whitelisted ? ((IERC20(wGLBD).balanceOf(msg.sender)).mul(ratioRequiredWGLBD)).add(amountForWhitelisted) : (IERC20(wGLBD).balanceOf(msg.sender)).mul(ratioRequiredWGLBD);
+        uint amountToInvest = isWhitelist(_user) && !userInfo[msg.sender].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(msg.sender)).mul(ratioRequiredWGLBD);
         return amountToInvest > maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) : amountToInvest;
     }
 
     function invest(uint256 _amount) public
     {
-        require (userInfo[msg.sender].depositedInvestmentTokens > 0 || minInvestment<=_amount, 'you need to invest more');
+        require (userInfo[msg.sender].depositWGLBD || minInvestment <= _amount.div(ratioRequiredWGLBD) || (whitelist[msg.sender] && !userInfo[msg.sender].whitelisted), 'you need to invest more');
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
         require (_amount > 0, 'need _amount > 0');
         require (_amount <= canInvestAmount(msg.sender), 'you cannot invest so many tokens'); //
         require (!isBlacklist(msg.sender), 'YOU cannot invest'); //
 
-        uint256 wglbdToDeposit = _amount.div(ratioRequiredWGLBD);
-
-        if(userInfo[msg.sender].whitelisted && userInfo[msg.sender].depositedInvestmentTokens < amountForWhitelisted)
+        if(whitelist[msg.sender] && !userInfo[msg.sender].whitelisted)
         {
             userInfo[msg.sender].whitelisted = true;
-            uint256 wglbdForWhitelisted = amountForWhitelisted.sub(userInfo[msg.sender].depositedInvestmentTokens).div(ratioRequiredWGLBD);
-            wglbdToDeposit = wglbdToDeposit < wglbdForWhitelisted ? 0 : wglbdToDeposit.sub(wglbdForWhitelisted);
         }
-
-        if(wglbdToDeposit>0)
+        else
         {
+            uint256 wglbdToDeposit = _amount.div(ratioRequiredWGLBD);
             userInfo[msg.sender].depositWGLBD = true;
             userInfo[msg.sender].depositedWGLBD = userInfo[msg.sender].depositedWGLBD.add(wglbdToDeposit);
             userInfo[msg.sender].remainingWGLBD = userInfo[msg.sender].remainingWGLBD.add(wglbdToDeposit);
@@ -187,6 +178,7 @@ contract IPSO2 is ReentrancyGuard, Ownable {
           addressList.push(address(msg.sender));
         }
         userInfo[msg.sender].depositedInvestmentTokens = userInfo[msg.sender].depositedInvestmentTokens.add(_amount);
+
         totalAmountInvested = totalAmountInvested.add(_amount);
         totalAmountInvestedRemaining = totalAmountInvestedRemaining.add(_amount);
 
@@ -287,17 +279,11 @@ contract IPSO2 is ReentrancyGuard, Ownable {
     function withdrawInvestmentToken(uint256 _amount) public onlyOwner {
         uint256 amountBlocked = totalAmountInvestedRemaining > raisingAmount ? totalAmountInvestedRemaining.sub(raisingAmount) : 0;
         require (_amount <= IBEP20(investmentToken).balanceOf(address(this)).sub(amountBlocked), 'not enough investment tokens');
-
-        //totalAmountInvestedRemaining = totalAmountInvestedRemaining.sub(_amount);
-
         IBEP20(investmentToken).safeTransfer(address(msg.sender), _amount);
     }
 
     function withdrawInvestmentToken() public onlyOwner {
         uint256 amountBlocked = totalAmountInvestedRemaining > raisingAmount ? totalAmountInvestedRemaining.sub(raisingAmount) : 0;
-
-        //totalAmountInvestedRemaining = totalAmountInvestedRemaining.sub(IBEP20(investmentToken).balanceOf(address(this)).sub(amountBlocked));
-
         IBEP20(investmentToken).safeTransfer(address(msg.sender), IBEP20(investmentToken).balanceOf(address(this)).sub(amountBlocked));
     }
 
