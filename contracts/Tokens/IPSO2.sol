@@ -209,13 +209,13 @@ contract IPSO2 is ReentrancyGuard, Ownable {
 
     function canInvestMin(address _user) public view returns (uint)
     {
-        return (isWhitelist(_user) && !userInfo[msg.sender].whitelisted) || userInfo[msg.sender].depositWGLBD ? 0 : minInvestment.mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
+        return (isWhitelist(_user) && !userInfo[_user].whitelisted) || userInfo[_user].depositWGLBD ? 0 : minInvestment.mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
     }
 
     function canInvestMax(address _user) public view returns (uint)
     {
-        uint amountToInvest = isWhitelist(_user) && !userInfo[msg.sender].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(msg.sender)).mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
-        return amountToInvest > maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) : amountToInvest;
+        uint amountToInvest = isWhitelist(_user) && !userInfo[_user].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(_user)).mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
+        return amountToInvest > maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) : amountToInvest;
     }
 
     function invest(uint256 _amount) public

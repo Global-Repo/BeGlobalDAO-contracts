@@ -113,18 +113,18 @@ async function main() {
     console.log("startTime = '" + startTime + "';");
     //let ipso = await IPSO.attach("0x37Cb9C9Bf6EF1Cf44A46b3f1eeD555B1EE3618BD");
     let ipso = await IPSO.deploy(
-        "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
-        "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
+        "0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",//WGLBD.address,
+        "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",//busd.address,
         startTime,
-        1644008400,
-        1644872400,
-        "7666666666666666666666666666",
+        startTime+20000,
+        startTime+40000,
+        "100000",
         BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(5000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(40000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
+        BigNumber.from(3000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
     console.log("[IPSO deployed]: " + ipso.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+/*
     console.log("Bond added 0xa1dE39ef38b087877b34033d2FB5317c2A8092E6");
     await ipso.addBond(1,"0xa1dE39ef38b087877b34033d2FB5317c2A8092E6");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -144,22 +144,22 @@ async function main() {
     console.log("Bond added 0x0a61a4E810f5D15F9D347a67b5D5ED92a5A4d94C");
     await ipso.addBond(2,"0x0a61a4E810f5D15F9D347a67b5D5ED92a5A4d94C");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+*/
     try {
         console.log("VERIFYING IPSO: ", ipso.address);
         //// Verify contract on bsc
         await hre.run("verify:verify", {
             address: ipso.address,
             constructorArguments: [
-                "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
-                "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
+                "0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",//WGLBD.address,
+                "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",//busd.address,
                 startTime,
-                1644008400,
-                1644872400,
-                "7666666666666666666666666666",
+                startTime+20000,
+                startTime+40000,
+                "100000",
                 BigNumber.from(100000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(5000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(40000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+                BigNumber.from(3000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });
         console.log( "Verified IPSO: " + ipso.address );
