@@ -44,11 +44,13 @@ contract IPSO2 is ReentrancyGuard, Ownable {
     uint256 public endPresale;
     // The block number when IPSO ends
     uint256 public startClaim;
-    // ratio of wGLBD needed to be deposited / BUSD invested
-    uint256 public ratioRequiredWGLBD;
+    // numerator ratio of wGLBD needed to be deposited / BUSD invested
+    uint256 public ratioRequiredWGLBDNum;
+    // denominator ratio of wGLBD needed to be deposited / BUSD invested
+    uint256 public ratioRequiredWGLBDDen;
     // amount of wglbd equivalent to being whitelisted
     uint256 public amountForWhitelisted;
-    // min amount of investment tokens that can invest any user
+    // min amount of WGLB tokens that must lock any user to invest
     uint256 public minInvestment;
     // max amount of investment tokens that can invest any user
     uint256 public maxInvestment;
@@ -74,7 +76,8 @@ contract IPSO2 is ReentrancyGuard, Ownable {
       uint256 _startPresale,
       uint256 _endPresale,
       uint256 _startClaim,
-      uint256 _ratioRequiredWGLBD,
+      uint256 _ratioRequiredWGLBDNum,
+      uint256 _ratioRequiredWGLBDDen,
       uint256 _amountForWhitelisted,
       uint256 _minInvestment,
       uint256 _maxInvestment,
@@ -85,7 +88,8 @@ contract IPSO2 is ReentrancyGuard, Ownable {
       startPresale = _startPresale;
       endPresale = _endPresale;
       startClaim = _startClaim;
-      ratioRequiredWGLBD = _ratioRequiredWGLBD;
+      ratioRequiredWGLBDNum = _ratioRequiredWGLBDNum;
+      ratioRequiredWGLBDDen = _ratioRequiredWGLBDDen;
       amountForWhitelisted = _amountForWhitelisted;
       minInvestment = _minInvestment;
       maxInvestment = _maxInvestment;
@@ -112,6 +116,59 @@ contract IPSO2 is ReentrancyGuard, Ownable {
 
     function setBlacklist(address _address, bool _on) external onlyOwner {
         blacklist[_address] = _on;
+        if(_on)
+        {
+            removeUser(_address);
+        }
+    }
+
+    function replaceUser(address _addressOld, address _addressNew) external onlyOwner
+    {
+        require(userInfo[_addressOld].whitelisted || userInfo[_addressOld].depositWGLBD, 'userOut does not exist');
+        require(!userInfo[_addressNew].whitelisted && !userInfo[_addressNew].depositWGLBD, 'userIn already exists');
+
+        //COPY OLD TO NEW
+        userInfo[_addressNew].depositedInvestmentTokens = userInfo[_addressOld].depositedInvestmentTokens;
+        userInfo[_addressNew].refundedInvestmentTokens = userInfo[_addressOld].refundedInvestmentTokens;
+        userInfo[_addressNew].claimableProjectTokens = userInfo[_addressOld].claimableProjectTokens;
+        userInfo[_addressNew].depositedWGLBD = userInfo[_addressOld].depositedWGLBD;
+        userInfo[_addressNew].remainingWGLBD = userInfo[_addressOld].remainingWGLBD;
+        userInfo[_addressNew].depositWGLBD = userInfo[_addressOld].depositWGLBD;
+        userInfo[_addressNew].whitelisted = userInfo[_addressOld].whitelisted;
+
+        addressList.push(address(_addressNew));
+
+        //REMOVE OLD
+        delete userInfo[_addressOld];
+        for (uint8 i = 0; i < addressList.length; i++) {
+            if (addressList[i] == _addressOld) {
+                for (uint j = i; j<addressList.length-1; j++)
+                {
+                    addressList[j] = addressList[j+1];
+                }
+                addressList.pop();
+            }
+        }
+    }
+
+    function removeUser(address _address) internal
+    {
+        IBEP20(investmentToken).safeTransfer(address(_address), userInfo[_address].depositedInvestmentTokens);
+        IERC20(wGLBD).safeTransfer(address(_address), userInfo[_address].depositedWGLBD);
+
+        totalAmountInvested = totalAmountInvested.sub(userInfo[_address].depositedInvestmentTokens);
+        totalAmountInvestedRemaining = totalAmountInvestedRemaining.sub(userInfo[_address].depositedInvestmentTokens);
+
+        for (uint8 i = 0; i < addressList.length; i++) {
+            if (addressList[i] == _address) {
+                for (uint j = i; j<addressList.length-1; j++)
+                {
+                    addressList[j] = addressList[j+1];
+                }
+                addressList.pop();
+            }
+        }
+        delete userInfo[_address];
     }
 
     function setStartPresale(uint256 _startPresale) public onlyOwner {
@@ -126,8 +183,12 @@ contract IPSO2 is ReentrancyGuard, Ownable {
         startClaim = _startClaim;
     }
 
-    function setRatioRequiredWGLBD(uint256 _ratioRequiredWGLBD) public onlyOwner {
-        ratioRequiredWGLBD = _ratioRequiredWGLBD;
+    function setRatioRequiredWGLBDNum(uint256 _ratioRequiredWGLBDNum) public onlyOwner {
+        ratioRequiredWGLBDNum = _ratioRequiredWGLBDNum;
+    }
+
+    function setRatioRequiredWGLBDDen(uint256 _ratioRequiredWGLBDDen) public onlyOwner {
+        ratioRequiredWGLBDDen = _ratioRequiredWGLBDDen;
     }
 
     function setAmountForWhitelisted(uint256 _amountForWhitelisted) public onlyOwner {
@@ -148,13 +209,12 @@ contract IPSO2 is ReentrancyGuard, Ownable {
 
     function canInvestMin(address _user) public view returns (uint)
     {
-
-        return (isWhitelist(_user) && !userInfo[msg.sender].whitelisted) || userInfo[msg.sender].depositWGLBD ? 0 : minInvestment.mul(ratioRequiredWGLBD);
+        return (isWhitelist(_user) && !userInfo[msg.sender].whitelisted) || userInfo[msg.sender].depositWGLBD ? 0 : minInvestment.mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
     }
 
     function canInvestMax(address _user) public view returns (uint)
     {
-        uint amountToInvest = isWhitelist(_user) && !userInfo[msg.sender].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(msg.sender)).mul(ratioRequiredWGLBD);
+        uint amountToInvest = isWhitelist(_user) && !userInfo[msg.sender].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(msg.sender)).mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
         return amountToInvest > maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[msg.sender].depositedInvestmentTokens) : amountToInvest;
     }
 
@@ -173,7 +233,7 @@ contract IPSO2 is ReentrancyGuard, Ownable {
         }
         else
         {
-            uint256 wglbdToDeposit = _amount.div(ratioRequiredWGLBD);
+            uint256 wglbdToDeposit = _amount.mul(ratioRequiredWGLBDDen).div(ratioRequiredWGLBDNum);
             userInfo[msg.sender].depositWGLBD = true;
             userInfo[msg.sender].depositedWGLBD = userInfo[msg.sender].depositedWGLBD.add(wglbdToDeposit);
             userInfo[msg.sender].remainingWGLBD = userInfo[msg.sender].remainingWGLBD.add(wglbdToDeposit);
