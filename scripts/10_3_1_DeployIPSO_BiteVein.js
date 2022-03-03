@@ -52,9 +52,9 @@ async function main() {
         console.log("[BUSDt attached]: " + busd.address);
     }*/
 
-    /*
+
     //MAINNET
-    console.log("[Deploying IPSO2 SC]");
+    /*console.log("[Deploying IPSO2 SC]");
     const IPSO = await ethers.getContractFactory('IPSO2');
     let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
@@ -73,13 +73,13 @@ async function main() {
         BigNumber.from(90000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
     );
     console.log("[IPSO deployed]: " + ipso.address);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
 
     try {
-        console.log("VERIFYING IPSO: ", ipso.address);
+        console.log("VERIFYING IPSO: ", "0x50474dD1A73A3F87d45b222c401705C184352837");
         //// Verify contract on bsc
         await hre.run("verify:verify", {
-            address: ipso.address,
+            address: "0x50474dD1A73A3F87d45b222c401705C184352837",
             constructorArguments: [
                 "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
                 "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
@@ -94,13 +94,13 @@ async function main() {
                 BigNumber.from(90000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });
-        console.log( "Verified IPSO: " + ipso.address );
+        console.log( "Verified IPSO: " + "0x50474dD1A73A3F87d45b222c401705C184352837" );
     } catch (err) {
         console.log(err.message);
-    }*/
+    }
 
     //TESTNET
-    console.log("[Deploying IPSO2 SC]");
+    /*console.log("[Deploying IPSO2 SC]");
     const IPSO = await ethers.getContractFactory('IPSO2');
     let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
@@ -146,7 +146,7 @@ async function main() {
         console.log( "Verified IPSO: " + ipso.address );
     } catch (err) {
         console.log(err.message);
-    }
+    }*/
 
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
