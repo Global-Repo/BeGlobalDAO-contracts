@@ -62,39 +62,39 @@ async function main() {
     let ipso = await IPSO.deploy(
         "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
         "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
-        1646348401,
-        1647212401,
-        1651010401,
-        2,
-        52631578,
-        BigNumber.from(1000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(1578947368).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(390000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(39000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+        1646949600, //start sale
+        1647468000, //end sale
+        1650488400, //end claim
+        1, // _ratioRequiredWGLBDNum
+        13500000, // _ratioRequiredWGLBDDen
+        BigNumber.from(1000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _amountForWhitelisted
+        BigNumber.from(6750000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _minInvestment
+        BigNumber.from(999999).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _maxInvestment
+        BigNumber.from(999999).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG) // _raisingAmount
     );
     console.log("[IPSO deployed]: " + ipso.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     try {
-        console.log("VERIFYING IPSO: ", "0x50474dD1A73A3F87d45b222c401705C184352837");
+        console.log("VERIFYING IPSO: ", "0xab31CDd431183313e95d661A75386935364787ba");
         //// Verify contract on bsc
         await hre.run("verify:verify", {
-            address: "0x50474dD1A73A3F87d45b222c401705C184352837",
+            address: "0xab31CDd431183313e95d661A75386935364787ba",
             constructorArguments: [
                 "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
                 "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
-                1646348401,
-                1647212401,
-                1651010401,
-                2,
-                52631578,
+                1646949600,
+                1647468000,
+                1650488400,
+                1,
+                13500000,
                 BigNumber.from(1000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(1578947368).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(390000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(39000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+                BigNumber.from(6750000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(999999).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(999999).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });
-        console.log( "Verified IPSO: " + "0x50474dD1A73A3F87d45b222c401705C184352837" );
+        console.log( "Verified IPSO: " + "0xab31CDd431183313e95d661A75386935364787ba" );
     } catch (err) {
         console.log(err.message);
     }
