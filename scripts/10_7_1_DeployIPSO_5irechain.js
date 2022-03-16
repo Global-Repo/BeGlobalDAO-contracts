@@ -54,7 +54,7 @@ async function main() {
 
 
     //MAINNET
-    /*console.log("[Deploying IPSO3 SC]");
+    console.log("[Deploying IPSO3 SC]");
     const IPSO = await ethers.getContractFactory('IPSO3');
     let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
@@ -73,7 +73,7 @@ async function main() {
         BigNumber.from(12000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG) // _raisingAmount
     );
     console.log("[IPSO deployed]: " + ipso.address);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
+    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     try {
         console.log("VERIFYING IPSO: ", "0x9157a22ef0D7CA5fa9F73e49C92DF97E7bD9C2B3");

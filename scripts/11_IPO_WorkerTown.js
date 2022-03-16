@@ -1,18 +1,6 @@
 const hre = require("hardhat");
 require("@nomiclabs/hardhat-ethers");
 
-const {
-    DEV_POWER_ADDRESS,
-} = require("./addresses");
-
-const {
-    deployVaultLocked,
-} = require("../test/helpers/singleDeploys");
-
-const { timestampNHours, timestampNDays, bep20Amount } = require("../test/helpers/utils.js");
-
-const VAULT_LOCKED_DISTRIBUTE_GLOBAL_INTERVAL = timestampNHours(12); // 12h, Hours to distribute Globals from last distribution event.
-
 let CURRENT_BLOCK;
 let ipo;
 
@@ -32,45 +20,63 @@ async function main() {
     let prova = await ipo.userInfo("0x6063130f5Ba259ee9d51F62c16ABFe1B4b91610B")
     console.log(prova.toString());*/
 
+    const investmentToken = '0x5A05328D3E9505859b51bEc77122FCCCe18E3402'; //0xe9e7cea3dedca5984780bafc599bd69add087d56 0x5A05328D3E9505859b51bEc77122FCCCe18E3402
+    const startWhitelist = 1647720000; //1647720000
+    const endWhitelist = 1647802800; //1647802800
+    const startPublicSale = 1647806400; //1647806400
+    const endPublicSale = 1647889200; //1647889200
+    const startClaim = 1647892800; //1647892800
+    const endClaim = 1654801200; //1654801200
+    const ratioNumWhitelist = 10; //10
+    const ratioDenumWhitelist = 9; //9
+    const maxInvestmentWhitelist = '500000000000000000000'; //500 000000000000000000
+    const raisingAmountWhitelist = '285000000000000000000000'; //285000 000000000000000000
+    const ratioNumPublicSale = 100; //100
+    const ratioDenumPublicSale = 99; //95
+    const maxInvestmentPublicSale = '1000000000000000000000'; //1000 000000000000000000
+    const raisingAmountPublicSale = '90000000000000000000000'; //90000 000000000000000000
+
     ipo = await IPO.deploy(
-        "0xe9e7cea3dedca5984780bafc599bd69add087d56", //_investmentToken
-        31620, //_startWhitelist
-        31620, //_endWhitelist
-        31620, //_startPublicSale
-        31620, //_startClaim
-        31620, //_endClaim
-        31620, //_ratioNumWhitelist
-        31620, //_ratioDenumWhitelist
-        31620, //_maxInvestmentWhitelist
-        31620, //_raisingAmountWhitelist
-        31620, //_ratioNumPublicSale
-        31620, //_ratioDenumPublicSale
-        31620, //_maxInvestmentPublicSale
-        31620 //_raisingAmountPublicSale
+        investmentToken,
+        startWhitelist,
+        endWhitelist,
+        startPublicSale,
+        endPublicSale,
+        startClaim,
+        endClaim,
+        ratioNumWhitelist,
+        ratioDenumWhitelist,
+        maxInvestmentWhitelist,
+        raisingAmountWhitelist,
+        ratioNumPublicSale,
+        ratioDenumPublicSale,
+        maxInvestmentPublicSale,
+        raisingAmountPublicSale
     );
 
     await ipo.deployed();
-    console.log("IPO deployed to:", ipo.address);
+    console.log("IPO deployed to:", ipo.address); //ipo.address,
     await new Promise(r => setTimeout(() => r(), 10000));
 
     // Verify
     await hre.run("verify:verify", {
         address: ipo.address, //ipo.address,
         constructorArguments: [
-            "0xe9e7cea3dedca5984780bafc599bd69add087d56", //_investmentToken
-            31620, //_startWhitelist
-            31620, //_endWhitelist
-            31620, //_startPublicSale
-            31620, //_startClaim
-            31620, //_endClaim
-            31620, //_ratioNumWhitelist
-            31620, //_ratioDenumWhitelist
-            31620, //_maxInvestmentWhitelist
-            31620, //_raisingAmountWhitelist
-            31620, //_ratioNumPublicSale
-            31620, //_ratioDenumPublicSale
-            31620, //_maxInvestmentPublicSale
-            31620 //_raisingAmountPublicSale
+            investmentToken,
+            startWhitelist,
+            endWhitelist,
+            startPublicSale,
+            endPublicSale,
+            startClaim,
+            endClaim,
+            ratioNumWhitelist,
+            ratioDenumWhitelist,
+            maxInvestmentWhitelist,
+            raisingAmountWhitelist,
+            ratioNumPublicSale,
+            ratioDenumPublicSale,
+            maxInvestmentPublicSale,
+            raisingAmountPublicSale
         ],
     });
 
