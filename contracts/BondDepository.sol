@@ -737,7 +737,7 @@ contract GlobalDAOBondDepository is Ownable {
             require( _input >= 10000, "Vesting must be longer than 36 hours" );
             terms.vestingTerm = _input;
         } else if ( _parameter == PARAMETER.PAYOUT ) { // 1
-            require( _input <= 1000, "Payout cannot be above 1 percent" );
+            require( _input <= 10000, "Payout cannot be above 10 percent" );
             terms.maxPayout = _input;
         } else if ( _parameter == PARAMETER.FEE ) { // 2
             require( _input <= 10000, "DAO fee cannot exceed payout" );
