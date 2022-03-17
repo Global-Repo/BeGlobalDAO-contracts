@@ -52,25 +52,25 @@ async function main() {
         console.log("[BUSDt attached]: " + busd.address);
     }*/
 
-    /*
+
     //MAINNET
-    console.log("[Deploying IPSO2 SC]");
-    const IPSO = await ethers.getContractFactory('IPSO2');
+    console.log("[Deploying IPSO3 SC]");
+    const IPSO = await ethers.getContractFactory('IPSO3');
     let startTime = Math.round(new Date().getTime()/1000);
     console.log("startTime = '" + startTime + "';");
     //let ipso = await IPSO.attach("0x37Cb9C9Bf6EF1Cf44A46b3f1eeD555B1EE3618BD");
     let ipso = await IPSO.deploy(
         "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
         "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
-        1645135200,
-        1646344800,
-        1649019600,
-        560,
-        6388888889,
-        BigNumber.from(1000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(6388888889).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(900000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(90000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+        1647295200, //start sale
+        1649451600, //end sale
+        1652475600, //end claim
+        2, // _ratioRequiredWGLBDNum 2000
+        17500000, // _ratioRequiredWGLBDDen 17500000000
+        BigNumber.from(2000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _amountForWhitelisted
+        BigNumber.from(17500000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _minInvestment
+        BigNumber.from(2000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _maxInvestment
+        BigNumber.from(46000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG) // _raisingAmount
     );
     console.log("[IPSO deployed]: " + ipso.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -83,71 +83,21 @@ async function main() {
             constructorArguments: [
                 "0xbe7cbd94060f237ca06596a92c60b728ee891ab6",//WGLBD.address,
                 "0xe9e7cea3dedca5984780bafc599bd69add087d56",//busd.address,
-                1645135200,
-                1646344800,
-                1649019600,
-                560,
-                6388888889,
-                BigNumber.from(1000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(6388888889).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(900000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(90000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
-            ],
-        });
-        console.log( "Verified IPSO: " + ipso.address );
-    } catch (err) {
-        console.log(err.message);
-    }*/
-
-    //TESTNET
-    console.log("[Deploying IPSO2 SC]");
-    const IPSO = await ethers.getContractFactory('IPSO2');
-    let startTime = Math.round(new Date().getTime()/1000);
-    console.log("startTime = '" + startTime + "';");
-    //let ipso = await IPSO.attach("0x37Cb9C9Bf6EF1Cf44A46b3f1eeD555B1EE3618BD");
-    let ipso = await IPSO.deploy(
-        "0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",//WGLBD.address,
-        "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",//busd.address,
-        1645058791,
-        1646344800,
-        1649019600,
-        10,
-        1,
-        BigNumber.from(1000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(10).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(900000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(10000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
-    );
-    console.log("[IPSO deployed]: " + ipso.address);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    await ipso.setWhitelist("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f", true);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-    try {
-        console.log("VERIFYING IPSO: ", ipso.address);
-        //// Verify contract on bsc
-        await hre.run("verify:verify", {
-            address: ipso.address,
-            constructorArguments: [
-                "0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",//WGLBD.address,
-                "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",//busd.address,
-                1645058791,
-                1646344800,
-                1649019600,
-                10,
-                1,
-                BigNumber.from(1000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(10).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(900000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(10000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+                1647295200,
+                1649451600,
+                1652475600,
+                2,
+                17500000,
+                BigNumber.from(2000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(17500000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(2000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(46000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });
         console.log( "Verified IPSO: " + ipso.address );
     } catch (err) {
         console.log(err.message);
     }
-
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
 }
