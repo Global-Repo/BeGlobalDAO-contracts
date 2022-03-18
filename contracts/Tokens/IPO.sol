@@ -205,7 +205,7 @@ contract IPO is ReentrancyGuard, Ownable {
     require ((whitelist[msg.sender] && block.timestamp > startWhitelist && block.timestamp < endWhitelist)
     || (block.timestamp > startPublicSale && block.timestamp < endPublicSale), 'not ipo time');
     require (_amount > 0, 'need amount > 0');
-    require (_amount < availableToInvest(msg.sender), 'too much amount');
+    require (_amount <= availableToInvest(msg.sender), 'too much amount');
 
     IBEP20(investmentToken).safeTransferFrom(address(msg.sender), address(this), _amount);
 
