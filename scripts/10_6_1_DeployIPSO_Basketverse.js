@@ -65,10 +65,10 @@ async function main() {
         1647295200, //start sale
         1649451600, //end sale
         1652475600, //end claim
-        2, // _ratioRequiredWGLBDNum 2000
-        17500000, // _ratioRequiredWGLBDDen 17500000000
+        2, // _ratioRequiredWGLBDNum 2000               -> 1
+        17500000, // _ratioRequiredWGLBDDen 17500000000 -> 10000000
         BigNumber.from(2000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _amountForWhitelisted
-        BigNumber.from(17500000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _minInvestment
+        BigNumber.from(17500000000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _minInvestment -> 4000000000
         BigNumber.from(2000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG), // _maxInvestment
         BigNumber.from(46000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG) // _raisingAmount
     );
