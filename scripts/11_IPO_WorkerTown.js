@@ -21,7 +21,8 @@ async function main() {
     console.log(prova.toString());*/
 
     const investmentToken = '0x5A05328D3E9505859b51bEc77122FCCCe18E3402'; //0xe9e7cea3dedca5984780bafc599bd69add087d56 0x5A05328D3E9505859b51bEc77122FCCCe18E3402
-    const startWhitelist = 1647720000; //1647720000
+    const projectToken = '0x5A05328D3E9505859b51bEc77122FCCCe18E3402'; //0xdc279ddC65Ea17382BbF9a141bb71550CdD587B3 0x5A05328D3E9505859b51bEc77122FCCCe18E3402
+    const startWhitelist = 1647480000; //1647720000
     const endWhitelist = 1647802800; //1647802800
     const startPublicSale = 1647806400; //1647806400
     const endPublicSale = 1647889200; //1647889200
@@ -32,12 +33,13 @@ async function main() {
     const maxInvestmentWhitelist = '500000000000000000000'; //500 000000000000000000
     const raisingAmountWhitelist = '285000000000000000000000'; //285000 000000000000000000
     const ratioNumPublicSale = 100; //100
-    const ratioDenumPublicSale = 99; //95
+    const ratioDenumPublicSale = 95; //95
     const maxInvestmentPublicSale = '1000000000000000000000'; //1000 000000000000000000
     const raisingAmountPublicSale = '90000000000000000000000'; //90000 000000000000000000
 
     ipo = await IPO.deploy(
         investmentToken,
+        projectToken,
         startWhitelist,
         endWhitelist,
         startPublicSale,
@@ -63,6 +65,7 @@ async function main() {
         address: ipo.address, //ipo.address,
         constructorArguments: [
             investmentToken,
+            projectToken,
             startWhitelist,
             endWhitelist,
             startPublicSale,

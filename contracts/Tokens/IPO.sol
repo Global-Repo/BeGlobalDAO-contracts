@@ -2,18 +2,21 @@
 pragma solidity ^0.7.5;
 
 import './IBEP20.sol';
-import '../Libraries/SafeMath.sol';
 import '../Libraries/SafeBEP20.sol';
-import '../Modifiers/ReentrancyGuard.sol';
+import "../Libraries/SafeERC20.sol";
+import '../Libraries/SafeMath.sol';
 import '../Modifiers/Ownable.sol';
+import "../Modifiers/WorkerTownable.sol";
+import '../Modifiers/ReentrancyGuard.sol';
 
 /**
  * Initial Public Offering
  *
  */
-contract IPO is ReentrancyGuard, Ownable {
+contract IPO is ReentrancyGuard, Ownable, WorkerTownable {
   using SafeMath for uint256;
   using SafeBEP20 for IBEP20;
+  using SafeERC20 for IERC20;
 
   // Info of each user.
   struct UserInfo {
@@ -75,6 +78,7 @@ contract IPO is ReentrancyGuard, Ownable {
 
   constructor(
     address _investmentToken,
+    address _projectToken,
     uint256 _startWhitelist,
     uint256 _endWhitelist,
     uint256 _startPublicSale,
@@ -91,6 +95,7 @@ contract IPO is ReentrancyGuard, Ownable {
     uint256 _raisingAmountPublicSale
   ) {
     investmentToken = _investmentToken;
+    projectToken = _projectToken;
 
     startWhitelist = _startWhitelist;
     endWhitelist = _endWhitelist;
@@ -112,10 +117,6 @@ contract IPO is ReentrancyGuard, Ownable {
     investedAmountPublicSale = 0;
 
     excessProjectTokens = 0;
-  }
-
-  function setProjectToken(address _projectToken) public onlyOwner {
-    projectToken = _projectToken;
   }
 
   function setStartWhitelist(uint256 _startWhitelist) public onlyOwner {
@@ -178,12 +179,18 @@ contract IPO is ReentrancyGuard, Ownable {
     return whitelist[_address];
   }
 
-  function setWhitelist(address _address) external onlyOwner {
+  function setWhitelist(address _address) external onlyWorkerTown {
     whitelist[_address] = !whitelist[_address];
   }
 
+  function setWhitelist(address[] calldata addrs) external onlyWorkerTown {
+    for (uint256 i = 0; i < addrs.length; i++) {
+      whitelist[addrs[i]] = !whitelist[addrs[i]];
+    }
+  }
+
   function availableToInvest(address user) public view returns(uint256) {
-    uint256 maxInvestPerUser;
+    uint256 maxInvestPerUser = 0;
     if(whitelist[user] && block.timestamp > startWhitelist && block.timestamp < endWhitelist)
     {
       maxInvestPerUser = maxInvestmentWhitelist.sub(userInfo[user].amountInvestedWhitelist);
@@ -194,16 +201,10 @@ contract IPO is ReentrancyGuard, Ownable {
       maxInvestPerUser = maxInvestmentPublicSale.sub(userInfo[user].amountInvestedPublicSale);
       maxInvestPerUser = maxInvestPerUser < raisingAmountPublicSale.sub(investedAmountPublicSale) ? maxInvestPerUser : raisingAmountPublicSale.sub(investedAmountPublicSale);
     }
-    else
-    {
-      maxInvestPerUser = 0;
-    }
     return maxInvestPerUser;
   }
 
-  function invest(uint256 _amount) public {
-    require ((whitelist[msg.sender] && block.timestamp > startWhitelist && block.timestamp < endWhitelist)
-    || (block.timestamp > startPublicSale && block.timestamp < endPublicSale), 'not ipo time');
+  function invest(uint256 _amount) public nonReentrant {
     require (_amount > 0, 'need amount > 0');
     require (_amount <= availableToInvest(msg.sender), 'too much amount');
 
@@ -218,12 +219,14 @@ contract IPO is ReentrancyGuard, Ownable {
     {
       userInfo[msg.sender].amountInvestedWhitelist = userInfo[msg.sender].amountInvestedWhitelist.add(_amount);
       userInfo[msg.sender].amountToBeClaimed = userInfo[msg.sender].amountToBeClaimed.add(_amount.mul(ratioNumWhitelist).div(ratioDenumWhitelist));
+      userInfo[msg.sender].amountRemaining = userInfo[msg.sender].amountRemaining.add(_amount.mul(ratioNumWhitelist).div(ratioDenumWhitelist));
       investedAmountWhitelist = investedAmountWhitelist.add(_amount);
     }
     else if(block.timestamp > startPublicSale && block.timestamp < endPublicSale)
     {
       userInfo[msg.sender].amountInvestedPublicSale = userInfo[msg.sender].amountInvestedPublicSale.add(_amount);
       userInfo[msg.sender].amountToBeClaimed = userInfo[msg.sender].amountToBeClaimed.add(_amount.mul(ratioNumPublicSale).div(ratioDenumPublicSale));
+      userInfo[msg.sender].amountRemaining = userInfo[msg.sender].amountRemaining.add(_amount.mul(ratioNumPublicSale).div(ratioDenumPublicSale));
       investedAmountPublicSale = investedAmountPublicSale.add(_amount);
     }
 
@@ -253,17 +256,14 @@ contract IPO is ReentrancyGuard, Ownable {
       }
   }
 
-  function availableBonus(address _user) public view returns ( uint )
-  {
-    return userInfo[ _user ].claimed ? 0 : userInfo[ _user ].amountToBeClaimed.mul(actualBonus()).div(100);
-  }
-
   function availableToClaim(address _user) public view returns ( uint ) {
     uint256 amountToBeClaimed = userInfo[ _user ].amountToBeClaimed;
+    uint256 amountRemaining = userInfo[ _user ].amountRemaining;
 
     if(!userInfo[ _user ].claimed)
     {
-      amountToBeClaimed = amountToBeClaimed.mul(actualBonus()).div(100);
+      amountToBeClaimed = amountToBeClaimed.mul(actualBonus().add(100)).div(100);
+      amountRemaining = amountToBeClaimed;
     }
 
     uint harvestingAmount = 0;
@@ -278,12 +278,14 @@ contract IPO is ReentrancyGuard, Ownable {
       .div(endClaim.sub(startClaim));
     }
 
-    return userInfo[ _user ].amountRemaining.sub(harvestingAmount);
+    return amountRemaining.sub(harvestingAmount);
   }
 
   function claim(address _user) public nonReentrant {
-    require (block.number > startClaim, 'not claim time');
+    require (block.timestamp > startClaim, 'not claim time');
     require (userInfo[_user].amountToBeClaimed > 0, 'have you participated?');
+    require (userInfo[_user].amountRemaining > 0, 'you have nothing left');
+
     uint transferAmount = availableToClaim(_user);
     require (transferAmount > 0, 'nothing to claim');
 
@@ -291,25 +293,29 @@ contract IPO is ReentrancyGuard, Ownable {
     {
       if(block.timestamp<endClaim)
       {
-        excessProjectTokens = excessProjectTokens.add(userInfo[_user].amountToBeClaimed.mul(actualBonus()).sub(userInfo[_user].amountToBeClaimed.add(availableBonus(_user))));
+        uint maxBonusAmount = userInfo[_user].amountToBeClaimed.mul(120).div(100);
+        uint actualBonusAmount = userInfo[_user].amountToBeClaimed.mul(actualBonus().add(100)).div(100);
+        excessProjectTokens = excessProjectTokens.add(maxBonusAmount.sub(actualBonusAmount));
       }
-      userInfo[_user].amountToBeClaimed = userInfo[_user].amountToBeClaimed.add(availableBonus(_user));
+
+      userInfo[_user].amountToBeClaimed = userInfo[_user].amountToBeClaimed.mul(actualBonus().add(100)).div(100);
+      userInfo[_user].amountRemaining = userInfo[_user].amountToBeClaimed;
       userInfo[_user].claimed = true;
     }
 
-    IBEP20(projectToken).safeTransfer(_user, transferAmount);
+    IERC20(projectToken).safeTransfer(_user, transferAmount);
 
     userInfo[_user].amountRemaining = userInfo[_user].amountRemaining.sub(transferAmount);
 
     emit Claim(_user, transferAmount);
   }
 
-  function burnExcessProjectTokens() public onlyOwner {
-    IBEP20(projectToken).safeTransfer(address(0x000000000000000000000000000000000000dEaD), excessProjectTokens);
+  function burnExcessProjectTokens() public onlyWorkerTown {
+    IERC20(projectToken).safeTransfer(address(0x000000000000000000000000000000000000dEaD), excessProjectTokens);
     excessProjectTokens = 0;
   }
 
-  function burnExcessProjectTokens(uint256 _amount) public onlyOwner {
+  function burnExcessProjectTokens(uint256 _amount) public onlyWorkerTown {
     require(_amount <= excessProjectTokens, 'not enough excess of project tokens');
     IBEP20(projectToken).safeTransfer(address(0x000000000000000000000000000000000000dEaD), _amount);
     excessProjectTokens = excessProjectTokens.sub(_amount);
@@ -319,23 +325,26 @@ contract IPO is ReentrancyGuard, Ownable {
     return addressList.length;
   }
 
-  function withdrawInvestmentTokens(uint256 _amount) public onlyOwner {
+  function withdrawInvestmentTokens(uint256 _amount) public onlyWorkerTown {
     require (_amount <= IBEP20(investmentToken).balanceOf(address(this)), 'not enough token');
+    require (0 < _amount, 'amount must be > 0');
     IBEP20(investmentToken).safeTransfer(address(msg.sender), _amount);
   }
 
-  function withdrawInvestmentTokens() public onlyOwner {
+  function withdrawInvestmentTokens() public onlyWorkerTown {
     require (0 < IBEP20(investmentToken).balanceOf(address(this)), 'not enough token');
     IBEP20(investmentToken).safeTransfer(address(msg.sender), IBEP20(investmentToken).balanceOf(address(this)));
   }
 
-  function withdrawProjectTokens(uint256 _amount) public onlyOwner {
-    require (_amount <= IBEP20(projectToken).balanceOf(address(this)), 'not enough token');
-    IBEP20(projectToken).safeTransfer(address(msg.sender), _amount);
+  function withdrawOtherTokens(address _token) public onlyWorkerTown {
+    require (_token != projectToken, 'you cannot withdraw the project token');
+    require (0 <= IBEP20(_token).balanceOf(address(this)), 'not enough token');
+    IBEP20(_token).safeTransfer(address(msg.sender), IBEP20(_token).balanceOf(address(this)));
   }
 
-  function withdrawProjectTokens() public onlyOwner {
-    require (0 < IBEP20(projectToken).balanceOf(address(this)), 'not enough token');
-    IBEP20(projectToken).safeTransfer(address(msg.sender), IBEP20(projectToken).balanceOf(address(this)));
+  function withdrawOtherTokens(address _token, uint256 _amount) public onlyWorkerTown {
+    require (_token != projectToken, 'you cannot withdraw the project token');
+    require (_amount <= IBEP20(_token).balanceOf(address(this)), 'not enough token');
+    IBEP20(_token).safeTransfer(address(msg.sender), _amount);
   }
 }
