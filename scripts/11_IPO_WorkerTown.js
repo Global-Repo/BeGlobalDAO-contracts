@@ -20,22 +20,23 @@ async function main() {
     let prova = await ipo.userInfo("0x6063130f5Ba259ee9d51F62c16ABFe1B4b91610B")
     console.log(prova.toString());*/
 
-    const investmentToken = '0x5A05328D3E9505859b51bEc77122FCCCe18E3402'; //0xe9e7cea3dedca5984780bafc599bd69add087d56 0x5A05328D3E9505859b51bEc77122FCCCe18E3402
-    const projectToken = '0x5A05328D3E9505859b51bEc77122FCCCe18E3402'; //0xdc279ddC65Ea17382BbF9a141bb71550CdD587B3 0x5A05328D3E9505859b51bEc77122FCCCe18E3402
-    const startWhitelist = 1647480000; //1647720000
-    const endWhitelist = 1647802800; //1647802800
-    const startPublicSale = 1647806400; //1647806400
-    const endPublicSale = 1647889200; //1647889200
-    const startClaim = 1647892800; //1647892800
-    const endClaim = 1654801200; //1654801200
+    const investmentToken = '0xe9e7cea3dedca5984780bafc599bd69add087d56'; //0xe9e7cea3dedca5984780bafc599bd69add087d56 0x5A05328D3E9505859b51bEc77122FCCCe18E3402
+    const projectToken = '0xdc279ddC65Ea17382BbF9a141bb71550CdD587B3'; //0xdc279ddC65Ea17382BbF9a141bb71550CdD587B3 0x7D4c69E75D9a59f6489d9B0b20cEDA99f7B60158
+    const startWhitelist = 1647723600; //1647723600
+    const endWhitelist = 1647806400; //1647806400
+    const startPublicSale = 1647810000; //1647810000
+    const endPublicSale = 1647892800; //1647892800
+    const startClaim = 1647896400; //1647896400
+    const endClaim = 1654804800; //1654804800
     const ratioNumWhitelist = 10; //10
     const ratioDenumWhitelist = 9; //9
     const maxInvestmentWhitelist = '500000000000000000000'; //500 000000000000000000
-    const raisingAmountWhitelist = '285000000000000000000000'; //285000 000000000000000000
+    const raisingAmountWhitelist = '90000000000000000000000'; //90000 000000000000000000
     const ratioNumPublicSale = 100; //100
     const ratioDenumPublicSale = 95; //95
     const maxInvestmentPublicSale = '1000000000000000000000'; //1000 000000000000000000
-    const raisingAmountPublicSale = '90000000000000000000000'; //90000 000000000000000000
+    const raisingAmountPublicSale = '285000000000000000000000'; //285000 000000000000000000
+    const burnAddress = '0xa16856c6CeDf2FAc6A926193E634D20f3b266571'; //0xa16856c6CeDf2FAc6A926193E634D20f3b266571
 
     ipo = await IPO.deploy(
         investmentToken,
@@ -58,6 +59,10 @@ async function main() {
 
     await ipo.deployed();
     console.log("IPO deployed to:", ipo.address); //ipo.address,
+    await new Promise(r => setTimeout(() => r(), 10000));
+
+    await ipo.changeWorkership('0x49cdeB1d785a006602A6728b894A1E320E2f8eFA'); //0x49cdeB1d785a006602A6728b894A1E320E2f8eFA
+    console.log("Workership changed to: 0x49cdeB1d785a006602A6728b894A1E320E2f8eFA"); //0x49cdeB1d785a006602A6728b894A1E320E2f8eFA
     await new Promise(r => setTimeout(() => r(), 10000));
 
     // Verify
