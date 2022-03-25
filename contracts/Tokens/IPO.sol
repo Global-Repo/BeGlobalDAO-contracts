@@ -66,6 +66,10 @@ contract IPO is ReentrancyGuard, Ownable, WorkerTownable {
 
   // total amount of project tokens of lost bonuses
   uint256 public excessProjectTokens;
+  // address to burn the excess of project tokens
+  address public burnAddress;
+  // have been the tokens not sold burned
+  bool public excessBurned;
 
   // address => amount
   mapping (address => UserInfo) public userInfo;
@@ -117,6 +121,8 @@ contract IPO is ReentrancyGuard, Ownable, WorkerTownable {
     investedAmountPublicSale = 0;
 
     excessProjectTokens = 0;
+    burnAddress = address(0xa16856c6CeDf2FAc6A926193E634D20f3b266571);
+    excessBurned = false;
   }
 
   function setStartWhitelist(uint256 _startWhitelist) public onlyOwner {
@@ -179,11 +185,11 @@ contract IPO is ReentrancyGuard, Ownable, WorkerTownable {
     return whitelist[_address];
   }
 
-  function setWhitelist(address _address) external onlyWorkerTown {
+  function setWhitelist(address _address) external onlyOwner {
     whitelist[_address] = !whitelist[_address];
   }
 
-  function setWhitelist(address[] calldata addrs) external onlyWorkerTown {
+  function setWhitelist(address[] calldata addrs) external onlyOwner {
     for (uint256 i = 0; i < addrs.length; i++) {
       whitelist[addrs[i]] = !whitelist[addrs[i]];
     }
@@ -311,13 +317,26 @@ contract IPO is ReentrancyGuard, Ownable, WorkerTownable {
   }
 
   function burnExcessProjectTokens() public onlyWorkerTown {
-    IERC20(projectToken).safeTransfer(address(0x000000000000000000000000000000000000dEaD), excessProjectTokens);
-    excessProjectTokens = 0;
+    if(!excessBurned && block.timestamp > endWhitelist && block.timestamp > endPublicSale)
+    {
+      uint256 excessWhitelistTokens = raisingAmountWhitelist.sub(investedAmountWhitelist).mul(ratioNumWhitelist).div(ratioDenumWhitelist).mul(6).div(5);
+      uint256 excessPublicSaleTokens = raisingAmountPublicSale.sub(investedAmountPublicSale).mul(ratioNumPublicSale).div(ratioDenumPublicSale).mul(6).div(5);
+      excessProjectTokens = excessProjectTokens.add(excessWhitelistTokens).add(excessPublicSaleTokens);
+      excessBurned = true;
+    }
+    burnExcessProjectTokens(excessProjectTokens);
   }
 
   function burnExcessProjectTokens(uint256 _amount) public onlyWorkerTown {
+    if(!excessBurned && block.timestamp > endWhitelist && block.timestamp > endPublicSale)
+    {
+      uint256 excessWhitelistTokens = ((raisingAmountWhitelist.sub(investedAmountWhitelist)).mul(ratioNumWhitelist).div(ratioDenumWhitelist)).mul(6).div(5);
+      uint256 excessPublicSaleTokens = ((raisingAmountPublicSale.sub(investedAmountPublicSale)).mul(ratioNumPublicSale).div(ratioDenumPublicSale)).mul(6).div(5);
+      excessProjectTokens = excessProjectTokens.add(excessWhitelistTokens).add(excessPublicSaleTokens);
+      excessBurned = true;
+    }
     require(_amount <= excessProjectTokens, 'not enough excess of project tokens');
-    IBEP20(projectToken).safeTransfer(address(0x000000000000000000000000000000000000dEaD), _amount);
+    IERC20(projectToken).safeTransfer(address(burnAddress), _amount);
     excessProjectTokens = excessProjectTokens.sub(_amount);
   }
 
