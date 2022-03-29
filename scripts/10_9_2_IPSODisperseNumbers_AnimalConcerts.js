@@ -30,9 +30,11 @@ async function main() {
     let user;
     let userAllocation;
     let amountToDistribute;
+    let amountInvested;
     const numUsers = await ipso.getAddressListLength();
+    const raisingAmount = await ipso.raisingAmount();
     const totalAmountInvested = await ipso.totalAmountInvested();
-    const tokensToDisperse = 100000;
+    const tokensToDisperse = 2923433;
     /*const tokensToDisperseUser1 = tokensToDisperse * 0.015;
     const tokensToDisperseUser2 = tokensToDisperse * 0.01;*/
     const tokensToDisperseToUsers = tokensToDisperse; // * 0.95;
@@ -42,11 +44,25 @@ async function main() {
     /*console.log("", tokensToDisperseUser1.toFixed(2));
     console.log("", tokensToDisperseUser2.toFixed(2));*/
 
+    /*for (let i = 0; i < numUsers; i++) {
+        user = await ipso.addressList(i);
+        console.log(user);
+    }
+
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
         [userAllocation,,,,,,] = await ipso.userInfo(user);
         amountToDistribute = tokensToDisperseToUsers * userAllocation / totalAmountInvested;
-        console.log(user, amountToDistribute.toFixed(2));
+        console.log(amountToDistribute.toFixed(2));
+    }*/
+
+    for (let i = 0; i < numUsers; i++) {
+        user = await ipso.addressList(i);
+        [userAllocation,,,,,,] = await ipso.userInfo(user);
+        userAllocation /= 1000000000000000000;
+        amountInvested = userAllocation * 0.91;
+        //amountInvested = userAllocation * raisingAmount / totalAmountInvested;
+        console.log(amountInvested.toFixed(2));
     }
 
 
