@@ -21,15 +21,16 @@ async function main() {
     console.log(prova.toString());*/
 
     const projectToken = '0xdc279ddC65Ea17382BbF9a141bb71550CdD587B3'; //0xdc279ddC65Ea17382BbF9a141bb71550CdD587B3 0x7D4c69E75D9a59f6489d9B0b20cEDA99f7B60158
-    const startClaim = 1647896400; //1647896400
-    const endClaim = 1654804800; //1654804800
+    const startClaim = 1648749600; //1648749600
+    const endClaim = 1650045600; //1650045600
     const burnAddress = '0xa16856c6CeDf2FAc6A926193E634D20f3b266571'; //0xa16856c6CeDf2FAc6A926193E634D20f3b266571
 
-    ipoDistributor = await IPODistributor.deploy(
+    ipoDistributor = await IPODistributor.attach('0xD0A4bdAAfcD39d8B35Ff5ACBE4A819F1Ec1169C2');
+    /*ipoDistributor = await IPODistributor.deploy(
         projectToken,
         startClaim,
         endClaim
-    );
+    );*/
 
     await ipoDistributor.deployed();
     console.log("IPODistributor deployed to:", ipoDistributor.address); //ipo.address,
@@ -37,6 +38,10 @@ async function main() {
 
     /*await ipo.changeWorkership('0x49cdeB1d785a006602A6728b894A1E320E2f8eFA'); //0x49cdeB1d785a006602A6728b894A1E320E2f8eFA
     console.log("Workership changed to: 0x49cdeB1d785a006602A6728b894A1E320E2f8eFA"); //0x49cdeB1d785a006602A6728b894A1E320E2f8eFA
+    await new Promise(r => setTimeout(() => r(), 10000));*/
+
+    /*console.log("Loading users");
+    await ipoDistributor.loadInvestors('0x063CECB822f1D2A562555d865e45810CEa536527');
     await new Promise(r => setTimeout(() => r(), 10000));*/
 
     // Verify

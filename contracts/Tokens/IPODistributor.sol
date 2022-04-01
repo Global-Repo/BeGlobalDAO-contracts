@@ -87,7 +87,6 @@ contract IPODistributor is ReentrancyGuard, Ownable, WorkerTownable {
   }
 
   function loadInvestors(address _address) external onlyOwner {
-
     IPO ipo = IPO(_address);
 
     uint numUsers = ipo.getAddressListLength();
@@ -153,7 +152,7 @@ contract IPODistributor is ReentrancyGuard, Ownable, WorkerTownable {
   }
 
   function claim(address _user) public nonReentrant {
-    require (isBlacklist(_user), 'you cannot claim');
+    require (!isBlacklist(_user), 'you cannot claim');
     require (block.timestamp > startClaim, 'not claim time');
     require (userInfo[_user].amountToBeClaimed > 0, 'have you participated?');
     require (userInfo[_user].amountRemaining > 0, 'you have nothing left');
