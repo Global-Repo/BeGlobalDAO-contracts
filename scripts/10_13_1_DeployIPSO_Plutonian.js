@@ -47,27 +47,41 @@ async function main() {
         console.log("[BUSDt attached]: " + busd.address);
     }*/
 
-    let startWhitelist = 1649880000;
+    /*let startWhitelist = 1649880000;
     let endWhitelist = 1649966400;
     let startPublicSale = 1649880000;
     let endPublicSale = 1649966400;
     let startVesting = 1649966400;
     let endVesting = 1649966400;
-    let ratioRequiredWGLBDNum = 2;
-    let ratioRequiredWGLBDDenum = 1;
-    let amountForWhitelisted = 500;
-    let minInvestment = 300;
-    let maxInvestment = 3000;
-    let raisingAmount = 5000;
-    let hardCap = 5500;
+    let ratioRequiredWGLBDNum = 100; // 350 14
+    let ratioRequiredWGLBDDenum = 1; // 75 3
+    let amountForWhitelisted = 500; // 350
+    let minInvestment = 300; // 350
+    let maxInvestment = 3000; // 28000
+    let raisingAmount = 5000; // 7094
+    let hardCap = 5500; // 28376*/
+
+    let startWhitelist = 1649970000;
+    let endWhitelist = 1650229200;
+    let startPublicSale = 1649970000;
+    let endPublicSale = 1650229200;
+    let startVesting = 1650229200;
+    let endVesting = 1654117200;
+    let ratioRequiredWGLBDNum = 14; // 350 14
+    let ratioRequiredWGLBDDenum = 3; // 75 3
+    let amountForWhitelisted = 350; // 350
+    let minInvestment = 350; // 350
+    let maxInvestment = 28376; // 28000
+    let raisingAmount = 7094; // 7094
+    let hardCap = 28376; // 28376
 
     //MAINNET
     console.log("[Deploying IPSO7 SC]");
     const IPSO = await ethers.getContractFactory('IPSO7');
-    let ipso = await IPSO.attach("0x2332aEc053Df5809bed79Fab4756b2EcF13624AD");
-    /*let ipso = await IPSO.deploy(
-        "0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15", //"0xbe7cbd94060f237ca06596a92c60b728ee891ab6"
-        "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b", //"0xe9e7cea3dedca5984780bafc599bd69add087d56"
+    //let ipso = await IPSO.attach("0x2332aEc053Df5809bed79Fab4756b2EcF13624AD");
+    let ipso = await IPSO.deploy(
+        "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15"
+        "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b"
         startWhitelist,
         endWhitelist,
         startPublicSale,
@@ -81,7 +95,7 @@ async function main() {
         BigNumber.from(maxInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(hardCap).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
-    );*/
+    );
     console.log("[IPSO deployed]: " + ipso.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -94,8 +108,8 @@ async function main() {
         await hre.run("verify:verify", {
             address: ipso.address,
             constructorArguments: [
-                "0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15", //"0xbe7cbd94060f237ca06596a92c60b728ee891ab6"
-                "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b", //"0xe9e7cea3dedca5984780bafc599bd69add087d56"
+                "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15"
+                "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b"
                 startWhitelist,
                 endWhitelist,
                 startPublicSale,

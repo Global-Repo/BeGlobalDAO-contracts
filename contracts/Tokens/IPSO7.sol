@@ -23,7 +23,7 @@ contract IPSO7 is ReentrancyGuard, Ownable
     // Info of each user.
     struct UserInfo
     {
-        address claimWallet;
+        string claimWallet;
 
         uint depositedInvestmentTokens;   // How many tokens the user has provided.
         uint refundedInvestmentTokens;   // How many tokens the user has been refunded.
@@ -271,10 +271,10 @@ contract IPSO7 is ReentrancyGuard, Ownable
     function canInvestMin(address _user) public view returns (uint)
     {
         uint amountToInvest = 0;
-        if(block.timestamp > startPublicSale && block.timestamp < endPublicSale && !userInfo[_user].depositWGLBD
-        && (!whitelist[_user] || amountForWhitelisted == userInfo[_user].depositedInvestmentTokens))
+        if((block.timestamp > startPublicSale && block.timestamp < endPublicSale) && !userInfo[_user].depositWGLBD &&
+         !(block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[_user] && !userInfo[_user].whitelisted) && minInvestment > userInfo[_user].depositedInvestmentTokens)
         {
-            amountToInvest = minInvestment;
+            amountToInvest = minInvestment.sub(userInfo[_user].depositedInvestmentTokens);
         }
         return amountToInvest;
     }
@@ -283,9 +283,9 @@ contract IPSO7 is ReentrancyGuard, Ownable
     {
         uint amountToInvest = 0;
 
-        if (block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[_user] && amountForWhitelisted > userInfo[_user].depositedInvestmentTokens)
+        if (block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[_user] && !userInfo[_user].whitelisted)
         {
-            amountToInvest = amountForWhitelisted.sub(userInfo[_user].depositedInvestmentTokens);
+            amountToInvest = amountForWhitelisted;
         }
         else if(block.timestamp > startPublicSale && block.timestamp < endPublicSale)
         {
@@ -297,17 +297,17 @@ contract IPSO7 is ReentrancyGuard, Ownable
         return amountToInvest < amountRemainingToInvest ? amountToInvest : amountRemainingToInvest;
     }
 
-    function invest(uint _amount, address _claimWallet) public nonReentrant
+    function invest(uint _amount, string memory _claimWallet) public nonReentrant
     {
         require ((block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[msg.sender]) ||
             (block.timestamp > startPublicSale && block.timestamp < endPublicSale), 'not presale time');
         require (_amount > 0, 'need _amount > 0');
-        require (_claimWallet != address(0), 'not valid claim wallet');
+        require (bytes(_claimWallet).length > 0, 'not valid claim wallet');
         require (_amount >= canInvestMin(msg.sender), 'you need to invest more');
         require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens'); //
         require (!isBlacklist(msg.sender), 'YOU cannot invest'); //
 
-        if(block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[msg.sender] && amountForWhitelisted > userInfo[msg.sender].depositedInvestmentTokens)
+        if(block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[msg.sender] && !userInfo[msg.sender].whitelisted)
         {
             userInfo[msg.sender].whitelisted = true;
         }
