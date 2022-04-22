@@ -23,12 +23,14 @@ async function main() {
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
 
     //MAINNET
-    console.log("[Disperse statistics for Animal Concerts]");
-    const IPSO = await ethers.getContractFactory('IPSO6');
-    let ipso = await IPSO.attach("0x00A0c8970A79b3D205B9c1c27a0Ce6CB93f10583");
+    console.log("[Disperse statistics for Plutonian]");
+    const IPSO = await ethers.getContractFactory('IPSO7');
+    let ipso = await IPSO.attach("0x9cD7D3e6D2fE576d153Ac9A109E311Fc597872DE");
 
     let user;
+    let claimWallet;
     let userAllocation;
+    let refunded;
     let amountToDistribute;
     let amountInvested;
     const numUsers = await ipso.getAddressListLength();
@@ -59,11 +61,12 @@ async function main() {
     console.log("Number of users: ", numUsers);
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
-        [userAllocation,,,,,,] = await ipso.userInfo(user);
+        [claimWallet,userAllocation,refunded,,,,,] = await ipso.userInfo(user);
         userAllocation /= 1000000000000000000;
+        refunded /= 1000000000000000000;
         //amountInvested = userAllocation * 0.91;
         //amountInvested = userAllocation * raisingAmount / totalAmountInvested;
-        console.log(user/*,userAllocation.toFixed(2)*/);
+        console.log(user, claimWallet, userAllocation);
     }
 
 
