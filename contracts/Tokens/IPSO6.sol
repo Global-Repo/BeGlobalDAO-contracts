@@ -269,7 +269,7 @@ contract IPSO6 is ReentrancyGuard, Ownable
     function canInvestMin(address _user) public view returns (uint)
     {
         uint amountToInvest = 0;
-        if(block.timestamp > startPublicSale && block.timestamp < endPublicSale && !userInfo[_user].depositWGLBD)
+        if(block.timestamp > startPublicSale && block.timestamp < endPublicSale && !userInfo[_user].depositWGLBD && !whitelist[_user])
         {
             amountToInvest = minInvestment;
         }
@@ -280,7 +280,7 @@ contract IPSO6 is ReentrancyGuard, Ownable
     {
         uint amountToInvest = 0;
 
-        if (block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[_user])
+        if (block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[_user] && userInfo[msg.sender].depositedInvestmentTokens < amountForWhitelisted)
         {
             amountToInvest = amountForWhitelisted.sub(userInfo[_user].depositedInvestmentTokens);
         }
@@ -303,7 +303,7 @@ contract IPSO6 is ReentrancyGuard, Ownable
         require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens'); //
         require (!isBlacklist(msg.sender), 'YOU cannot invest'); //
 
-        if(block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[msg.sender])
+        if(block.timestamp > startWhitelist && block.timestamp < endWhitelist && whitelist[msg.sender] && userInfo[msg.sender].depositedInvestmentTokens < amountForWhitelisted)
         {
             userInfo[msg.sender].whitelisted = true;
         }
@@ -405,7 +405,7 @@ contract IPSO6 is ReentrancyGuard, Ownable
 
         for (uint i = start; i <= end; i++)
         {
-            userInfo[addressList[i]].claimableProjectTokens = getOfferingAmount(addressList[i],_amount);
+            userInfo[addressList[i]].claimableProjectTokens = userInfo[addressList[i]].claimableProjectTokens.add(getOfferingAmount(addressList[i],_amount));
         }
     }
 

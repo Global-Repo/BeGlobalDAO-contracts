@@ -223,7 +223,9 @@ contract IPSO5 is ReentrancyGuard, Ownable {
     {
         uint amountToInvest = isWhitelist(_user) && !userInfo[_user].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(_user)).mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
         amountToInvest = amountToInvest > maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) : amountToInvest;
-        return raisingAmount.mul(7) >= totalAmountInvested ? amountToInvest : 0;
+
+        uint amountRemainingToInvest = raisingAmount.mul(2) >= totalAmountInvested ? raisingAmount.mul(2).sub(amountToInvest) : 0;
+        return amountToInvest < amountRemainingToInvest ? amountToInvest : amountRemainingToInvest;
     }
 
     function invest(uint256 _amount) public
@@ -231,7 +233,7 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         //require (userInfo[msg.sender].depositWGLBD || minInvestment <= _amount.div(ratioRequiredWGLBD) || (whitelist[msg.sender] && !userInfo[msg.sender].whitelisted), 'you need to invest more');
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
         require (_amount > 0, 'need _amount > 0');
-        require (raisingAmount.mul(7) >= totalAmountInvested, 'IPSO already full');
+        require (raisingAmount.mul(2) >= totalAmountInvested, 'IPSO already full');
         require (_amount >= canInvestMin(msg.sender), 'you need to invest more');
         require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens'); //
         require (!isBlacklist(msg.sender), 'YOU cannot invest'); //
@@ -330,7 +332,7 @@ contract IPSO5 is ReentrancyGuard, Ownable {
 
         for (uint256 i = start; i <= end; i++)
         {
-            userInfo[addressList[i]].claimableProjectTokens = getOfferingAmount(addressList[i],_amount);
+            userInfo[addressList[i]].claimableProjectTokens = userInfo[addressList[i]].claimableProjectTokens.add(getOfferingAmount(addressList[i],_amount));
         }
     }
 

@@ -422,7 +422,7 @@ contract IPSO8 is ReentrancyGuard, Ownable
 
         for (uint i = start; i <= end; i++)
         {
-            userInfo[addressList[i]].claimableProjectTokens = getOfferingAmount(addressList[i],_amount);
+            userInfo[addressList[i]].claimableProjectTokens = userInfo[addressList[i]].claimableProjectTokens.add(getOfferingAmount(addressList[i],_amount));
         }
     }
 
