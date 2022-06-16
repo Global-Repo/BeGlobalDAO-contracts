@@ -24,7 +24,7 @@ async function main() {
     let ratio = 380;
     let timeoutPeriod = 10000;
     let maxDeposit = BigNumber.from(500000).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
-    let deployBUSD = false;
+    let deployBUSD = true;
     let largeApproval = '1000000000000000000000000000000000000';
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);

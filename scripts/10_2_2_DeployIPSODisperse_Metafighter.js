@@ -23,12 +23,13 @@ async function main() {
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
 
     //MAINNET
-    console.log("[Disperse statistics for Animal Concerts]");
-    const IPSO = await ethers.getContractFactory('IPSO6');
-    let ipso = await IPSO.attach("0x00A0c8970A79b3D205B9c1c27a0Ce6CB93f10583");
+    console.log("[Disperse statistics for MetaFighter]");
+    const IPSO = await ethers.getContractFactory('IPSO');
+    let ipso = await IPSO.attach("0xD30a041B443b804ec8071DF384947Bd0C8E27c20");
 
     let user;
     let userAllocation;
+    let refundedInvestmentTokens;
     let amountToDistribute;
     let amountInvested;
     const numUsers = await ipso.getAddressListLength();
@@ -39,7 +40,7 @@ async function main() {
     const tokensToDisperseUser2 = tokensToDisperse * 0.01;*/
     const tokensToDisperseToUsers = tokensToDisperse; // * 0.95;
 
-    console.log(totalAmountInvested);
+    console.log(raisingAmount/1000000000000000000);
 
     /*console.log("", tokensToDisperseUser1.toFixed(2));
     console.log("", tokensToDisperseUser2.toFixed(2));*/
@@ -56,24 +57,20 @@ async function main() {
         console.log(amountToDistribute.toFixed(2));
     }*/
 
-    console.log("Number of users: ", numUsers);
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
-        [userAllocation,,,,,,] = await ipso.userInfo(user);
-        userAllocation /= 1000000000000000000;
-        //amountInvested = userAllocation * 0.91;
-        //amountInvested = userAllocation * raisingAmount / totalAmountInvested;
-        console.log(user/*,userAllocation.toFixed(2)*/);
+        console.log(user);
     }
 
-    console.log("Number of users: ", numUsers);
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
-        [userAllocation,,,,,,] = await ipso.userInfo(user);
+        [userAllocation,refundedInvestmentTokens,,,,,,] = await ipso.userInfo(user);
+        userAllocation = userAllocation - refundedInvestmentTokens - (await ipso.getExcessInvestmentTokens(user));
+        //userAllocation *= 0.91;
         userAllocation /= 1000000000000000000;
         //amountInvested = userAllocation * 0.91;
         //amountInvested = userAllocation * raisingAmount / totalAmountInvested;
-        console.log(/*user,*/userAllocation.toFixed(2));
+        console.log(userAllocation);
     }
 
 

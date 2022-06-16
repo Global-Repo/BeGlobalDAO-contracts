@@ -23,12 +23,13 @@ async function main() {
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
 
     //MAINNET
-    console.log("[Disperse statistics for Animal Concerts]");
+    console.log("[Disperse statistics for MetaFighter]");
     const IPSO = await ethers.getContractFactory('IPSO4');
     let ipso = await IPSO.attach("0x7314161fcb75E260f9E6f82A4f0C9Ca750ccB389");
 
     let user;
     let userAllocation;
+    let refundedInvestmentTokens;
     let amountToDistribute;
     let amountInvested;
     const numUsers = await ipso.getAddressListLength();
@@ -39,7 +40,7 @@ async function main() {
     const tokensToDisperseUser2 = tokensToDisperse * 0.01;*/
     const tokensToDisperseToUsers = tokensToDisperse; // * 0.95;
 
-    console.log(totalAmountInvested);
+    console.log(raisingAmount/1000000000000000000);
 
     /*console.log("", tokensToDisperseUser1.toFixed(2));
     console.log("", tokensToDisperseUser2.toFixed(2));*/
@@ -56,13 +57,20 @@ async function main() {
         console.log(amountToDistribute.toFixed(2));
     }*/
 
+    /*for (let i = 0; i < numUsers; i++) {
+        user = await ipso.addressList(i);
+        console.log(user);
+    }*/
+
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
-        //[userAllocation,,,,,,] = await ipso.userInfo(user);
-        //userAllocation /= 1000000000000000000;
+        [userAllocation,refundedInvestmentTokens,,,,,] = await ipso.userInfo(user);
+        userAllocation = userAllocation - refundedInvestmentTokens;
+        userAllocation *= 0.91;
+        userAllocation /= 1000000000000000000;
         //amountInvested = userAllocation * 0.91;
         //amountInvested = userAllocation * raisingAmount / totalAmountInvested;
-        console.log(user);
+        console.log(userAllocation);
     }
 
 

@@ -22,23 +22,23 @@ async function main() {
     let timeoutPeriod = 10000;
 
 
-    let startSale = 1652734800;
-    let endSale = 1652907600;
-    let endClaim = 1657054800;
+    let startSale = 1654203600;
+    let endSale = 1654462800;
+    let endClaim = 1658350800;
     let ratioRequiredWGLBDNum = 600;
-    let ratioRequiredWGLBDDenum = 11538461538;
+    let ratioRequiredWGLBDDenum = 11111111111;
     let amountForWhitelisted = 600;
-    let minInvestment = 11538461538;
-    let maxInvestment = 47058;
-    let raisingAmount = 23529;
+    let minInvestment = 11111111111;
+    let maxInvestment = 106820;
+    let raisingAmount = 53410;
 
     //MAINNET
     console.log("[Deploying IPSO5 SC]");
     const IPSO = await ethers.getContractFactory('IPSO5');
     //let ipso = await IPSO.attach("0x71AcCEE97a220da6D06E4470F640230806345FBd");
     let ipso = await IPSO.deploy(
-        "0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15"
-        "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b"
+        "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
+        "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
         startSale,
         endSale,
         endClaim,
@@ -61,8 +61,8 @@ async function main() {
         await hre.run("verify:verify", {
             address: ipso.address,
             constructorArguments: [
-                "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15"
-                "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b"
+                "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
+                "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
                 startSale,
                 endSale,
                 endClaim,
