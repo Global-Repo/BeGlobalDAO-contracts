@@ -23,7 +23,7 @@ let Treasury;
 let BUSD;
 let Distributor;
 let deploys = false;
-let test1 = false;
+let test1 = true;
 let test2 = false;
 let test3 = false;
 let test4 = false;
@@ -49,7 +49,7 @@ async function main() {
 
     // Wallets que nos creamos para los tests
     const [testAccount, addr1, addr2, addr3] = await ethers.getSigners();
-    let timeoutPeriod = 3000;
+    let timeoutPeriod = 5000;
 
     // getContractFactories
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
@@ -227,13 +227,10 @@ async function main() {
     }
 
     let _fullAmount = 100000000000;
-
     Staking.setFeeWallet(FEE_ADDRESS_B);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
     Staking.setEarlyUnstakingFee(2000);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
     if (test1) {
         // Stake 1 básico.
         console.log("------------------------------------------------------------------------------ 1 ------------------------------------------------------------------------------");

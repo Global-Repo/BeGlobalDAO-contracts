@@ -576,8 +576,8 @@ contract StakingWithEarlyPenaltyFee is Ownable {
 
     uint public totalBonus;
     uint public periodInBlocks;
+    uint public fee;
     uint16 public warmupPeriod;
-    uint16 public fee;
 
     constructor (
         address _GLBD,
@@ -606,10 +606,10 @@ contract StakingWithEarlyPenaltyFee is Ownable {
     }
 
     /**
-        @notice early unstaking fee, max of 20%
-        @param _fee uint16
+        @notice early unstaking fee, max of 20%. Could be uint16
+        @param _fee uint256
     */
-    function setEarlyUnstakingFee(uint16 _fee) external onlyManager{
+    function setEarlyUnstakingFee(uint256 _fee) external onlyManager{
         require(_fee < 2001, "Fee is too high");
         fee = _fee;
     }
@@ -731,7 +731,7 @@ contract StakingWithEarlyPenaltyFee is Ownable {
     function unstake( uint _fullAmount) external {
         rebase();
 
-        uint16 fee2apply = unstakingFee(msg.sender, 0);
+        uint fee2apply = unstakingFee(msg.sender, 0);
         uint _GLBDFee = fee2apply == 0? 0 : _fullAmount.mul(fee2apply).div(10000);
         uint _userAmount = _fullAmount.sub(_GLBDFee);
 
@@ -745,12 +745,12 @@ contract StakingWithEarlyPenaltyFee is Ownable {
 
     /**
         @notice returns the current early unstaking fee of a specific address at a specific block
-        @return uint16
+        @return uint256
     */
-    function unstakingFee(address _addr, uint _block) public view returns ( uint16 ) {
+    function unstakingFee(address _addr, uint _block) public view returns ( uint256 ) {
         require(_block > lastBlockDepositedByWallet[ _addr ] || _block == 0, "Block is not correct");
         uint blocks = _block == 0? block.number.sub(lastBlockDepositedByWallet[ _addr ]): _block.sub(lastBlockDepositedByWallet[ _addr ]);
-        uint16 fee2apply;
+        uint fee2apply;
         if (blocks < periodInBlocks ){
             fee2apply = fee.mul(3);
         } else if (blocks < periodInBlocks.mul(2) ){
