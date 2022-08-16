@@ -224,7 +224,7 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         uint amountToInvest = isWhitelist(_user) && !userInfo[_user].whitelisted ? amountForWhitelisted : (IERC20(wGLBD).balanceOf(_user)).mul(ratioRequiredWGLBDNum).div(ratioRequiredWGLBDDen);
         amountToInvest = amountToInvest > maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) : amountToInvest;
 
-        uint amountRemainingToInvest = raisingAmount.mul(2) >= totalAmountInvested ? raisingAmount.mul(2).sub(amountToInvest) : 0;
+        uint amountRemainingToInvest = raisingAmount.mul(1) >= totalAmountInvested ? raisingAmount.mul(1).sub(totalAmountInvested) : 0;
         return amountToInvest < amountRemainingToInvest ? amountToInvest : amountRemainingToInvest;
     }
 
@@ -233,7 +233,7 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         //require (userInfo[msg.sender].depositWGLBD || minInvestment <= _amount.div(ratioRequiredWGLBD) || (whitelist[msg.sender] && !userInfo[msg.sender].whitelisted), 'you need to invest more');
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
         require (_amount > 0, 'need _amount > 0');
-        require (raisingAmount.mul(2) >= totalAmountInvested, 'IPSO already full');
+        require (raisingAmount.mul(1) >= totalAmountInvested, 'IPSO already full');
         require (_amount >= canInvestMin(msg.sender), 'you need to invest more');
         require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens'); //
         require (!isBlacklist(msg.sender), 'YOU cannot invest'); //
