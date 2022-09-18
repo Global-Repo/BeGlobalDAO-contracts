@@ -12,7 +12,7 @@ import '../Modifiers/Ownable.sol';
 /**
  * @dev BeGlobalDAO: Initial Private Sale Offering
  */
-contract IPSO5 is ReentrancyGuard, Ownable {
+contract IPSO9 is ReentrancyGuard, Ownable {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
     using SafeERC20 for IERC20;
@@ -155,6 +155,14 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         hardcap = _hardcap;
     }
 
+    function addToBlacklist(address _user) public onlyOwner {
+        blacklist[_user] = true;
+    }
+
+    function removeFromBlacklist(address _user) public onlyOwner {
+        blacklist[_user] = false;
+    }
+
     function canInvestMin(address _user) public view returns (uint)
     {
         return userInfo[_user].depositedInvestmentTokens > 0 ? 0 : minInvestment;
@@ -172,10 +180,11 @@ contract IPSO5 is ReentrancyGuard, Ownable {
     function invest(uint256 _amount) public
     {
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
+        require (blacklist[msg.sender] == false, 'you are blacklisted');
         require (_amount > 0, 'need _amount > 0');
         require (hardcap > totalAmountInvested, 'IPSO already full');
         require (_amount >= canInvestMin(msg.sender), 'you need to invest more');
-        require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens'); //
+        require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens');
 
         IBEP20(investmentToken).safeTransferFrom(address(msg.sender), address(this), _amount);
         if (userInfo[msg.sender].depositedInvestmentTokens == 0) {
