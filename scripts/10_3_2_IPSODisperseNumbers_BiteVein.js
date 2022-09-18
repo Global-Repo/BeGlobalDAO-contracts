@@ -23,9 +23,9 @@ async function main() {
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
 
     //MAINNET
-    console.log("[Disperse statistics for PenguinKarts]");
+    console.log("[Disperse statistics for BiteVein]");
     const IPSO = await ethers.getContractFactory('IPSO2');
-    let ipso = await IPSO.attach("0x43d4E219dCcc3eC9cF366BB6e00bb57A0528dA49");
+    let ipso = await IPSO.attach("0x50474dD1A73A3F87d45b222c401705C184352837");
 
     let user;
     let userAllocation;

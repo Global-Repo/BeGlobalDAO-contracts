@@ -6,7 +6,7 @@ const secretsDeployer = fs.readFileSync(".secret_deployer_aa3").toString().trim(
 const mnemonicDeployer = secretsDeployer[0].trim();
 const apiKeyBSC = secretsDeployer[1].trim();
 
-const secrets = fs.readFileSync(".secret").toString().trim().split(/\n/);
+const secrets = fs.readFileSync(".secret_deployer_dd3").toString().trim().split(/\n/);
 const mnemonicDep = secrets[0].trim();
 
 module.exports = {
