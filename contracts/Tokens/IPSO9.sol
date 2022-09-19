@@ -12,7 +12,7 @@ import '../Modifiers/Ownable.sol';
 /**
  * @dev BeGlobalDAO: Initial Private Sale Offering
  */
-contract IPSO5 is ReentrancyGuard, Ownable {
+contract IPSO9 is ReentrancyGuard, Ownable {
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
     using SafeERC20 for IERC20;
@@ -23,17 +23,9 @@ contract IPSO5 is ReentrancyGuard, Ownable {
     struct UserInfo {
         uint256 depositedInvestmentTokens;   // How many tokens the user has provided.
         uint256 refundedInvestmentTokens;   // How many tokens the user has been refunded.
-
         uint256 claimableProjectTokens;
-
-        uint256 depositedWGLBD;
-        uint256 remainingWGLBD;
-        bool depositWGLBD;  // default false
-        bool whitelisted;  // default false
     }
 
-    // The raising token
-    address public wGLBD;
     // The raising token
     address public investmentToken;
     // The offering token
@@ -44,18 +36,14 @@ contract IPSO5 is ReentrancyGuard, Ownable {
     uint256 public endPresale;
     // The block number when IPSO ends
     uint256 public startClaim;
-    // numerator ratio of wGLBD needed to be deposited / BUSD invested
-    uint256 public ratioRequiredWGLBDNum;
-    // denominator ratio of wGLBD needed to be deposited / BUSD invested
-    uint256 public ratioRequiredWGLBDDen;
-    // amount of wglbd equivalent to being whitelisted
-    uint256 public amountForWhitelisted;
-    // min amount of WGLB tokens that must lock any user to invest
+    // min amount of investment tokens that any user can invest
     uint256 public minInvestment;
     // max amount of investment tokens that can invest any user
     uint256 public maxInvestment;
     // total amount of investment tokens need to be raised
     uint256 public raisingAmount;
+    // max amount of investment tokens to be raised
+    uint256 public hardcap;
     // total amount of investment tokens that have already raised
     uint256 public totalAmountInvested;
     // total amount of investment tokens remaining
@@ -64,35 +52,32 @@ contract IPSO5 is ReentrancyGuard, Ownable {
     mapping (address => UserInfo) public userInfo;
     // participators
     address[] public addressList;
-    mapping (address => bool) private whitelist;
     mapping (address => bool) private blacklist;
 
     event Invest(address indexed user, uint256 amount);
     event Claim(address indexed user, uint256 amount);
 
-  constructor(
-      address _wGLBD,
-      address _investmentToken,
-      uint256 _startPresale,
-      uint256 _endPresale,
-      uint256 _startClaim,
-      uint256 _amountForWhitelisted,
-      uint256 _minInvestment,
-      uint256 _maxInvestment,
-      uint256 _raisingAmount
-  ) {
-      wGLBD = _wGLBD;
-      investmentToken = _investmentToken;
-      startPresale = _startPresale;
-      endPresale = _endPresale;
-      startClaim = _startClaim;
-      amountForWhitelisted = _amountForWhitelisted;
-      minInvestment = _minInvestment;
-      maxInvestment = _maxInvestment;
-      raisingAmount= _raisingAmount;
-      totalAmountInvested = 0;
-      totalAmountInvestedRemaining = 0;
-  }
+    constructor(
+        address _investmentToken,
+        uint256 _startPresale,
+        uint256 _endPresale,
+        uint256 _startClaim,
+        uint256 _minInvestment,
+        uint256 _maxInvestment,
+        uint256 _raisingAmount,
+        uint256 _hardcap
+    ) {
+        investmentToken = _investmentToken;
+        startPresale = _startPresale;
+        endPresale = _endPresale;
+        startClaim = _startClaim;
+        minInvestment = _minInvestment;
+        maxInvestment = _maxInvestment;
+        raisingAmount= _raisingAmount;
+        hardcap= _hardcap;
+        totalAmountInvested = 0;
+        totalAmountInvestedRemaining = 0;
+    }
 
     function setProjectToken(address _projectToken) external onlyOwner {
         projectToken = _projectToken;
@@ -154,18 +139,6 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         startClaim = _startClaim;
     }
 
-    function setRatioRequiredWGLBDNum(uint256 _ratioRequiredWGLBDNum) public onlyOwner {
-        ratioRequiredWGLBDNum = _ratioRequiredWGLBDNum;
-    }
-
-    function setRatioRequiredWGLBDDen(uint256 _ratioRequiredWGLBDDen) public onlyOwner {
-        ratioRequiredWGLBDDen = _ratioRequiredWGLBDDen;
-    }
-
-    function setAmountForWhitelisted(uint256 _amountForWhitelisted) public onlyOwner {
-        amountForWhitelisted = _amountForWhitelisted;
-    }
-
     function setMinInvestment(uint256 _minInvestment) public onlyOwner {
         minInvestment = _minInvestment;
     }
@@ -178,6 +151,18 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         raisingAmount = _raisingAmount;
     }
 
+    function setHardcap(uint256 _hardcap) public onlyOwner {
+        hardcap = _hardcap;
+    }
+
+    function addToBlacklist(address _user) public onlyOwner {
+        blacklist[_user] = true;
+    }
+
+    function removeFromBlacklist(address _user) public onlyOwner {
+        blacklist[_user] = false;
+    }
+
     function canInvestMin(address _user) public view returns (uint)
     {
         return userInfo[_user].depositedInvestmentTokens > 0 ? 0 : minInvestment;
@@ -188,17 +173,18 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         uint amountToInvest = (IERC20(investmentToken).balanceOf(_user));
         amountToInvest = amountToInvest > maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) ? maxInvestment.sub(userInfo[_user].depositedInvestmentTokens) : amountToInvest;
 
-        uint amountRemainingToInvest = raisingAmount.mul(1) >= totalAmountInvested ? raisingAmount.mul(1).sub(totalAmountInvested) : 0;
+        uint amountRemainingToInvest = hardcap >= totalAmountInvested ? hardcap.sub(totalAmountInvested) : 0;
         return amountToInvest < amountRemainingToInvest ? amountToInvest : amountRemainingToInvest;
     }
 
     function invest(uint256 _amount) public
     {
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
+        require (blacklist[msg.sender] == false, 'you are blacklisted');
         require (_amount > 0, 'need _amount > 0');
-        require (raisingAmount.mul(1) >= totalAmountInvested, 'IPSO already full');
+        require (hardcap > totalAmountInvested, 'IPSO already full');
         require (_amount >= canInvestMin(msg.sender), 'you need to invest more');
-        require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens'); //
+        require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens');
 
         IBEP20(investmentToken).safeTransferFrom(address(msg.sender), address(this), _amount);
         if (userInfo[msg.sender].depositedInvestmentTokens == 0) {
@@ -220,7 +206,7 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         uint256 allocation = getUserAllocation(_user);
         uint256 payAmount = raisingAmount.mul(allocation).div(1e6);
         uint256 excessInvestment = userInfo[_user].depositedInvestmentTokens.sub(payAmount).sub(userInfo[_user].refundedInvestmentTokens);
-        return excessInvestment>DUST?excessInvestment:0;
+        return excessInvestment > DUST ? excessInvestment : 0;
     }
 
     function refundExcessInvestmentTokens(address _user) public nonReentrant {
@@ -234,28 +220,16 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         }
     }
 
-    function recoverWGLBD(address _depositor) external returns ( uint ) {
-        return 0;
-    }
-
-    function availableToInvest(address _depositor) public view returns ( uint ) {
-        return maxInvestment.sub(userInfo[ _depositor ].depositedInvestmentTokens);
-    }
-
-    function availableToRecoverWGLBD(address _depositor) public view returns ( uint ) {
-        return 0;
-    }
-
-  // allocation 100000 means 0.1(10%), 1 meanss 0.000001(0.0001%), 1000000 means 1(100%)
-  function getUserAllocation(address _user) public view returns(uint256) {
+    // allocation 100000 means 0.1(10%), 1 meanss 0.000001(0.0001%), 1000000 means 1(100%)
+    function getUserAllocation(address _user) public view returns(uint256) {
     return userInfo[_user].depositedInvestmentTokens.mul(1e12).div(totalAmountInvested).div(1e6);
-  }
+    }
 
-  // get the amount of IPSO token you will get
-  function getOfferingAmount(address _user, uint _amount) public view returns(uint256) {
+    // get the amount of IPSO token you will get
+    function getOfferingAmount(address _user, uint _amount) public view returns(uint256) {
       uint256 allocation = getUserAllocation(_user);
       return _amount.mul(allocation).div(1e6);
-  }
+    }
 
     function distributeProjectTokens(uint _amount, uint256 start, uint256 end) public onlyOwner {
 
@@ -279,9 +253,9 @@ contract IPSO5 is ReentrancyGuard, Ownable {
         }
     }
 
-  function getAddressListLength() external view returns(uint256) {
+    function getAddressListLength() external view returns(uint256) {
     return addressList.length;
-  }
+    }
 
     function withdrawInvestmentToken(uint256 _amount) public onlyOwner {
         uint256 amountBlocked = totalAmountInvestedRemaining > raisingAmount ? totalAmountInvestedRemaining.sub(raisingAmount) : 0;
