@@ -963,7 +963,7 @@ contract BondDepositoryOnlyStaking is Ownable {
      *  @return price_ uint
      */
     function bondPrice() public view returns ( uint price_ ) {
-        price_ = terms.controlVariable.mul( debtRatio() ).add( 1000000000 ).div( 1e7 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 200000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;
         }
@@ -974,7 +974,7 @@ contract BondDepositoryOnlyStaking is Ownable {
      *  @return price_ uint
      */
     function _bondPrice() internal returns ( uint price_ ) {
-        price_ = terms.controlVariable.mul( debtRatio() ).add( 1000000000 ).div( 1e7 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 200000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;
         } else if ( terms.minimumPrice != 0 ) {
