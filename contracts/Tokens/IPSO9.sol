@@ -21,6 +21,7 @@ contract IPSO9 is ReentrancyGuard, Ownable {
 
     // Info of each user.
     struct UserInfo {
+        string claimWallet;
         uint256 depositedInvestmentTokens;   // How many tokens the user has provided.
         uint256 refundedInvestmentTokens;   // How many tokens the user has been refunded.
         uint256 claimableProjectTokens;
@@ -177,11 +178,12 @@ contract IPSO9 is ReentrancyGuard, Ownable {
         return amountToInvest < amountRemainingToInvest ? amountToInvest : amountRemainingToInvest;
     }
 
-    function invest(uint256 _amount) public
+    function invest(uint256 _amount, string memory _claimWallet) public
     {
         require (block.timestamp > startPresale && block.timestamp < endPresale, 'not presale time');
         require (blacklist[msg.sender] == false, 'you are blacklisted');
         require (_amount > 0, 'need _amount > 0');
+        require (bytes(_claimWallet).length > 0, 'not valid claim wallet');
         require (hardcap > totalAmountInvested, 'IPSO already full');
         require (_amount >= canInvestMin(msg.sender), 'you need to invest more');
         require (_amount <= canInvestMax(msg.sender), 'you cannot invest so many tokens');
@@ -190,6 +192,8 @@ contract IPSO9 is ReentrancyGuard, Ownable {
         if (userInfo[msg.sender].depositedInvestmentTokens == 0) {
           addressList.push(address(msg.sender));
         }
+
+        userInfo[msg.sender].claimWallet = _claimWallet;
         userInfo[msg.sender].depositedInvestmentTokens = userInfo[msg.sender].depositedInvestmentTokens.add(_amount);
 
         totalAmountInvested = totalAmountInvested.add(_amount);

@@ -62,7 +62,7 @@ async function main() {
     let hardCap = 43956;
 
     //MAINNET
-    console.log("[Deploying IPSO6 SC]");
+    console.log("[Deploying IPSO7 SC]");
     const IPSO = await ethers.getContractFactory('IPSO7');
     //let ipso = await IPSO.attach("0xB44A617aB5EFA28003a5b0ed9Be206099fd7Dd7b");
     let ipso = await IPSO.deploy(
