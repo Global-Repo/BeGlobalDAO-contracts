@@ -35,7 +35,7 @@ async function main() {
     const IPSO = await ethers.getContractFactory('IPSO9');
     //let ipso = await IPSO.attach("0x71AcCEE97a220da6D06E4470F640230806345FBd");
     let ipso = await IPSO.deploy(
-        "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b", //"0xe9e7cea3dedca5984780bafc599bd69add087d56",
+        "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
         startSale,
         endSale,
         endClaim,
@@ -56,7 +56,7 @@ async function main() {
         await hre.run("verify:verify", {
             address: ipso.address,
             constructorArguments: [
-                "0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b", //"0xe9e7cea3dedca5984780bafc599bd69add087d56",
+                "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
                 startSale,
                 endSale,
                 endClaim,
