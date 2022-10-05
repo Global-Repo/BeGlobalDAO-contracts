@@ -866,7 +866,7 @@ contract GlobalDAOBondDepository is Ownable {
         if ( percentVested >= 10000 ) { // if fully vested
             delete bondInfo[ _recipient ]; // delete user info
             emit BondRedeemed( _recipient, info.payout, 0 ); // emit bond data
-            return stakeOrSend( _recipient, _stake, info.payout ); // pay user everything due
+            return stakeOrSend( _recipient, true, info.payout ); // pay user everything due
 
         } else { // if unfinished
             // calculate payout vested
@@ -881,7 +881,7 @@ contract GlobalDAOBondDepository is Ownable {
             });
 
             emit BondRedeemed( _recipient, payout, bondInfo[ _recipient ].payout );
-            return stakeOrSend( _recipient, _stake, payout );
+            return stakeOrSend( _recipient, true, payout );
         }
     }
 
@@ -970,7 +970,7 @@ contract GlobalDAOBondDepository is Ownable {
      *  @return price_ uint
      */
     function bondPrice() public view returns ( uint price_ ) {        
-        price_ = terms.controlVariable.mul( debtRatio() ).add( 1000000000 ).div( 1e7 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 200000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;
         }
@@ -981,7 +981,7 @@ contract GlobalDAOBondDepository is Ownable {
      *  @return price_ uint
      */
     function _bondPrice() internal returns ( uint price_ ) {
-        price_ = terms.controlVariable.mul( debtRatio() ).add( 1000000000 ).div( 1e7 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 200000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;        
         } else if ( terms.minimumPrice != 0 ) {
