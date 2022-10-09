@@ -14,8 +14,13 @@ const {
     GLBD_BUSD_LP_2_ADDRESS,
     MULTISIG_ADDRESS,
     BUSD_BOND_ADDRESS,
-    GLBD_BUSD_BOND_ADDRESS, GLBD_BUSD_BOND_2_ADDRESS, DEPLOYER_ADDRESS, FACTORY_ADDRESS, WETH_ADDRESS, ROUTER_BEGLOBAL_ADDRESS
+    GLBD_BUSD_BOND_ADDRESS, GLBD_BUSD_BOND_2_ADDRESS, DEPLOYER_ADDRESS, FACTORY_ADDRESS, WETH_ADDRESS, ROUTER_BEGLOBAL_ADDRESS,
+    SGLBD_ADDRESS_NOU,
+    STAKING_ADDRESS_NOU,
+    STAKING_HELPER_ADDRESS_NOU,
+    STAKING_WARMUP_ADDRESS_NOU
 } = require("./addresses_mainnet");
+
 
 async function main() {
 
@@ -23,13 +28,15 @@ async function main() {
     console.log('Verifying contracts with the account: ' + deployer.address);
 
     // First block epoch occurs
-    const firstBlockEpoch = '16322544';
+    const firstBlockEpoch = '21945774';
 
     // How many blocks are in each epoch
     const epochLengthInBlocks = '14400';
 
     // What epoch will be first epoch
-    const firstEpochNumber = '0';
+    const firstEpochNumber = '535';
+
+
 
     /*
         try {
@@ -147,14 +154,14 @@ async function main() {
             }
 
             try {
-                console.log("VERIFYING SGLBD_ADDRESS: ", SGLBD_ADDRESS);
+                console.log("VERIFYING SGLBD_ADDRESS: ", SGLBD_ADDRESS_NOU);
                 //// Verify contract on bsc
                 await hre.run("verify:verify", {
-                    address: SGLBD_ADDRESS,
+                    address: SGLBD_ADDRESS_NOU,
                     constructorArguments: [
                     ],
                 });
-                console.log( "SGLBD verified: " + SGLBD_ADDRESS );
+                console.log( "SGLBD verified: " + SGLBD_ADDRESS_NOU );
                 console.log("Success");
             } catch (err) {
                 console.log(err.message);
@@ -196,57 +203,61 @@ async function main() {
                 console.log(err.message);
             }
 
+*/
             try {
-                console.log("VERIFYING STAKING_ADDRESS: ", STAKING_ADDRESS);
+                console.log("VERIFYING STAKING_ADDRESS: ", STAKING_ADDRESS_NOU);
                 //// Verify contract on bsc
                 await hre.run("verify:verify", {
-                    address: STAKING_ADDRESS,
+                    address: STAKING_ADDRESS_NOU,
                     constructorArguments: [
                         GLBD_ADDRESS,
-                        SGLBD_ADDRESS,
+                        SGLBD_ADDRESS_NOU,
+                        DEPLOYER_ADDRESS,
                         epochLengthInBlocks,
                         firstEpochNumber,
                         firstBlockEpoch
                     ],
                 });
-                console.log( "STAKING verified: " + STAKING_ADDRESS );
+                console.log( "STAKING verified: " + STAKING_ADDRESS_NOU );
                 console.log("Success");
             } catch (err) {
                 console.log(err.message);
             }
+/*
 
+ */
             try {
-                console.log("VERIFYING STAKING_HELPER_ADDRESS: ", STAKING_HELPER_ADDRESS);
+                console.log("VERIFYING STAKING_HELPER_ADDRESS: ", STAKING_HELPER_ADDRESS_NOU);
                 //// Verify contract on bsc
                 await hre.run("verify:verify", {
-                    address: STAKING_HELPER_ADDRESS,
+                    address: STAKING_HELPER_ADDRESS_NOU,
                     constructorArguments: [
-                        STAKING_ADDRESS,
+                        STAKING_ADDRESS_NOU,
                         GLBD_ADDRESS
                     ],
                 });
-                console.log( "STAKING_HELPER verified: " + STAKING_HELPER_ADDRESS );
+                console.log( "STAKING_HELPER verified: " + STAKING_HELPER_ADDRESS_NOU );
                 console.log("Success");
             } catch (err) {
                 console.log(err.message);
             }
 
             try {
-                console.log("VERIFYING STAKING_WARMUP_ADDRESS: ", STAKING_WARMUP_ADDRESS);
+                console.log("VERIFYING STAKING_WARMUP_ADDRESS: ", STAKING_WARMUP_ADDRESS_NOU);
                 //// Verify contract on bsc
                 await hre.run("verify:verify", {
-                    address: STAKING_WARMUP_ADDRESS,
+                    address: STAKING_WARMUP_ADDRESS_NOU,
                     constructorArguments: [
-                        STAKING_ADDRESS,
-                        SGLBD_ADDRESS
+                        STAKING_ADDRESS_NOU,
+                        SGLBD_ADDRESS_NOU
                     ],
                 });
-                console.log( "STAKING_WARMUP verified: " + STAKING_WARMUP_ADDRESS );
+                console.log( "STAKING_WARMUP verified: " + STAKING_WARMUP_ADDRESS_NOU );
                 console.log("Success");
             } catch (err) {
                 console.log(err.message);
             }
-
+/*
             try {
                 console.log("VERIFYING BONDING_CALCULATOR_ADDRESS: ", BONDING_CALCULATOR_ADDRESS);
                 //// Verify contract on bsc
@@ -275,7 +286,7 @@ async function main() {
             } catch (err) {
                 console.log(err.message);
             }
-    */
+
         try {
             console.log("VERIFYING BUSD_BOND_ADDRESS: ", "0xfa087ffE428C85Da57750D7700d72C54932040Fb");
             //// Verify contract on bsc
@@ -295,7 +306,7 @@ async function main() {
             console.log(err.message);
         }
 
-
+*/
 
     console.log("VERIFICATION SUCCESSFULLY FINISHED");
 }

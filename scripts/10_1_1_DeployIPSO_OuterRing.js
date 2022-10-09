@@ -82,31 +82,32 @@ async function main() {
     await sGLBD.mint(deployer.address//"0xa978688CE4721f0e28CF85c4C2b0f55d3186736f"
     , INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-*/
-    /*const WGLBDT = await ethers.getContractFactory('wGlobalDAOToken');
-    //let WGLBD = await WGLBDT.attach("0x8AeB0d0F8eb35135eFB9aB9AFDB70F312C059f13");
-    let WGLBD = await WGLBDT.deploy("0xf3922fA91Bb2e2Bf9f694573B3C73cfA765fb1C3"); // TODO canviar per sGLBD
-    console.log("const WGLBD_ADDRESS = '" + WGLBD.address + "';");
 
+    const WGLBDT = await ethers.getContractFactory('wGlobalDAOToken');
+    //let WGLBD = await WGLBDT.attach("0x8AeB0d0F8eb35135eFB9aB9AFDB70F312C059f13");
+    let WGLBD = await WGLBDT.deploy("0xb98c17E24CCC881d11A17c7546a2b907317C0ee7"); // TODO canviar per sGLBD
+    console.log("const WGLBD_ADDRESS = '" + WGLBD.address + "';");
+*/
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));try {
-        console.log("VERIFYING WGLBD: ", WGLBD.address);
+        console.log("VERIFYING WGLBD: ", "0x6644AB5C3549143F8De0B39b2F3efdA332a678A3");
         //// Verify contract on bsc
         await hre.run("verify:verify", {
-            address: WGLBD.address,
+            address: "0x6644AB5C3549143F8De0B39b2F3efdA332a678A3",
             constructorArguments: [
-                "0xf3922fA91Bb2e2Bf9f694573B3C73cfA765fb1C3"
+                "0xb98c17E24CCC881d11A17c7546a2b907317C0ee7"
             ],
+            contract: "contracts/Tokens/WGLBD.sol:wGlobalDAOToken"
         });
         console.log( "Verified WGLBD: " + WGLBD.address );
     } catch (err) {
         console.log(err.message);
-    }*/
+    }
 /*
     await sGLBD.approve(WGLBD.address,largeApproval);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     await WGLBD.wrap(INITIAL_SUPPLY);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));/*
-*/
+
     console.log("[Deploying IPSO GLB SC]");
     const IPSO = await ethers.getContractFactory('IPSO');
     let startTime = Math.round(new Date().getTime()/1000);
@@ -166,7 +167,7 @@ async function main() {
     } catch (err) {
         console.log(err.message);
     }
-
+*/
 
     console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
 }
