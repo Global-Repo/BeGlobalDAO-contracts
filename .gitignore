@@ -1,3 +1,6 @@
 node_modules/
 artifacts/
 cache/
+/.secret_deployer_aa3
+/.secret_deployer_eef
+/.secret_deployer_dd3
