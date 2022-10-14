@@ -19,35 +19,30 @@ const INITIAL_SUPPLY_BIG = BigNumber.from(60000).mul(BIG_NUMBER_TOKEN_DECIMALS_M
 async function main() {
 
     const [deployer] = await ethers.getSigners();
-    let timeoutPeriod = 10000;
+    let timeoutPeriod = 5000;
 
 
-    let startSale = 1663963200;
-    let endSale = 1664568000;
-    let endClaim = 1667854800;
-    let ratioRequiredWGLBDNum = 325;
-    let ratioRequiredWGLBDDenum = 3333333333;
-    let amountForWhitelisted = 325;
-    let minInvestment = 3333333333; //5128205127
+    let startSale = 1665435600;
+    let endSale = 1665864000;
+    let endClaim = 1670274000;
+    let minInvestment = 700;
     let maxInvestment = 999999;
     let raisingAmount = 999999;
+    let hardcap = 999999;
 
     //MAINNET
-    console.log("[Deploying IPSO5 SC]");
-    const IPSO = await ethers.getContractFactory('IPSO5');
+    console.log("[Deploying IPSO9 SC]");
+    const IPSO = await ethers.getContractFactory('IPSO9');
     //let ipso = await IPSO.attach("0x71AcCEE97a220da6D06E4470F640230806345FBd");
     let ipso = await IPSO.deploy(
-        "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
         "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
         startSale,
         endSale,
         endClaim,
-        ratioRequiredWGLBDNum,
-        ratioRequiredWGLBDDenum,
-        BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(minInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(maxInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+        BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+        BigNumber.from(hardcap).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
     );
     console.log("[IPSO deployed]: " + ipso.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
@@ -61,17 +56,14 @@ async function main() {
         await hre.run("verify:verify", {
             address: ipso.address,
             constructorArguments: [
-                "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
                 "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
                 startSale,
                 endSale,
                 endClaim,
-                ratioRequiredWGLBDNum,
-                ratioRequiredWGLBDDenum,
-                BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(minInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(maxInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
+                BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(hardcap).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
             ],
         });
         console.log( "Verified IPSO: " + ipso.address );

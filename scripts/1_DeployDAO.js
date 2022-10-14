@@ -1,11 +1,14 @@
 const { ethers } = require("hardhat");
 const {
+    GLBD_ADDRESS,
     ROUTER_BEGLOBAL_ADDRESS,
     DEPLOYER_ADDRESS,
     BUSD_ADDRESS,
     WETH_ADDRESS,
     FACTORY_ADDRESS,
-} = require("./addresses_testnet");
+    STAKING_ADDRESS_NOU,
+    SGLBD_ADDRESS_NOU
+} = require("./addresses_mainnet");
 
 async function main() {
 
@@ -36,55 +39,55 @@ async function main() {
     let epochLengthInBlocks = '14400';
 
     // Quin bloc serà el primer que doni staking [!]
-    const firstBlockEpoch = '16322544';
+    const firstBlockEpoch = '21945774';
 
     console.log("[Deploying from " + deployer.address + "]");
+    /*
+        // SETUP AMM ENVIRONMENT
+        if (!originalAMM) {
+            // Deploy factory
+            factory = await deployFactory(DEPLOYER_ADDRESS);
+            console.log("const FACTORY_ADDRESS = '" + factory.address+"';");
+            await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+        } else {
+            // Attach factory
+            const Factory = await ethers.getContractFactory("Factory");
+            factory = await Factory.attach(FACTORY_ADDRESS);
+            console.log("[Factory attached]: " + factory.address);
+            await new Promise(r => seimeout(() => r(), timeoutPeriod));
+        }
 
-    // SETUP AMM ENVIRONMENT
-    if (!originalAMM) {
-        // Deploy factory
-        factory = await deployFactory(DEPLOYER_ADDRESS);
-        console.log("const FACTORY_ADDRESS = '" + factory.address+"';");
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    } else {
-        // Attach factory
-        const Factory = await ethers.getContractFactory("Factory");
-        factory = await Factory.attach(FACTORY_ADDRESS);
-        console.log("[Factory attached]: " + factory.address);
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    }
-
-    /*if (!originalAMM) {
-        // Deploy Router
-        router = await deployRouter(factory.address, WETH_ADDRESS); // Direcció WETH random només per tal de que funcioni el router.
-        console.log("const ROUTER_BEGLOBAL_ADDRESS = '" + router.address+"';");
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    } else {
-        // Attach Router
-        const Router = await ethers.getContractFactory("Router");
-        router = await Router.attach(ROUTER_BEGLOBAL_ADDRESS);
-        console.log("[Router attached]: " + router.address);
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    }*/
-
-
-    if (deployBUSD) {
-        // Deploy BUSD
-        busd = await BUSD.deploy();
-        console.log("const BUSD_ADDRESS = '" + busd.address+"';");
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    } else {
-        // Attach BUSD
-        busd = await BUSD.attach(BUSD_ADDRESS);
-        console.log("[BUSDt attached]: " + busd.address);
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-    }
+        /*if (!originalAMM) {
+            // Deploy Router
+            router = await deployRouter(factory.address, WETH_ADDRESS); // Direcció WETH random només per tal de que funcioni el router.
+            console.log("const ROUTER_BEGLOBAL_ADDRESS = '" + router.address+"';");
+            await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+        } else {
+            // Attach Router
+            const Router = await ethers.getContractFactory("Router");
+            router = await Router.attach(ROUTER_BEGLOBAL_ADDRESS);
+            console.log("[Router attached]: " + router.address);
+            await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+        }
 
 
-    // Deploy GLBD
-    GLBD = await GLBDT.deploy();
-    console.log("const GLBD_ADDRESS = '" + GLBD.address+"';");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+        if (deployBUSD) {
+            // Deploy BUSD
+            busd = await BUSD.deploy();
+            console.log("const BUSD_ADDRESS = '" + busd.address+"';");
+            await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+        } else {
+            // Attach BUSD
+            busd = await BUSD.attach(BUSD_ADDRESS);
+            console.log("[BUSDt attached]: " + busd.address);
+            await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+        }
+
+
+        // Deploy GLBD
+        GLBD = await GLBDT.deploy();
+        console.log("const GLBD_ADDRESS = '" + GLBD.address+"';");
+        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy sGLBD
     sGLBD = await sGLBDT.deploy();
@@ -127,20 +130,22 @@ async function main() {
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy Staking
-    const Staking = await ethers.getContractFactory('GlobalDAOStaking');
-    staking = await Staking.deploy(GLBD.address, sGLBD.address, epochLengthInBlocks, 0, firstBlockEpoch);
+    //const Staking = await ethers.getContractFactory('GlobalDAOStaking');
+    //staking = await Staking.deploy(GLBD.address, sGLBD.address, epochLengthInBlocks, 0, firstBlockEpoch);
+    const Staking = await ethers.getContractFactory('StakingWithEarlyPenaltyFee');
+    staking = await Staking.deploy(GLBD_ADDRESS, sGLBD.address, deployer.address, epochLengthInBlocks, 535, firstBlockEpoch);
     console.log("const STAKING_ADDRESS = '" + staking.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     // Deploy StakingHelper
     const StakingHelper = await ethers.getContractFactory('StakingHelper');
-    stakingHelper = await StakingHelper.deploy(staking.address, GLBD.address);
+    stakingHelper = await StakingHelper.deploy(staking.address, GLBD_ADDRESS);
     console.log("const STAKING_HELPER_ADDRESS = '" + stakingHelper.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
+*/
     // Deploy WarmUp
     const StakingWarmup = await ethers.getContractFactory('StakingWarmup');
-    stakingWarmup = await StakingWarmup.deploy(staking.address, sGLBD.address);
+    stakingWarmup = await StakingWarmup.deploy(STAKING_ADDRESS_NOU, SGLBD_ADDRESS_NOU);
     console.log("const STAKING_WARMUP_ADDRESS = '" + stakingWarmup.address+"';");
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 

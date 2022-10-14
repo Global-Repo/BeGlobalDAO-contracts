@@ -22,13 +22,13 @@ async function main() {
     let timeoutPeriod = 10000;
 
 
-    let startSale = 1663963200;
-    let endSale = 1664568000;
-    let endClaim = 1667854800;
-    let ratioRequiredWGLBDNum = 325;
-    let ratioRequiredWGLBDDenum = 3333333333;
-    let amountForWhitelisted = 325;
-    let minInvestment = 3333333333; //5128205127
+    let startSale = 1665691200;
+    let endSale = 1665950400;
+    let endClaim = 1671138000;
+    let ratioRequiredWGLBDNum = 15;
+    let ratioRequiredWGLBDDenum = 833333333333;
+    let amountForWhitelisted = 150000000;
+    let minInvestment = 8333333333; //5128205127
     let maxInvestment = 999999;
     let raisingAmount = 999999;
 
@@ -38,13 +38,13 @@ async function main() {
     //let ipso = await IPSO.attach("0x71AcCEE97a220da6D06E4470F640230806345FBd");
     let ipso = await IPSO.deploy(
         "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
-        "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
+        "0x2170ed0880ac9a755fd29b2688956bd959f933f8", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
         startSale,
         endSale,
         endClaim,
         ratioRequiredWGLBDNum,
         ratioRequiredWGLBDDenum,
-        BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+        BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
         BigNumber.from(minInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(maxInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
         BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
@@ -52,8 +52,8 @@ async function main() {
     console.log("[IPSO deployed]: " + ipso.address);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-    await ipso.pushManagement("0xF386A7d8eB28a4e507553760c92E8B4D9D1D0eEf");
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    //await ipso.pushManagement("0xF386A7d8eB28a4e507553760c92E8B4D9D1D0eEf");
+    //await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
     try {
         console.log("VERIFYING IPSO: ", ipso.address);
@@ -62,13 +62,13 @@ async function main() {
             address: ipso.address,
             constructorArguments: [
                 "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
-                "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
+                "0x2170ed0880ac9a755fd29b2688956bd959f933f8", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
                 startSale,
                 endSale,
                 endClaim,
                 ratioRequiredWGLBDNum,
                 ratioRequiredWGLBDDenum,
-                BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
+                BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_LITTLE),
                 BigNumber.from(minInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(maxInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
                 BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)

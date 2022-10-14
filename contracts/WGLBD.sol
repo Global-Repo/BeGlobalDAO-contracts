@@ -772,7 +772,7 @@ interface IsGLBDOLD {
     function index() external view returns (uint256);
 }
 
-contract wGlobalDAOToken is ERC20 {
+contract WGLBD is ERC20 {
     using SafeERC20 for ERC20;
     using Address for address;
     using SafeMath for uint256;

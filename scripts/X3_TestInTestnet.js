@@ -1,3 +1,9 @@
+// IMPORTANT PEL TEST5 NECESSITEM ENVIAR SGLBD DE DEPLOYER_ADDRESS A ADDRE1,2,3. SI NO, NO PODEM FER UNSTKAE.
+// SHA DENVIAR SGLBD A TOTHOM QUE SE LI MIGRI AUTOMÀTICAMENT.
+// AQUEST SGLBD HA DE SER UN NOU TOKEN JA QUE NO TENIM ACCÉS A L'ANTERIOR.
+// FA FALTA DEFINIR UNA FEEWALLET
+
+
 const { ethers } = require("hardhat");
 const {
     GLBD_ADDRESS_V2,
@@ -22,7 +28,7 @@ let StakingWarmup;
 let Treasury;
 let BUSD;
 let Distributor;
-let deploys = false;
+let deploys = true;
 let test1 = true;
 let test2 = false;
 let test3 = false;
@@ -45,11 +51,17 @@ function returnMinutes() {
     return min;
 }
 
+function returnHours() {
+    const d = new Date();
+    let min = d.getHours();
+    return min;
+}
+
 async function main() {
 
     // Wallets que nos creamos para los tests
     const [testAccount, addr1, addr2, addr3] = await ethers.getSigners();
-    let timeoutPeriod = 5000;
+    let timeoutPeriod = 3000;
 
     // getContractFactories
     const GLBDT = await ethers.getContractFactory('GlobalDAOToken');
@@ -227,36 +239,44 @@ async function main() {
     }
 
     let _fullAmount = 100000000000;
+    let _base9 = 1000000000;
     Staking.setFeeWallet(FEE_ADDRESS_B);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
     Staking.setEarlyUnstakingFee(2000);
     await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+
+    let _GLBDFee;
+    let _userAmount;
+
     if (test1) {
-        // Stake 1 básico.
+        // Stake 1 básico. Nota: la fee és general i el seu valor no depèn del moment de l'staking
         console.log("------------------------------------------------------------------------------ 1 ------------------------------------------------------------------------------");
-        console.log("[Deployer] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS) + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS) + "'");
-        console.log("[Staking] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
-        console.log("[GLBD to stake = '" + _fullAmount + "']");
+        console.log("[Deployer] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "'");
+        console.log("[Staking] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
+        console.log("[Fee wallet] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "' y '" + await sGLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "'");
+        console.log("[GLBD to stake = '" + _fullAmount/_base9 + "']");
         let fee2apply = await Staking.unstakingFee(DEPLOYER_ADDRESS, 0);
         await StakingHelper.stake(_fullAmount, DEPLOYER_ADDRESS);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-        console.log("[Deployer] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS) + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS) + "'");
-        console.log("[Staking] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
+        console.log("[Deployer] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "'");
+        console.log("[Staking] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
 
-        let _GLBDFee = fee2apply == 0 ? 0 : (_fullAmount * (fee2apply)) / (10000);
-        let _userAmount = _fullAmount - _GLBDFee;
-        console.log("[fee2apply: '" + fee2apply + "']");
-        console.log("[_GLBDFee: '" + _GLBDFee + "']");
-        console.log("[_userAmount: '" + _userAmount + "']");
+        _GLBDFee = fee2apply == 0 ? 0 : (_fullAmount * (fee2apply)) / (10000);
+        _userAmount = _fullAmount - _GLBDFee;
+        console.log("[fee2apply: '" + fee2apply/100 + "']");
+        console.log("[_GLBDFee: '" + _GLBDFee/_base9 + "']");
+        console.log("[_userAmount: '" + _userAmount/_base9 + "']");
 
         Staking.unstake(_fullAmount);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-        console.log("[Deployer] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS) + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS) + "'");
-        console.log("[Staking] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
+        console.log("[Deployer] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "'");
+        console.log("[Staking] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
+        console.log("[Fee wallet] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "' y '" + await sGLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "'");
+        console.log("Quantitat que hem stakejat i unstakejat: " + _fullAmount/_base9 + " = _userAmount("+_userAmount/_base9+") + _GLBDFee("+_GLBDFee/_base9+")");
     }
 
     if (test2) {
@@ -267,40 +287,44 @@ async function main() {
 
         await Staking.setEarlyUnstakingFee(750);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-        console.log("[Deployer] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS) + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS) + "'");
-        console.log("[Staking] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
-        console.log("[GLBD to stake = '" + _fullAmount + "']");
+        console.log("[Deployer] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "'");
+        console.log("[Staking] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
+        console.log("[Fee wallet] balance GLBD and sGLBD before staking --> = '" + await GLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "' y '" + await sGLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "'");
+        console.log("[GLBD to stake = '" + _fullAmount/_base9 + "']");
         fee2apply = await Staking.unstakingFee(DEPLOYER_ADDRESS, 0);
         await StakingHelper.stake(_fullAmount, DEPLOYER_ADDRESS);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-        console.log("[Deployer] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS) + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS) + "'");
-        console.log("[Staking] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
+        console.log("[Deployer] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "'");
+        console.log("[Staking] balance GLBD and sGLBD after staking --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
 
         _GLBDFee = fee2apply == 0 ? 0 : (_fullAmount * (fee2apply)) / (10000);
         _userAmount = _fullAmount - _GLBDFee;
-        console.log("[fee2apply: '" + fee2apply + "']");
-        console.log("[_GLBDFee: '" + _GLBDFee + "']");
-        console.log("[_userAmount: '" + _userAmount + "']");
+        console.log("[fee2apply: '" + fee2apply/100 + "']");
+        console.log("[_GLBDFee: '" + _GLBDFee/_base9 + "']");
+        console.log("[_userAmount: '" + _userAmount/_base9 + "']");
 
         await Staking.unstake(_fullAmount);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-        console.log("[Deployer] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS) + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS) + "'");
-        console.log("[Staking] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
+        console.log("[Deployer] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "' y '" + await sGLBD.balanceOf(DEPLOYER_ADDRESS)/_base9 + "'");
+        console.log("[Staking] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
+        console.log("[Fee wallet] balance GLBD and sGLBD after unstaking --> = '" + await GLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "' y '" + await sGLBD.balanceOf(FEE_ADDRESS_B)/_base9 + "'");
+        console.log("Quantitat que hem stakejat i unstakejat: " + _fullAmount/_base9 + " = _userAmount("+_userAmount/_base9+") + _GLBDFee("+_GLBDFee/_base9+")");
     }
     if (test3) {
         // Migrators
         console.log("------------------------------------------------------------------------------ 3 ------------------------------------------------------------------------------");
         let _withdrawAmount = 1000000000;
-        console.log("[Staking] balance GLBD and sGLBD BEFORE recovering "+_withdrawAmount/1000000000+" tokens --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
+        console.log("[Staking] balance GLBD and sGLBD BEFORE recovering "+_withdrawAmount/_base9+" tokens --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
         await Staking.recoverWrongTokensIERC20(SGLBD_ADDRESS_V2, _withdrawAmount);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-        await Staking.recoverWrongTokensIERC20(GLBD_ADDRESS_V2, _withdrawAmount);
+
+        //await Staking.recoverWrongTokensIERC20(GLBD_ADDRESS_V2, _withdrawAmount);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-        console.log("[Staking] balance GLBD and sGLBD AFTER recovering "+_withdrawAmount/1000000000+" tokens --> = '" + await GLBD.balanceOf(Staking.address) + "' y '" + await sGLBD.balanceOf(Staking.address) + "'");
+        console.log("[Staking] balance GLBD and sGLBD AFTER recovering twice "+_withdrawAmount/_base9+" tokens --> = '" + await GLBD.balanceOf(Staking.address)/_base9 + "' y '" + await sGLBD.balanceOf(Staking.address)/_base9 + "'");
 
     }
 
@@ -320,7 +344,7 @@ async function main() {
         await new Promise(r => setTimeout(() => r(), timeoutPeriod*2));
         let _PeriodInBlocks = await Staking.periodInBlocks();
         let _unstakingFee = await Staking.unstakingFee(DEPLOYER_ADDRESS, 0);
-        console.log("[Staking 1] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
+        console.log("[Staking 1] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnHours()+":"+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
         await Staking.unstake(_unstakingAmount);
         let _GLBDFee = _unstakingFee == 0 ? 0 : (_unstakingAmount * (_unstakingFee)) / (10000);
         let _userAmount = _unstakingAmount - _GLBDFee;
@@ -331,18 +355,18 @@ async function main() {
 
         _PeriodInBlocks = await Staking.periodInBlocks();
         _unstakingFee = await Staking.unstakingFee(DEPLOYER_ADDRESS, 0);
-        console.log("[Staking 2] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
+        console.log("[Staking 2] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnHours()+":"+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
         await Staking.unstake(_unstakingAmount);
         _GLBDFee = _unstakingFee == 0 ? 0 : (_unstakingAmount * (_unstakingFee)) / (10000);
         _userAmount = _unstakingAmount - _GLBDFee;
         console.log("[fee2apply 2: '" + _unstakingFee + "']");
         console.log("[_GLBDFee 2: '" + _GLBDFee + "']");
         console.log("[_userAmount 2: '" + _userAmount + "']");
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod*21));
+        await new Promise(r => setTimeout(() => r(), timeoutPeriod*20));
 
         _PeriodInBlocks = await Staking.periodInBlocks();
         _unstakingFee = await Staking.unstakingFee(DEPLOYER_ADDRESS, 0);
-        console.log("[Staking 3] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
+        console.log("[Staking 3] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnHours()+":"+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
         await Staking.unstake(_unstakingAmount);
         _GLBDFee = _unstakingFee == 0 ? 0 : (_unstakingAmount * (_unstakingFee)) / (10000);
         _userAmount = _unstakingAmount - _GLBDFee;
@@ -353,7 +377,7 @@ async function main() {
 
         _PeriodInBlocks = await Staking.periodInBlocks();
         _unstakingFee = await Staking.unstakingFee(DEPLOYER_ADDRESS, 0);
-        console.log("[Staking 4] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
+        console.log("[Staking 4] Block period --> = '" + _PeriodInBlocks + "'. Fee actual: " + _unstakingFee + ". Current time: "+returnHours()+":"+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + "'");
         await Staking.unstake(_unstakingAmount);
         _GLBDFee = _unstakingFee == 0 ? 0 : (_unstakingAmount * (_unstakingFee)) / (10000);
         _userAmount = _unstakingAmount - _GLBDFee;
@@ -363,11 +387,11 @@ async function main() {
     }
 
     if (test5) {
-        // PeriodInBlocks
+        // PeriodInBlocks. Provem de posar un o varios stakers que fan una migració
         console.log("------------------------------------------------------------------------------ 5 ------------------------------------------------------------------------------");
         let _stakingAmount = 100000000000; //100
         let _unstakingAmount = 100000000000/4; //100
-        await Staking.setBlockPeriod(10); // 0.5 minutos
+        await Staking.setBlockPeriod(10); // 0.5 minutos = 30''
         console.log("[New staking --> = setBlockPeriod]");
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
@@ -376,15 +400,15 @@ async function main() {
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
         await StakingHelper.stake(_stakingAmount, DEPLOYER_ADDRESS); // Random account stakes GLBD so staking contract has tokens in
-        console.log("[New staking --> = StakingHelper.stake]");
+        console.log("[New staking DEPLOYER--> = StakingHelper.stake]. Current time: "+returnHours()+":"+returnMinutes()+":" + returnSeconds());
         await new Promise(r => setTimeout(() => r(), timeoutPeriod*2));
 
         Staking.setInitialDepositDateForStaker('21005846', addr1.address); // Aquest bloc ja ha passat fa temps així que tot i que el deployer acaba de fer staking i ha d'esperar per treure sense fee, el addr1 hauria de poder-ho treureu tot sense pagar la fee.
-        console.log("[New staking --> = setInitialDepositDateForStaker]");
+        console.log("[New staking --> = setInitialDepositDateForStaker: 21005846. "+addr1.address+"]");
         await new Promise(r => setTimeout(() => r(), timeoutPeriod*2));
 
         Staking.setInitialDepositDateForStakers(['21005846', '2100584'], [addr2.address, addr3.address]); // Aquest bloc ja ha passat fa temps així que tot i que el deployer acaba de fer staking i ha d'esperar per treure sense fee, el addr1 hauria de poder-ho treureu tot sense pagar la fee.
-        console.log("[New staking --> = setInitialDepositDateForStakers]");
+        console.log("[New staking --> = setInitialDepositDateForStaker: 21005846 -> "+addr2.address+". 2100584 -> "+addr3.address+"]");
         await new Promise(r => setTimeout(() => r(), timeoutPeriod*2));
 
         let _PeriodInBlocks = await Staking.periodInBlocks();
@@ -393,48 +417,52 @@ async function main() {
         console.log("[New Staking --> = '" + _PeriodInBlocks + "'. Fee deployer: " + _unstakingFee0 + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(DEPLOYER_ADDRESS) + ". Unstaking fee: '" + _unstakingFee0 + "'");
         let _GLBDFee0 = _unstakingFee0 == 0 ? 0 : (_unstakingAmount * (_unstakingFee0)) / (10000);
         let _userAmount0 = _unstakingAmount - _GLBDFee0;
-        console.log("[fee2apply 0: '" + _unstakingFee0 + "']");
+        console.log("[fee2apply 0 (deployer - max): '" + _unstakingFee0 + "']");
         console.log("[_GLBDFee 0: '" + _GLBDFee0 + "']");
         console.log("[_userAmount 0: '" + _userAmount0 + "']");
 
-        let _unstakingFee1 = await Staking.connect(addr1).unstakingFee(addr1.address, 0);
+        let _unstakingFee1 = await Staking.connect(addr1.address).unstakingFee(addr1.address, 0);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-        console.log("[New Staking --> = '" + _PeriodInBlocks + "'. Fee addr1: " + _unstakingFee1 + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(addr1) + ". Unstaking fee: '" + _unstakingFee1 + "'");
+        console.log("[New Staking --> = '" + _PeriodInBlocks + "'. Fee addr1: " + _unstakingFee1 + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(addr1.address) + ". Unstaking fee: '" + _unstakingFee1 + "'");
         let _GLBDFee1 = _unstakingFee1 == 0 ? 0 : (_unstakingAmount * (_unstakingFee1)) / (10000);
         let _userAmount1 = _unstakingAmount - _GLBDFee1;
-        console.log("[fee2apply 1: '" + _unstakingFee1 + "']");
+        console.log("[fee2apply 1 (old - no fee): '" + _unstakingFee1 + "']");
         console.log("[_GLBDFee 1: '" + _GLBDFee1 + "']");
         console.log("[_userAmount 1: '" + _userAmount1 + "']");
 
-        let _unstakingFee2 = await Staking.connect(addr2).unstakingFee(addr2.address, 0);
+        let _unstakingFee2 = await Staking.connect(addr2.address).unstakingFee(addr2.address, 0);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-        console.log("[New Staking --> = '" + _PeriodInBlocks + "'. Fee addr2: " + _unstakingFee2 + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(addr2) + ". Unstaking fee: '" + _unstakingFee2 + "'");
+        console.log("[New Staking --> = '" + _PeriodInBlocks + "'. Fee addr2: " + _unstakingFee2 + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(addr2.address) + ". Unstaking fee: '" + _unstakingFee2 + "'");
         let _GLBDFee2 = _unstakingFee2 == 0 ? 0 : (_unstakingAmount * (_unstakingFee2)) / (10000);
         let _userAmount2 = _unstakingAmount - _GLBDFee2;
-        console.log("[fee2apply 2: '" + _unstakingFee2 + "']");
+        console.log("[fee2apply 2 (old - no fee): '" + _unstakingFee2 + "']");
         console.log("[_GLBDFee 2: '" + _GLBDFee2 + "']");
         console.log("[_userAmount 2: '" + _userAmount2 + "']");
 
-        let _unstakingFee3 = await Staking.connect(addr3).unstakingFee(addr3.address, 0);
+        let _unstakingFee3 = await Staking.connect(addr3.address).unstakingFee(addr3.address, 0);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-        console.log("[New Staking --> = '" + _PeriodInBlocks + "'. Fee addr3: " + _unstakingFee3 + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(addr3) + ". Unstaking fee: '" + _unstakingFee3 + "'");
+        console.log("[New Staking --> = '" + _PeriodInBlocks + "'. Fee addr3: " + _unstakingFee3 + ". Current time: "+returnMinutes()+":" + returnSeconds() + ". Last deposit: " + await Staking.lastBlockDepositedByWallet(addr3.address) + ". Unstaking fee: '" + _unstakingFee3 + "'");
         let _GLBDFee3 = _unstakingFee3 == 0 ? 0 : (_unstakingAmount * (_unstakingFee3)) / (10000);
         let _userAmount3 = _unstakingAmount - _GLBDFee3;
-        console.log("[fee2apply 3: '" + _unstakingFee3 + "']");
+        console.log("[fee2apply 3 (old - no fee): '" + _unstakingFee3 + "']");
         console.log("[_GLBDFee 3: '" + _GLBDFee3 + "']");
         console.log("[_userAmount 3: '" + _userAmount3 + "']");
 
+        // NECESSITEM SGLBD PER TAL DE PODER FER UNSTAKE!!!!!!!!
+        await Staking.connect(addr1.address).unstake(_unstakingAmount);
+        /*
         await Staking.unstake(_unstakingAmount);
+        /*
+        await new Promise(r => setTimeout(() => r(), timeoutPeriod*5));
+
+        await Staking.connect(addr1.address).unstake(_unstakingAmount);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-        await Staking.connect(addr1).unstake(_unstakingAmount);
+        await Staking.connect(addr2.address).unstake(_unstakingAmount);
         await new Promise(r => setTimeout(() => r(), timeoutPeriod));
 
-        await Staking.connect(addr2).unstake(_unstakingAmount);
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
-
-        await Staking.connect(addr3).unstake(_unstakingAmount);
-        await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+        await Staking.connect(addr3.address).unstake(_unstakingAmount);
+        await new Promise(r => setTimeout(() => r(), timeoutPeriod));*/
     }
 }
 
