@@ -607,7 +607,7 @@ contract StakingWithEarlyPenaltyFee is Ownable {
     }
 
     /**
-        @notice early unstaking fee, max of 20%. Could be uint16
+        @notice early unstaking fee, max of 30%. Could be uint16
         @param _fee uint256
     */
     function setEarlyUnstakingFee(uint256 _fee) external onlyManager{
@@ -731,9 +731,10 @@ contract StakingWithEarlyPenaltyFee is Ownable {
         @notice redeem sGLBD for GLBD. Considers earlyUnstakingFee
         @param _fullAmount uint
      */
-    function unstake( uint _fullAmount) external {
-        rebase();
-
+    function unstake( uint _amount, bool _trigger ) external {
+        if ( _trigger ) {
+            rebase();
+        }
         uint fee2apply = unstakingFee(msg.sender, block.number);
         uint _GLBDFee = fee2apply == 0? 0 : _fullAmount.mul(fee2apply).div(10000);
         uint _userAmount = _fullAmount.sub(_GLBDFee);
