@@ -549,8 +549,9 @@ contract StakingWithEarlyPenaltyFee is Ownable {
     address public immutable GLBD;
     address public immutable sGLBD;
 
-    event AdminTokenRecoveryIBEP20(address tokenRecovered, uint256 amount);
     event AdminTokenRecoveryIERC20(address tokenRecovered, uint256 amount);
+    event AddressStakes(address wallet, uint amount, uint block);
+    event AddressUnstakes(address wallet, uint amount, uint GLBDfee);
 
     struct Epoch {
         uint length;
@@ -610,7 +611,7 @@ contract StakingWithEarlyPenaltyFee is Ownable {
         @param _fee uint256
     */
     function setEarlyUnstakingFee(uint256 _fee) external onlyManager{
-        require(_fee < 2001, "Fee is too high");
+        require(_fee < 3001, "Fee is too high");
         fee = _fee;
     }
 
@@ -683,6 +684,7 @@ contract StakingWithEarlyPenaltyFee is Ownable {
         @notice stake GLBD to enter warmup and register the current block
         @param _amount uint
         @return bool
+        @dev the fee is a master one AKA it's not stored individually for each deposit
      */
     function stake( uint _amount, address _recipient ) external returns ( bool ) {
         rebase();
@@ -701,6 +703,7 @@ contract StakingWithEarlyPenaltyFee is Ownable {
 
         IERC20( sGLBD ).safeTransfer( warmupContract, _amount );
         lastBlockDepositedByWallet[ _recipient ] = block.number;
+        emit AddressStakes(_recipient, _amount, block.number);
         return true;
     }
 
@@ -731,7 +734,7 @@ contract StakingWithEarlyPenaltyFee is Ownable {
     function unstake( uint _fullAmount) external {
         rebase();
 
-        uint fee2apply = unstakingFee(msg.sender, 0);
+        uint fee2apply = unstakingFee(msg.sender, block.number);
         uint _GLBDFee = fee2apply == 0? 0 : _fullAmount.mul(fee2apply).div(10000);
         uint _userAmount = _fullAmount.sub(_GLBDFee);
 
@@ -741,15 +744,17 @@ contract StakingWithEarlyPenaltyFee is Ownable {
         if(_GLBDFee > 0){
             IERC20( GLBD ).safeTransfer( feeWallet, _GLBDFee );
         }
+
+        emit AddressUnstakes(msg.sender, _userAmount, _GLBDFee);
     }
 
     /**
-        @notice returns the current early unstaking fee of a specific address at a specific block
+        @notice returns the current early unstaking fee of a specific address at a specific block. If block = 0 -> We see the current fee; block > 0 -> we calculate fee in block X
         @return uint256
     */
     function unstakingFee(address _addr, uint _block) public view returns ( uint256 ) {
-        require(_block > lastBlockDepositedByWallet[ _addr ] || _block == 0, "Block is not correct");
-        uint blocks = _block == 0? block.number.sub(lastBlockDepositedByWallet[ _addr ]): _block.sub(lastBlockDepositedByWallet[ _addr ]);
+        require(_block > lastBlockDepositedByWallet[ _addr ], "Block is not correct");
+        uint blocks = _block.sub(lastBlockDepositedByWallet[ _addr ]);
         uint fee2apply;
         if (blocks < periodInBlocks ){
             fee2apply = fee.mul(3);
