@@ -731,7 +731,7 @@ contract StakingWithEarlyPenaltyFee is Ownable {
         @notice redeem sGLBD for GLBD. Considers earlyUnstakingFee
         @param _fullAmount uint
      */
-    function unstake( uint _amount, bool _trigger ) external {
+    function unstake( uint _fullAmount, bool _trigger ) external {
         if ( _trigger ) {
             rebase();
         }
