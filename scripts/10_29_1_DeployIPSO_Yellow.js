@@ -19,67 +19,39 @@ const INITIAL_SUPPLY_BIG = BigNumber.from(60000).mul(BIG_NUMBER_TOKEN_DECIMALS_M
 async function main() {
 
     const [deployer] = await ethers.getSigners();
-    let timeoutPeriod = 10000;
 
-
-    let startSale = 1661198400;
-    let endSale = 1661889600;
-    let endClaim = 1665864000;
-    let ratioRequiredWGLBDNum = 400;
-    let ratioRequiredWGLBDDenum = 3448275;
-    let amountForWhitelisted = 600;
-    let minInvestment = 3448275;
-    let maxInvestment = 999999;
-    let raisingAmount = 999999;
-
-    //MAINNET
-    console.log("[Deploying IPSO5 SC]");
+    console.log('Deploying contracts. Deployer account: ' + deployer.address);
+    console.log("[Disperse statistics for Yellow]");
     const IPSO = await ethers.getContractFactory('IPSO5');
-    //let ipso = await IPSO.attach("0x71AcCEE97a220da6D06E4470F640230806345FBd");
-    let ipso = await IPSO.deploy(
-        "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
-        "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
-        startSale,
-        endSale,
-        endClaim,
-        ratioRequiredWGLBDNum,
-        ratioRequiredWGLBDDenum,
-        BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(minInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(maxInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-        BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
-    );
-    console.log("[IPSO deployed]: " + ipso.address);
-    await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    let ipso = await IPSO.attach("0x324888D5E7132bF17E2F7380E4e2F4c0a4ae7Ee7");
 
-    //await ipso.setWhitelist("0xa978688CE4721f0e28CF85c4C2b0f55d3186736f");
-    //await new Promise(r => setTimeout(() => r(), timeoutPeriod));
+    let user;
+    //let userAllocation;
+    let amountInvested;
+    const numUsers = await ipso.getAddressListLength();
+    const totalAmountInvested = await ipso.totalAmountInvested();
+    const raisingAmount = await ipso.raisingAmount();
 
-    try {
-        console.log("VERIFYING IPSO: ", ipso.address);
-        //// Verify contract on bsc
-        await hre.run("verify:verify", {
-            address: ipso.address,
-            constructorArguments: [
-                "0xbe7cbd94060f237ca06596a92c60b728ee891ab6", //"0x5Cb0be00673Cc760f87Fa9E8f4Ea01e672cF7f15",
-                "0xe9e7cea3dedca5984780bafc599bd69add087d56", //"0x5eF57C527D360cfcAe8FE801b2bbB931f492b92b",
-                startSale,
-                endSale,
-                endClaim,
-                ratioRequiredWGLBDNum,
-                ratioRequiredWGLBDDenum,
-                BigNumber.from(amountForWhitelisted).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(minInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(maxInvestment).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG),
-                BigNumber.from(raisingAmount).mul(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG)
-            ],
-        });
-        console.log( "Verified IPSO: " + ipso.address );
-    } catch (err) {
-        console.log(err.message);
+    console.log("totalAmountInvested");
+    console.log(totalAmountInvested/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    console.log("raisingAmount");
+    console.log(raisingAmount/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    console.log("numUsers");
+    console.log(numUsers);
+
+    for (let i = 0; i < numUsers; i++) {
+        user = await ipso.addressList(i);
+        console.log(user);
     }
 
-    console.log("DEPLOYMENT SUCCESSFULLY FINISHED");
+    for (let i = 0; i < numUsers; i++) {
+        user = await ipso.addressList(i);
+        [amountInvested,,,,,,] = await ipso.userInfo(user);
+        //refunded /= 1000000000000000000;
+        console.log((amountInvested*raisingAmount)/(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG*totalAmountInvested));
+    }
+
+    console.log("Statistics successfully printed");
 }
 
 

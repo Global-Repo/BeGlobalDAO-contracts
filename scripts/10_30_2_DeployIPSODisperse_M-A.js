@@ -21,9 +21,9 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
-    console.log("[Disperse statistics for Basketverse]");
-    const IPSO = await ethers.getContractFactory('IPSO3');
-    let ipso = await IPSO.attach("0x729cf4928C332Cc6964AE3acE91Dfc0283f67A01");
+    console.log("[Disperse statistics for M-A]");
+    const IPSO = await ethers.getContractFactory('IPSO5');
+    let ipso = await IPSO.attach("0x5Cf3E9a090e7E983FA255b7f503e0Cd833A1A920");
 
     let user;
     //let userAllocation;
@@ -36,6 +36,8 @@ async function main() {
     console.log(totalAmountInvested/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     console.log("raisingAmount");
     console.log(raisingAmount/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    console.log("numUsers");
+    console.log(numUsers);
 
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
@@ -46,7 +48,7 @@ async function main() {
         user = await ipso.addressList(i);
         [amountInvested,,,,,,] = await ipso.userInfo(user);
         //refunded /= 1000000000000000000;
-        console.log(amountInvested/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+        console.log((amountInvested)/(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG));
     }
 
     console.log("Statistics successfully printed");
@@ -58,5 +60,5 @@ main()
     .catch(error => {
         console.error(error);
         process.exit(1);
-})
+    })
 

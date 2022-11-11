@@ -21,9 +21,11 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
-    console.log("[Disperse statistics for Basketverse]");
-    const IPSO = await ethers.getContractFactory('IPSO3');
-    let ipso = await IPSO.attach("0x729cf4928C332Cc6964AE3acE91Dfc0283f67A01");
+
+    //MAINNET
+    console.log("[Disperse statistics for Metarail]");
+    const IPSO = await ethers.getContractFactory('IPSO2');
+    let ipso = await IPSO.attach("0xab31CDd431183313e95d661A75386935364787ba");
 
     let user;
     //let userAllocation;

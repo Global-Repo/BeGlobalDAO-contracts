@@ -21,9 +21,9 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
-    console.log("[Disperse statistics for Basketverse]");
-    const IPSO = await ethers.getContractFactory('IPSO3');
-    let ipso = await IPSO.attach("0x729cf4928C332Cc6964AE3acE91Dfc0283f67A01");
+    console.log("[Disperse statistics for Pontem]");
+    const IPSO = await ethers.getContractFactory('IPSO5');
+    let ipso = await IPSO.attach("0xdD15055960e5B780968bD34384E686735C9bEBAE");
 
     let user;
     //let userAllocation;
@@ -36,6 +36,8 @@ async function main() {
     console.log(totalAmountInvested/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
     console.log("raisingAmount");
     console.log(raisingAmount/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    console.log("numUsers");
+    console.log(numUsers);
 
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);

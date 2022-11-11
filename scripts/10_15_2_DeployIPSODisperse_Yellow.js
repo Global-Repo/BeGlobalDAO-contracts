@@ -21,54 +21,35 @@ async function main() {
     const [deployer] = await ethers.getSigners();
 
     console.log('Deploying contracts. Deployer account: ' + deployer.address);
-
-    //MAINNET
-    console.log("[Disperse statistics for Plutonian]");
+    console.log("[Disperse statistics for Yellow]");
     const IPSO = await ethers.getContractFactory('IPSO5');
     let ipso = await IPSO.attach("0x324888D5E7132bF17E2F7380E4e2F4c0a4ae7Ee7");
 
     let user;
-    let claimWallet;
-    let userAllocation;
-    let refunded;
-    let amountToDistribute;
+    //let userAllocation;
     let amountInvested;
     const numUsers = await ipso.getAddressListLength();
-    const raisingAmount = await ipso.raisingAmount();
     const totalAmountInvested = await ipso.totalAmountInvested();
-    const tokensToDisperse = 2923433;
-    /*const tokensToDisperseUser1 = tokensToDisperse * 0.015;
-    const tokensToDisperseUser2 = tokensToDisperse * 0.01;*/
-    const tokensToDisperseToUsers = tokensToDisperse; // * 0.95;
+    const raisingAmount = await ipso.raisingAmount();
 
-    console.log(totalAmountInvested);
+    console.log("totalAmountInvested");
+    console.log(totalAmountInvested/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    console.log("raisingAmount");
+    console.log(raisingAmount/BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG);
+    console.log("numUsers");
+    console.log(numUsers);
 
-    /*console.log("", tokensToDisperseUser1.toFixed(2));
-    console.log("", tokensToDisperseUser2.toFixed(2));*/
-
-    /*for (let i = 0; i < numUsers; i++) {
+    for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
         console.log(user);
     }
 
     for (let i = 0; i < numUsers; i++) {
         user = await ipso.addressList(i);
-        [userAllocation,,,,,,] = await ipso.userInfo(user);
-        amountToDistribute = tokensToDisperseToUsers * userAllocation / totalAmountInvested;
-        console.log(amountToDistribute.toFixed(2));
-    }*/
-
-    console.log("Number of users: ", numUsers);
-    for (let i = 0; i < numUsers; i++) {
-        user = await ipso.addressList(i);
-        [userAllocation,,,,,,] = await ipso.userInfo(user);
-        userAllocation /= 1000000000000000000;
-        refunded /= 1000000000000000000;
-        //amountInvested = userAllocation * 0.91;
-        //amountInvested = userAllocation * raisingAmount / totalAmountInvested;
-        console.log(user, userAllocation);
+        [amountInvested,,,,,,] = await ipso.userInfo(user);
+        //refunded /= 1000000000000000000;
+        console.log((amountInvested*raisingAmount)/(BIG_NUMBER_TOKEN_DECIMALS_MULTIPLIER_BIG*totalAmountInvested));
     }
-
 
     console.log("Statistics successfully printed");
 }
