@@ -27,12 +27,12 @@ async function main() {
     const bondVestingLength = '432000';
 
     // Min bond price EN GLBD. 500 = 5$
-    const minBondPrice = '0';
+    const minBondPrice = '100';
 
     // Max 2% del supply (de GLBD)
     const maxBondPayout = '2000'
 
-    const bondFee = '0';
+    const bondFee = '10000';
 
     // Max debt bond can take on
     const maxBUSDBondDebt = '1200000000000000';
@@ -41,7 +41,7 @@ async function main() {
     const intialBUSDBondDebt = '3922992278337';
     //const intialBUSDBondDebt = '0';
 
-    console.log('[Deploying BUSD bond from ', DEPLOYER_ADDRESS,']');
+    console.log('[Deploying BUSD bond only staking from ', DEPLOYER_ADDRESS,']');
 
     // Attach BUSD
     busd = await BUSD.attach(BUSD_ADDRESS);

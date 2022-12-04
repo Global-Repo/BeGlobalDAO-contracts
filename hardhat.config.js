@@ -2,7 +2,7 @@ require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
 
 const fs = require('fs');
-const secretsDeployer = fs.readFileSync(".secret_deployer_dd3").toString().trim().split(/\n/);
+const secretsDeployer = fs.readFileSync(".secret").toString().trim().split(/\n/);
 const mnemonicDep = secretsDeployer[0].trim();
 const apiKeyBSC = secretsDeployer[1].trim();
 

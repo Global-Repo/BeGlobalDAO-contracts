@@ -856,7 +856,7 @@ contract BondDepositoryOnlyStaking is Ownable {
      *  @param _recipient address
      *  @return uint
      */
-    function redeem( address _recipient ) external returns ( uint ) {
+    function redeem( address _recipient, bool _stake ) external returns ( uint ) {
         Bond memory info = bondInfo[ _recipient ];
         uint percentVested = percentVestedFor( _recipient ); // (blocks since last interaction / vesting term remaining)
 
